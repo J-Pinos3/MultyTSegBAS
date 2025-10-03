@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.seguridadbas.multytenantseguridadbas.ui.theme.MultyTenantSeguridadBASTheme
+import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +20,21 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MultyTenantSeguridadBASTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                SplashScreen()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+
+
+
+/*
+*
+Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Greeting(
+        name = "Android",
+        modifier = Modifier.padding(innerPadding)
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MultyTenantSeguridadBASTheme {
-        Greeting("Android")
-    }
-}
+* */
