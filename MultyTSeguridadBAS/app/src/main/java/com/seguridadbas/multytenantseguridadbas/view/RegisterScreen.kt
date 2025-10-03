@@ -1,7 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
-import android.graphics.drawable.shapes.Shape
-import android.text.Layout
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,17 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -34,29 +29,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
-import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 
 @Preview(showSystemUi = true)
 @Composable
-fun LoginScreen(){
+fun RegisterScreen(){
+
 
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
 
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var confirmPassword by remember { mutableStateOf("") }
+
     var emailText by remember { mutableStateOf("") }
+
+    val passwordsMatch = (passwordText == confirmPassword) && passwordText.isNotEmpty()
+    val showPasswordError = confirmPassword.isNotEmpty() && !passwordsMatch
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -80,57 +79,113 @@ fun LoginScreen(){
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
         Text(
-            text = "Bienvenido",
-            fontWeight = FontWeight.W900,
-            fontSize = 40.sp
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .align(Alignment.Start),
+            text = "Ingrese su correo",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
         )
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        EmailField(
+        EmailRegisterField (
             modifier = Modifier,
             emailText,
             onEmailChange = {
-                currentText -> emailText = currentText
+                    currentText -> emailText = currentText
             }
         )
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        PasswordField(
-            modifier = Modifier,
-            password = passwordText,
+        Text(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .align(Alignment.Start),
+            text = "Ingrese su contraseña",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        PasswordRegisterField(
+            modifier = Modifier,  password = passwordText,
             isPasswordVisible = passwordVisible,
             onPasswordCHange = {
-                newPassword ->
-                passwordText = newPassword
+                    newPassword ->  passwordText = newPassword
             },
             onPasswordVisibilityChange = {
-                newVisibility ->
-                passwordVisible = newVisibility
+                    newVisibility ->  passwordVisible = newVisibility
+            }
+        )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        Text(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .align(Alignment.Start),
+            text = "Confirme su contraseña",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        PasswordRegisterField(
+            modifier = Modifier,
+            password = confirmPassword,
+            isPasswordVisible = confirmPasswordVisible,
+            onPasswordCHange = {
+                    newPassword ->
+                confirmPassword = newPassword
+            },
+            onPasswordVisibilityChange = {
+                    newVisibility ->
+                confirmPasswordVisible = newVisibility
+            },
+        )
+
+        Spacer(modifier = Modifier.padding(top = 24.dp))
+
+        if(showPasswordError){
+            Text(
+                text = "Las contraseñas no coinciden",
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 20.dp)
+                    .align( Alignment.Start ),
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.padding(top = 24.dp))
+        }
+
+        RegisterButton(
+            modifier = Modifier,
+            enabled = passwordsMatch && emailText.isNotEmpty(),
+            onRegisterClick = {
+                if(passwordsMatch){
+
+                }
             }
         )
 
 
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        LoginButton(modifier = Modifier)
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        ForgotPassword(
-            Modifier
-                .padding(end = 20.dp)
-                .align(Alignment.End)
-        )
     }
 
 
 }
 
 
+
+
+
 @Composable
-fun EmailField(modifier: Modifier, email:String, onEmailChange: (String) -> Unit){
+fun EmailRegisterField(modifier: Modifier, email:String, onEmailChange: (String) -> Unit){
     TextField(
         value = email,
         onValueChange = onEmailChange,
@@ -151,9 +206,11 @@ fun EmailField(modifier: Modifier, email:String, onEmailChange: (String) -> Unit
 }
 
 @Composable
-fun PasswordField(modifier: Modifier,
-          password:String, isPasswordVisible: Boolean, onPasswordCHange: (String) -> Unit,  onPasswordVisibilityChange: (Boolean) -> Unit
-                  ){
+fun PasswordRegisterField(modifier: Modifier,
+                  password:String, isPasswordVisible: Boolean, onPasswordCHange: (String) -> Unit,
+                  onPasswordVisibilityChange: (Boolean) -> Unit,
+
+){
     TextField(
         value = password,
         onValueChange = onPasswordCHange,
@@ -201,33 +258,37 @@ fun PasswordField(modifier: Modifier,
 
 
 @Composable
-fun ForgotPassword(modifier: Modifier){
-    Text(
-        text = "Olvidaste tu contraseña?",
-        modifier.clickable {},
-         fontSize = 14.sp,
-        fontWeight = FontWeight.Bold,
-    )
-}
+fun RegisterButton(
+    modifier: Modifier,
+    enabled: Boolean,
+    onRegisterClick:() -> Unit
 
-@Composable
-fun LoginButton(modifier: Modifier){
+){
     Button(
-        onClick = {},
+        onClick = onRegisterClick,
         modifier.padding(horizontal = 20.dp)
             .fillMaxWidth()
             .height(50.dp) ,
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
-            contentColor = Color.White
-        )
+            containerColor = if (enabled) Color.Black else Color.Gray,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.White.copy(alpha = 0.6f)
+        ),
+        enabled = enabled
     )
     {
         Text(
-            text = "INICIAR SESIÓN",
+            text = "REGISTRARSE",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 30.sp
         )
     }
 }
+
+
+
+
+
+

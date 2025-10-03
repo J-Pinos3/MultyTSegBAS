@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,8 +30,10 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 fun SplashScreen( enterprise: String = "Tu empresa" ){
 
     Column(
-        modifier = Modifier.background(color = BasBackground)
-            .paddingFromBaseline(top=30.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = BasBackground)
+            .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 
