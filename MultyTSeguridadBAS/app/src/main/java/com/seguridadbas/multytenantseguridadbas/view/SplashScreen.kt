@@ -2,6 +2,7 @@ package com.seguridadbas.multytenantseguridadbas.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,13 +28,20 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 
 @Preview(showSystemUi = true)
 @Composable
-fun SplashScreen( enterprise: String = "Tu empresa" ){
+fun SplashScreen(
+    enterprise: String = "Tu empresa",
+    onSplashComplete: () -> Unit  = {}
+){
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = BasBackground)
-            .statusBarsPadding(),
+            .statusBarsPadding()
+            .clickable{
+                onSplashComplete()
+            }
+        ,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 

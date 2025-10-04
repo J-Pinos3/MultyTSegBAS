@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.seguridadbas.multytenantseguridadbas.core.navigation.SplashNavigation
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.MultyTenantSeguridadBASTheme
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
@@ -22,7 +23,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MultyTenantSeguridadBASTheme {
-                SplashScreen()
+                SplashNavigation()
+                //SplashScreen()
             }
         }
     }

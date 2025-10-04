@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.dialog.EmailVerificationDialog
 
 @Preview(showSystemUi = true)
 @Composable
@@ -56,6 +57,9 @@ fun RegisterScreen(){
 
     val passwordsMatch = (passwordText == confirmPassword) && passwordText.isNotEmpty()
     val showPasswordError = confirmPassword.isNotEmpty() && !passwordsMatch
+
+    var showVerificationDialog by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -170,9 +174,25 @@ fun RegisterScreen(){
             onRegisterClick = {
                 if(passwordsMatch){
 
+                    showVerificationDialog = true
                 }
             }
         )
+
+        if(showVerificationDialog){
+            EmailVerificationDialog(
+                email = emailText,
+                onClose = {
+
+                    /** logica para enviar correos*/
+
+                    showVerificationDialog = false
+                    emailText = ""
+                    passwordText = ""
+                    confirmPassword = ""
+                }
+            )
+        }
 
 
     }
