@@ -44,9 +44,12 @@ import com.seguridadbas.multytenantseguridadbas.view.dialog.EmailVerificationDia
 
 @Preview(showSystemUi = true)
 @Composable
-fun RegisterScreen(){
+fun RegisterScreen(
 
+){
 
+    /** AÑADIR VOLVER AL  LOGIN
+    */
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
 
@@ -173,8 +176,9 @@ fun RegisterScreen(){
             enabled = passwordsMatch && emailText.isNotEmpty(),
             onRegisterClick = {
                 if(passwordsMatch){
-
                     showVerificationDialog = true
+                }else{
+                    showVerificationDialog = false
                 }
             }
         )

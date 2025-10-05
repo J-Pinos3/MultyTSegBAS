@@ -8,3 +8,9 @@ object Splash
 
 @Serializable
 object Login
+
+@Serializable
+object ResetPasswordScreen
+
+@Serializable
+object Register

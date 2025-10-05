@@ -37,9 +37,10 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 
 @Preview(showSystemUi = true)
 @Composable
-fun ResetPasswordScreen(){
+fun ResetPasswordScreen( ){
 
     var emailText by remember { mutableStateOf("") }
+
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -88,7 +89,7 @@ fun ResetPasswordScreen(){
             modifier = Modifier,
             enabled = emailText.isNotEmpty(),
             onResetClick = {
-
+                //LOGIC TO SEND MAIL
             }
         )
 
@@ -146,7 +147,7 @@ fun ResetButton(
     )
     {
         Text(
-            text = "REGISTRARSE",
+            text = "ACEPTAR",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 30.sp
         )

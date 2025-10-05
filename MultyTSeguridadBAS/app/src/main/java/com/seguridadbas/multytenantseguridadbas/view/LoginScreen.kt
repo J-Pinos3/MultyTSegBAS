@@ -51,7 +51,11 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 
 @Preview(showSystemUi = true)
 @Composable
-fun LoginScreen(){
+fun LoginScreen(
+    onLoginClicked:() -> Unit = {},
+    onForgotPasswordClicked: () -> Unit = {},
+    onCreateAccount: () -> Unit = {}
+){
 
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
@@ -114,18 +118,28 @@ fun LoginScreen(){
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        LoginButton(modifier = Modifier)
+        LoginButton(modifier = Modifier, onLoginButtonClicked = onLoginClicked )
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
         ForgotPassword(
             Modifier
                 .padding(end = 20.dp)
-                .align(Alignment.End)
+                .align(Alignment.End),
+            
+            _onForgotPasswordClicked = onForgotPasswordClicked
         )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
     }
 
-
+        CreateAccount(
+            Modifier
+                .padding(end = 20.dp)
+                .align(Alignment.End),
+            
+            _onCreateAccountClicked = onCreateAccount
+        )
 }
 
 
@@ -201,19 +215,31 @@ fun PasswordField(modifier: Modifier,
 
 
 @Composable
-fun ForgotPassword(modifier: Modifier){
+fun ForgotPassword(modifier: Modifier, _onForgotPasswordClicked: () -> Unit ){
     Text(
         text = "Olvidaste tu contraseña?",
-        modifier.clickable {},
+        modifier.clickable {  _onForgotPasswordClicked()   },
          fontSize = 14.sp,
         fontWeight = FontWeight.Bold,
     )
 }
 
+
 @Composable
-fun LoginButton(modifier: Modifier){
+fun CreateAccount(modifier: Modifier, _onCreateAccountClicked: () -> Unit){
+    Text(
+        text = "No tienes cuenta?, crea una.",
+        modifier.clickable {  _onCreateAccountClicked()   },
+         fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+    )
+}
+
+
+@Composable
+fun LoginButton(modifier: Modifier,  onLoginButtonClicked: () -> Unit ){
     Button(
-        onClick = {},
+        onClick = { onLoginButtonClicked()  },
         modifier.padding(horizontal = 20.dp)
             .fillMaxWidth()
             .height(50.dp) ,

@@ -19,7 +19,20 @@ fun SplashNavigation() {
         }
 
         composable <Login>{
-            LoginScreen()
+            LoginScreen(
+                ///todo create empty home screen
+                //{ navController.navigate() }
+                { navController.navigate(ResetPasswordScreen) },
+                { navController.navigate(RegisterScreen) }
+            )
+        }
+
+        composable <Register>{
+            RegisterScreen()
+        }
+
+        composable<ResetPasswordScreen>{
+            ResetPasswordScreen()
         }
     }
 
