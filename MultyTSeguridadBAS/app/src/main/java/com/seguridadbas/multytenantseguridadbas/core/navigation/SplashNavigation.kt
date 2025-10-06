@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.seguridadbas.multytenantseguridadbas.view.DemoHome
 import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
+import com.seguridadbas.multytenantseguridadbas.view.RegisterScreen
+import com.seguridadbas.multytenantseguridadbas.view.ResetPasswordScreen
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
 
 @Composable
@@ -20,18 +23,22 @@ fun SplashNavigation() {
 
         composable <Login>{
             LoginScreen(
-                ///todo create empty home screen
-                //{ navController.navigate() }
-                { navController.navigate(ResetPasswordScreen) },
-                { navController.navigate(RegisterScreen) }
+
+                { navController.navigate(Home) },
+                { navController.navigate(ResetPasswordSc) },
+                { navController.navigate(Register) }
             )
+        }
+
+        composable <Home>{
+            DemoHome()
         }
 
         composable <Register>{
             RegisterScreen()
         }
 
-        composable<ResetPasswordScreen>{
+        composable<ResetPasswordSc>{
             ResetPasswordScreen()
         }
     }

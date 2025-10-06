@@ -10,7 +10,10 @@ object Splash
 object Login
 
 @Serializable
-object ResetPasswordScreen
+object Home
+
+@Serializable
+object ResetPasswordSc
 
 @Serializable
 object Register

@@ -16,7 +16,9 @@ import com.seguridadbas.multytenantseguridadbas.core.navigation.SplashNavigation
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.MultyTenantSeguridadBASTheme
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

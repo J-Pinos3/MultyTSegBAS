@@ -131,15 +131,17 @@ fun LoginScreen(
         )
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
-    }
 
         CreateAccount(
             Modifier
                 .padding(end = 20.dp)
                 .align(Alignment.End),
-            
+
             _onCreateAccountClicked = onCreateAccount
         )
+    }
+
+
 }
 
 
