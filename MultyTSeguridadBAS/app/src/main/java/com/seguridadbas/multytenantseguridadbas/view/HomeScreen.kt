@@ -1,7 +1,5 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,11 +11,13 @@ import androidx.compose.ui.unit.sp
 
 @Preview(showSystemUi = true)
 @Composable
-fun DemoHome(){
+fun HomeScreen(
+    modifier: Modifier = Modifier
+){
     Text(
         modifier = Modifier.padding(top = 30.dp),
         textAlign = TextAlign.Center,
-        text = "Home Demo",
+        text = "Home",
         fontSize = 40.sp
     )
 }

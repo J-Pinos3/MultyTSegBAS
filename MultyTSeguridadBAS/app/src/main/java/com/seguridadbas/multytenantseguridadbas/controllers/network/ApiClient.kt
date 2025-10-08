@@ -1,4 +1,4 @@
-package com.seguridadbas.multytenantseguridadbas.controller.network
+package com.seguridadbas.multytenantseguridadbas.controllers.network
 
 import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.model.User

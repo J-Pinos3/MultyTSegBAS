@@ -4,8 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrainsKotlinSerialization)
 
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.ksp)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -55,16 +55,16 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.hilt.core)
-    implementation(libs.androidx.hilt.viewmodel)
-    ksp(libs.hilt.compiler)
-    ksp(libs.androidx.hilt.compiler)
 
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
 
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.google.code.gson:gson:2.13.2")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+
+    implementation("com.google.dagger:hilt-android:2.52")
+    kapt("com.google.dagger:hilt-android-compiler:2.52")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

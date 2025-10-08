@@ -1,6 +1,6 @@
-package com.seguridadbas.multytenantseguridadbas.controller.repository
+package com.seguridadbas.multytenantseguridadbas.controllers.repository
 
-import com.seguridadbas.multytenantseguridadbas.controller.retrohelper.RetrofitHelper
+import com.seguridadbas.multytenantseguridadbas.controllers.retrohelper.RetrofitHelper
 import com.seguridadbas.multytenantseguridadbas.model.User
 
 class AuthenticationRepository {
