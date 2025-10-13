@@ -2,6 +2,7 @@ package com.seguridadbas.multytenantseguridadbas.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,7 +15,6 @@ import androidx.navigation.compose.rememberNavController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.BottomNavBar
 import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BottonNavScreen(){
     var selectedIndex by remember{ mutableStateOf(0) }
@@ -28,14 +28,14 @@ fun BottonNavScreen(){
                 onItemSelected = { index -> selectedIndex = index }
             )
         }
-    ){
-        ContentScreen(selectedIndex)
+    ){ it ->
+        ContentScreen(selectedIndex, Modifier.padding(it))
     }
 }
 
 
 @Composable
-fun ContentScreen(selectedIndex: Int){
+fun ContentScreen(selectedIndex: Int, modifier: Modifier){
     when(selectedIndex){
         0-> HomeScreen()
 

@@ -56,6 +56,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+    //implementation("com.google.maps.android:maps-compose:6.11.0")
+    //implementation("com.google.android.gms:play-services-maps:18.2.0")
 
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.google.code.gson:gson:2.13.2")
@@ -66,6 +68,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.52")
     kapt("com.google.dagger:hilt-android-compiler:2.52")
 
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -74,3 +77,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+
+/*
+kapt {
+    correctErrorTypes = true
+}*/
