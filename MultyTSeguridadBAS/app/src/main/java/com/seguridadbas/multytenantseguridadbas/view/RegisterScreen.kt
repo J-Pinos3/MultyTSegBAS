@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import com.seguridadbas.multytenantseguridadbas.view.dialog.EmailVerificationDialog
@@ -59,7 +60,12 @@ fun RegisterScreen(
     var emailText by remember { mutableStateOf("") }
 
     val passwordsMatch = (passwordText == confirmPassword) && passwordText.isNotEmpty()
-    val showPasswordError = confirmPassword.isNotEmpty() && !passwordsMatch
+    var showPasswordError = confirmPassword.isNotEmpty() && !passwordsMatch
+    var passwordErrorMessage: String = ""
+    var showFormatPasswordError: Boolean = false
+
+
+    val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
     var showVerificationDialog by remember { mutableStateOf(false) }
 
@@ -122,6 +128,13 @@ fun RegisterScreen(
             isPasswordVisible = passwordVisible,
             onPasswordCHange = {
                     newPassword ->  passwordText = newPassword
+
+                passwordErrorMessage = validators.validatePassword(passwordText)
+                if( passwordErrorMessage.isNullOrEmpty() ){
+                    showFormatPasswordError = false
+                }else{
+                    showFormatPasswordError = true
+                }
             },
             onPasswordVisibilityChange = {
                     newVisibility ->  passwordVisible = newVisibility
@@ -158,6 +171,19 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.padding(top = 24.dp))
 
+        if(!showMailError){
+            Text(
+                text = "El formato de correo no es válido",
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 20.dp)
+                    .align( Alignment.Start ),
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.padding(top = 24.dp))
+        }
+
         if(showPasswordError){
             Text(
                 text = "Las contraseñas no coinciden",
@@ -171,11 +197,24 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.padding(top = 24.dp))
         }
 
+        if(!showFormatPasswordError){
+            Text(
+                text = passwordErrorMessage,
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 20.dp)
+                    .align( Alignment.Start ),
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.padding(top = 24.dp))
+        }
+
         RegisterButton(
             modifier = Modifier,
-            enabled = passwordsMatch && emailText.isNotEmpty(),
+            enabled = passwordsMatch && showMailError,
             onRegisterClick = {
-                if(passwordsMatch){
+                if(passwordsMatch && showMailError){
                     showVerificationDialog = true
                 }else{
                     showVerificationDialog = false

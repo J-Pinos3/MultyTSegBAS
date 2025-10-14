@@ -45,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
@@ -60,7 +61,12 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
 
+    var showPasswordError = false
+    var passwordErrorMessage: String = ""
+
     var emailText by remember { mutableStateOf("") }
+
+    val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -108,6 +114,13 @@ fun LoginScreen(
             onPasswordCHange = {
                 newPassword ->
                 passwordText = newPassword
+
+                passwordErrorMessage = validators.validatePassword(passwordText)
+                if( passwordErrorMessage.isNullOrEmpty() ){
+                    showPasswordError = false
+                }else{
+                    showPasswordError = true
+                }
             },
             onPasswordVisibilityChange = {
                 newVisibility ->
@@ -118,7 +131,37 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        LoginButton(modifier = Modifier, onLoginButtonClicked = onLoginClicked )
+        if(showPasswordError){
+            Text(
+                text = passwordErrorMessage,
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 20.dp)
+                    .align(Alignment.Start),
+                fontSize = 16.sp
+
+            )
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+        }
+
+        if(!showMailError){
+            Text(
+                text = "El formato de correo no es válido",
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 20.dp)
+                    .align( Alignment.Start ),
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.padding(top = 24.dp))
+        }
+
+        LoginButton(modifier = Modifier,
+            enabled = !showPasswordError && showMailError,
+            onLoginButtonClicked = onLoginClicked
+        )
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -239,7 +282,11 @@ fun CreateAccount(modifier: Modifier, _onCreateAccountClicked: () -> Unit){
 
 
 @Composable
-fun LoginButton(modifier: Modifier,  onLoginButtonClicked: () -> Unit ){
+fun LoginButton(
+    modifier: Modifier,
+    enabled: Boolean,
+    onLoginButtonClicked: () -> Unit
+){
     Button(
         onClick = { onLoginButtonClicked()  },
         modifier.padding(horizontal = 20.dp)
@@ -247,9 +294,13 @@ fun LoginButton(modifier: Modifier,  onLoginButtonClicked: () -> Unit ){
             .height(50.dp) ,
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
-            contentColor = Color.White
-        )
+            containerColor = if(enabled) Color.Black else Color.Gray ,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.White.copy(alpha = 0.6f)
+        ),
+        enabled = enabled
+
     )
     {
         Text(

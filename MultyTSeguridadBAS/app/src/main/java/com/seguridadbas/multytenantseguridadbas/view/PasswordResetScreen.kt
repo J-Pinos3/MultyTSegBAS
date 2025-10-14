@@ -40,6 +40,7 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 fun ResetPasswordScreen( ){
 
     var emailText by remember { mutableStateOf("") }
+    val validEmail = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
 
     Column(
@@ -87,7 +88,7 @@ fun ResetPasswordScreen( ){
 
         ResetButton(
             modifier = Modifier,
-            enabled = emailText.isNotEmpty(),
+            enabled = validEmail,
             onResetClick = {
                 //LOGIC TO SEND MAIL
             }
