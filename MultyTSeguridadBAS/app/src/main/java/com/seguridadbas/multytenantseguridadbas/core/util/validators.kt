@@ -7,22 +7,16 @@ object validators {
     fun validatePassword(password: String): String{
         var message: String = ""
 
-        if( !password.contains("@") ||
-            !password.contains(".")
-        ){
-            message = "El correo debe contener al menos un @ y un ."
-        }
-
         if(password.length !in (7..18) ){
-            message = "La contraseña debe tener entre 7 y 18 caracteres"
+            message += "\nLa contraseña debe tener entre 7 y 18 caracteres"
         }
 
         val hasUpperCase = password.any {
-            it.isLowerCase()
+            it.isUpperCase()
         }
 
-        if(hasUpperCase){
-            message = "La contraseña debe contener al menos una mayúscula"
+        if(!hasUpperCase){
+            message = "\nLa contraseña debe contener al menos una mayúscula"
         }
 
         val hasDigits = password.any {
@@ -30,7 +24,7 @@ object validators {
         }
 
         if(!hasDigits) {
-            message = "La contraseña debe contener al menos un número"
+            message = "\nLa contraseña debe contener al menos un número"
         }
 
         val hasSpecialCharacters = password.any {
@@ -38,7 +32,7 @@ object validators {
         }
 
         if(!hasSpecialCharacters){
-            message = "La contraseña debe contener al menos un carácter especial"
+            message = "\nLa contraseña debe contener al menos un carácter especial"
         }
 
 

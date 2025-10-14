@@ -61,8 +61,8 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
 
-    var showPasswordError = false
-    var passwordErrorMessage: String = ""
+    var showPasswordError by remember { mutableStateOf(false) }
+    var passwordErrorMessage by remember { mutableStateOf("") }
 
     var emailText by remember { mutableStateOf("") }
 
@@ -116,9 +116,11 @@ fun LoginScreen(
                 passwordText = newPassword
 
                 passwordErrorMessage = validators.validatePassword(passwordText)
+                //println("Error: $passwordErrorMessage")
                 if( passwordErrorMessage.isNullOrEmpty() ){
                     showPasswordError = false
                 }else{
+                    //println("Error: $passwordErrorMessage")
                     showPasswordError = true
                 }
             },

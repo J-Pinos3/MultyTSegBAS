@@ -86,6 +86,19 @@ fun ResetPasswordScreen( ){
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
+        if(!validEmail){
+            Text(
+                text = "El formato de correo no es válido",
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 20.dp)
+                    .align( Alignment.Start ),
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.padding(top = 24.dp))
+        }
+
         ResetButton(
             modifier = Modifier,
             enabled = validEmail,

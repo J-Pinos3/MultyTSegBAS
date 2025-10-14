@@ -59,10 +59,10 @@ fun RegisterScreen(
 
     var emailText by remember { mutableStateOf("") }
 
-    val passwordsMatch = (passwordText == confirmPassword) && passwordText.isNotEmpty()
-    var showPasswordError = confirmPassword.isNotEmpty() && !passwordsMatch
-    var passwordErrorMessage: String = ""
-    var showFormatPasswordError: Boolean = false
+    var passwordsMatch by remember { mutableStateOf(false) }
+    var showPasswordError by remember { mutableStateOf(false) }
+    var passwordErrorMessage by remember { mutableStateOf("") }
+
 
 
     val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
@@ -131,9 +131,9 @@ fun RegisterScreen(
 
                 passwordErrorMessage = validators.validatePassword(passwordText)
                 if( passwordErrorMessage.isNullOrEmpty() ){
-                    showFormatPasswordError = false
+                    showPasswordError = false
                 }else{
-                    showFormatPasswordError = true
+                    showPasswordError = true
                 }
             },
             onPasswordVisibilityChange = {
@@ -162,6 +162,10 @@ fun RegisterScreen(
             onPasswordCHange = {
                     newPassword ->
                 confirmPassword = newPassword
+
+                passwordsMatch = (passwordText == confirmPassword) && passwordText.isNotEmpty()
+
+                print("Claves iguales: $passwordsMatch")
             },
             onPasswordVisibilityChange = {
                     newVisibility ->
@@ -184,7 +188,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.padding(top = 24.dp))
         }
 
-        if(showPasswordError){
+        if(!passwordsMatch){
             Text(
                 text = "Las contraseñas no coinciden",
                 color = Color.Red,
@@ -197,7 +201,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.padding(top = 24.dp))
         }
 
-        if(!showFormatPasswordError){
+        if(showPasswordError){
             Text(
                 text = passwordErrorMessage,
                 color = Color.Red,
