@@ -11,13 +11,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.BottomNavBar
+import com.seguridadbas.multytenantseguridadbas.core.navigation.Business
 import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
 
 @Composable
-fun BottonNavScreen(){
+fun BottonNavScreen(navController: NavController){
     var selectedIndex by remember{ mutableStateOf(0) }
+
+    val navigateToBusiness: () -> Unit = {
+        navController.navigate(Business)
+    }
 
     Scaffold(
        modifier = Modifier.fillMaxWidth(),
@@ -29,17 +35,25 @@ fun BottonNavScreen(){
             )
         }
     ){ it ->
-        ContentScreen(selectedIndex, Modifier.padding(it))
+        ContentScreen(
+            selectedIndex,
+            Modifier.padding(it),
+            navigateToBusiness = navigateToBusiness
+        )
     }
 }
 
 
 @Composable
-fun ContentScreen(selectedIndex: Int, modifier: Modifier){
+fun ContentScreen(
+    selectedIndex: Int,
+    modifier: Modifier,
+    navigateToBusiness: () -> Unit = {}
+){
     when(selectedIndex){
         0-> HomeScreen()
 
-        1 -> BusinessScreen()
+        1 -> PostSitesScreen(Modifier, navigateToBusiness)
 
         2 -> MyAccountScreen()
     }

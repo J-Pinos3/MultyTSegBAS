@@ -1,12 +1,15 @@
 package com.seguridadbas.multytenantseguridadbas.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
+import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.HomeScreen
 import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
+import com.seguridadbas.multytenantseguridadbas.view.PostSitesScreen
 import com.seguridadbas.multytenantseguridadbas.view.RegisterScreen
 import com.seguridadbas.multytenantseguridadbas.view.ResetPasswordScreen
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
@@ -32,7 +35,7 @@ fun SplashNavigation() {
         }
 
         composable <Home>{
-            BottonNavScreen()
+            BottonNavScreen(navController)
         }
 
         composable <Register>{
@@ -41,6 +44,17 @@ fun SplashNavigation() {
 
         composable<ResetPasswordSc>{
             ResetPasswordScreen()
+        }
+
+        composable <Sites>{
+            PostSitesScreen(
+                Modifier,
+                onPostSiteClicked = { navController.navigate(Business) }
+            )
+        }
+
+        composable <Business>{
+            BusinessScreen()
         }
     }
 

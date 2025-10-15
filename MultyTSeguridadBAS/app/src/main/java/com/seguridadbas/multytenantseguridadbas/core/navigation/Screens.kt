@@ -25,12 +25,20 @@ object ResetPasswordSc
 @Serializable
 object Register
 
+@Serializable
+object Sites
+
+@Serializable
+object Business
+
 object NavItemList{
     val navItemList = listOf(
 
         NavItem("Inicio",  R.drawable.ic_home  ),
-        NavItem("Mi Negocio", R.drawable.ic_business ),
-        NavItem("MI Cuenta", R.drawable.ic_person),
+        NavItem("Sitios", R.drawable.ic_place),
+        //NavItem("Mi Negocio", R.drawable.ic_business ),
+        NavItem("Mi Cuenta", R.drawable.ic_person),
+
 
     )
 }
