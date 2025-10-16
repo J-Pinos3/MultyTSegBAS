@@ -41,7 +41,7 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 @Composable
 fun PostSitesScreen(
     modifier: Modifier = Modifier,
-    onPostSiteClicked: () -> Unit = {}
+    onPostSiteClicked: (String) -> Unit = {}
 
 ){
 
@@ -88,7 +88,7 @@ fun PostSitesScreen(
 fun PostSiteItemList(
     postSite: PostSite,
     modifier: Modifier,
-    onPostSiteClicked: () -> Unit = {}
+    onPostSiteClicked: (String) -> Unit = {}
     ){
 
     Box(
@@ -105,7 +105,7 @@ fun PostSiteItemList(
             .height(100.dp)
             .background(Color.White)
             .clickable{
-                onPostSiteClicked()
+                onPostSiteClicked(postSite.postSiteName)
             }
     ){
        Column(

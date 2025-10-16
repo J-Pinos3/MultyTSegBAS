@@ -18,8 +18,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,8 +34,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,18 +51,21 @@ import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberMarkerState
+import com.seguridadbas.multytenantseguridadbas.R
 //import com.google.maps.android.compose.rememberUpdatedMarkerState
 
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
+import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 
 
-
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showSystemUi = true)
 @Composable
 fun BusinessScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    postSiteName: String = "",
+    navigateBackToPostSites: () -> Unit = {}
 ) {
 
     // Simulación de datos desde API
@@ -69,45 +81,80 @@ fun BusinessScreen(
         )
     }
 
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    LazyColumn(
+    Scaffold (
         modifier = modifier
             .fillMaxSize()
-            .background(color = BasBackground)
-            .statusBarsPadding(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            CustomGoogleMaps(
-                modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .padding(10.dp),
-                -0.1938418,
-                -78.4941259
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {   Text(text = postSiteName, fontSize = 18.sp, fontWeight = FontWeight.Bold)   },
+                navigationIcon = {
+                    IconButton(
+                       onClick = {  navigateBackToPostSites()     }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_back),
+                            contentDescription = "navigate back to sites"
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = BasYellow,
+                    titleContentColor = Color.Black
+                )
+
             )
         }
+    ){
+        paddingVals ->
+
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .background(color = BasBackground)
+                .padding(paddingVals),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                CustomGoogleMaps(
+                    modifier
+                        .fillMaxWidth()
+                        .height(350.dp)
+                        .padding(horizontal = 10.dp),
+                    -0.1938418,
+                    -78.4941259
+                )
+            }
 
 
-        items(reportItems) { report ->
+            items(reportItems) { report ->
 
-            BadgeButtonReports(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                title = report.title,
-                description = report.description
-            )
+                BadgeButtonReports(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    title = report.title,
+                    description = report.description
+                )
+            }
+
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
 
-
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
     }
 
+
+
+
 }
+
 
 @Composable
 fun BadgeButtonReports(

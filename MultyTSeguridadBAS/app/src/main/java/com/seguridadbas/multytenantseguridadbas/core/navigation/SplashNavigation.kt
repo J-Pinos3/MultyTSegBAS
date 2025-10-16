@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.HomeScreen
@@ -49,12 +50,13 @@ fun SplashNavigation() {
         composable <Sites>{
             PostSitesScreen(
                 Modifier,
-                onPostSiteClicked = { navController.navigate(Business) }
+                onPostSiteClicked = { siteName -> navController.navigate(Business(siteName = siteName)) }
             )
         }
 
-        composable <Business>{
-            BusinessScreen()
+        composable <Business>{ backStackEntry ->
+            val business = backStackEntry.toRoute<Business>()
+            BusinessScreen(postSiteName = business.siteName ) { navController.popBackStack() }
         }
     }
 

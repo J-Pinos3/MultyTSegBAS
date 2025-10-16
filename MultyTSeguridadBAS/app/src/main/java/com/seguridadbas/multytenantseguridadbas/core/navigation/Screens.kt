@@ -29,7 +29,7 @@ object Register
 object Sites
 
 @Serializable
-object Business
+data class Business(val siteName: String)
 
 object NavItemList{
     val navItemList = listOf(

@@ -61,7 +61,7 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
 
-    var showPasswordError by remember { mutableStateOf(false) }
+    var showPasswordError by remember { mutableStateOf(true) }
     var passwordErrorMessage by remember { mutableStateOf("") }
 
     var emailText by remember { mutableStateOf("") }

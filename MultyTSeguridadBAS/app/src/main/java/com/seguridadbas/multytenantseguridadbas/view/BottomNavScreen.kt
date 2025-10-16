@@ -21,8 +21,9 @@ import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
 fun BottonNavScreen(navController: NavController){
     var selectedIndex by remember{ mutableStateOf(0) }
 
-    val navigateToBusiness: () -> Unit = {
-        navController.navigate(Business)
+    val navigateToBusiness: (String) -> Unit = {
+        siteName ->
+        navController.navigate(Business(siteName = siteName) )
     }
 
     Scaffold(
@@ -48,7 +49,7 @@ fun BottonNavScreen(navController: NavController){
 fun ContentScreen(
     selectedIndex: Int,
     modifier: Modifier,
-    navigateToBusiness: () -> Unit = {}
+    navigateToBusiness: (String) -> Unit = {}
 ){
     when(selectedIndex){
         0-> HomeScreen()
