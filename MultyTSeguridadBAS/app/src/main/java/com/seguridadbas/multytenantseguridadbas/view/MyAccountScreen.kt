@@ -91,7 +91,9 @@ fun MyAccountScreen(
         TextFieldsProfile(
             modifier = Modifier,
             textData = name,
-            onTextDataChange = {},
+            onTextDataChange = {
+                newName -> name = newName
+            },
             placeholder = "Nombre: ",
             keyboardTypes = KeyboardType.Text
         )
@@ -113,7 +115,9 @@ fun MyAccountScreen(
         TextFieldsProfile(
             modifier = Modifier,
             textData = email,
-            onTextDataChange = {},
+            onTextDataChange = {
+                    newEmail -> email = newEmail
+            },
             placeholder = "correo electronico: ",
             keyboardTypes = KeyboardType.Email
         )
@@ -135,7 +139,9 @@ fun MyAccountScreen(
         TextFieldsProfile(
             modifier = Modifier,
             textData = phone,
-            onTextDataChange = {},
+            onTextDataChange = {
+                newPhone -> phone = newPhone
+            },
             placeholder = "numero de telefono: ",
             keyboardTypes = KeyboardType.Phone
         )
@@ -157,7 +163,9 @@ fun MyAccountScreen(
         TextFieldsProfile(
             modifier = Modifier,
             textData = address,
-            onTextDataChange = {},
+            onTextDataChange = {
+                newAddress -> address = newAddress
+            },
             placeholder = "Direccion del cliente: ",
             keyboardTypes = KeyboardType.Text
         )
@@ -166,7 +174,7 @@ fun MyAccountScreen(
 
         UpdateProfileButton(
             modifier = Modifier,
-            enabled = false,
+            enabled = true,
             onUpdateProfileClick = {
 
             }

@@ -111,42 +111,49 @@ fun BusinessScreen(
     ){
         paddingVals ->
 
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .background(color = BasBackground)
-                .padding(paddingVals),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+          modifier = Modifier
+              .fillMaxSize()
+              .background(color = BasBackground)
+              .padding(paddingVals)
         ) {
-            item {
-                CustomGoogleMaps(
-                    modifier
-                        .fillMaxWidth()
-                        .height(350.dp)
-                        .padding(horizontal = 10.dp),
-                    -0.1938418,
-                    -78.4941259
-                )
-            }
+            CustomGoogleMaps(
+                modifier
+                    .fillMaxWidth()
+                    .height(350.dp)
+                    .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
+                -0.1938418,
+                -78.4941259
+            )
+
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxSize()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                items(reportItems) { report ->
+
+                    BadgeButtonReports(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        title = report.title,
+                        description = report.description
+                    )
+                }
 
 
-            items(reportItems) { report ->
-
-                BadgeButtonReports(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    title = report.title,
-                    description = report.description
-                )
-            }
-
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
+
+
+
 
     }
 
