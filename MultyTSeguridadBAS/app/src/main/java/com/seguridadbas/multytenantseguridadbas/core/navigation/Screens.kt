@@ -29,6 +29,9 @@ object Register
 object Sites
 
 @Serializable
+object More
+
+@Serializable
 data class Business(val siteName: String)
 
 object NavItemList{
@@ -38,6 +41,7 @@ object NavItemList{
         NavItem("Sitios", R.drawable.ic_place),
         //NavItem("Mi Negocio", R.drawable.ic_business ),
         NavItem("Mi Cuenta", R.drawable.ic_person),
+        NavItem("Más",  R.drawable.ic_more_features)
 
 
     )

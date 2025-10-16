@@ -57,5 +57,7 @@ fun ContentScreen(
         1 -> PostSitesScreen(Modifier, navigateToBusiness)
 
         2 -> MyAccountScreen()
+
+        3 -> MoreScreen()
     }
 }
