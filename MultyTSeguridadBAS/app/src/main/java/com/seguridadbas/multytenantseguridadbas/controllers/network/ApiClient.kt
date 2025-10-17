@@ -11,10 +11,10 @@ import retrofit2.http.PUT
 interface ApiClient {
 
     @POST("auth/sign-up")
-    suspend fun signUp(@Body p: User): Response<JsonObject>
+    suspend fun signUp(@Body user: User): Response<String>
 
     @POST("auth/sign-in")
-    suspend fun signIn(@Body p: User): Response<JsonObject>
+    suspend fun signIn(@Body user: User): Response<JsonObject>
 
     @GET("auth/me")
     suspend fun authenticateMe(): Response<User>
