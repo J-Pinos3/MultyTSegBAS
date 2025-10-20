@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,18 +37,27 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import com.seguridadbas.multytenantseguridadbas.view.dialog.EmailVerificationDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.jvm.java
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
 fun RegisterScreen(
-
+    authController: AuthController
 ){
 
     /** AÑADIR VOLVER AL  LOGIN
@@ -63,7 +74,7 @@ fun RegisterScreen(
     var showPasswordError by remember { mutableStateOf(false) }
     var passwordErrorMessage by remember { mutableStateOf("") }
 
-
+    var loading by remember {mutableStateOf(false)}
 
     val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
@@ -219,12 +230,45 @@ fun RegisterScreen(
             enabled = passwordsMatch && showMailError,
             onRegisterClick = {
                 if(passwordsMatch && showMailError){
-                    showVerificationDialog = true
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        loading = true
+                        val result = authController.signUp(emailText, passwordText)
+                        withContext(Dispatchers.Main){
+                            loading  =false
+                            when(result){
+                                is Resource.Success -> {
+                                    showVerificationDialog = true
+                                    var token = "Bearer " + result.data.toString()
+                                    Log.i("REGISTER SCREEN", "registro exitoso, token: ${token}")
+
+                                    verifyEmailWithToken(token, authController)
+                                }
+
+                                is Resource.Error->{
+                                    showVerificationDialog = false
+                                    Log.e("REGISTER SCREEN", "error registro: ${result.message.toString()}")
+                                }
+                                else ->{
+                                    showVerificationDialog = false
+                                    Log.e("REGISTER SCREEN", "error al registrarse")
+                                }
+                            }
+                        }
+                    }
+                    //authController.signUp(emailText, passwordText)
+
+
                 }else{
                     showVerificationDialog = false
                 }
             }
         )
+
+        if(loading){
+            Spacer(modifier = Modifier.padding(top = 24.dp))
+            Text("Cargandoo")
+        }
 
         if(showVerificationDialog){
             EmailVerificationDialog(
@@ -355,7 +399,25 @@ fun RegisterButton(
 }
 
 
+fun verifyEmailWithToken(token: String, controller: AuthController){
+    CoroutineScope(Dispatchers.IO).launch {
+        val result = controller.verifyEmail(token)
+        withContext(Dispatchers.Main){
+            when(result){
+                is Resource.Success -> {
+                    Log.i("REGISTER SCREEN", "correo verificado exitosamente, token: ${result.data}")
+                }
 
+                is Resource.Error->{
+                    Log.e("REGISTER SCREEN", "error verificacion: ${result.message.toString()}")
+                }
+                else ->{
+                    Log.e("REGISTER SCREEN", "error al verificar el email")
+                }
+            }
+        }
+    }
+}
 
 
 
