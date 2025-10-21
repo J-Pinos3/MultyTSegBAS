@@ -9,6 +9,6 @@ data class User(
     val password: String,
     @SerializedName("invitationToken")
     val invitationToken: String = "",
-    @SerializedName("tenantIfd")
+    @SerializedName("tenantId")
     val tenantID: String = ""
 )

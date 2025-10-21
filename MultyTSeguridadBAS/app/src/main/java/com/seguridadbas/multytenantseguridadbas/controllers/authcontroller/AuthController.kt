@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.AuthenticationRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
+import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
+import com.seguridadbas.multytenantseguridadbas.model.UserSignInResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +39,34 @@ class AuthController @Inject constructor(
 
         }
 
+    }
+
+
+    suspend fun signIn(email: String, password: String): Resource<SignInResponse>{
+        val user = User(email, password)
+
+        val response = authenticationRepository.signInRepo(user)
+
+        return if( response.isSuccessful ){
+            val body = response.body()
+
+            val userResponse = SignInResponse(
+                token = body?.get("token").toString(),
+                user = UserSignInResponse(
+                    id = body?.getAsJsonObject("user")?.get("id").toString(),
+                    email = body?.getAsJsonObject("user")?.get("email").toString(),
+                    firstName = body?.getAsJsonObject("user")?.get("firstName").toString(),
+                    lastName = body?.getAsJsonObject("user")?.get("lastName").toString()
+                )
+            )
+
+             Resource.Success(userResponse)
+        }else{
+            Resource.Error( response.message().toString() +"--"+
+                    response.errorBody()
+            )
+
+        }
     }
 
 

@@ -2,6 +2,7 @@ package com.seguridadbas.multytenantseguridadbas.view
 
 import android.graphics.drawable.shapes.Shape
 import android.text.Layout
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,17 +46,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonObject
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
 fun LoginScreen(
     onLoginClicked:() -> Unit = {},
     onForgotPasswordClicked: () -> Unit = {},
-    onCreateAccount: () -> Unit = {}
+    onCreateAccount: () -> Unit = {},
+    authController: AuthController
 ){
 
     var passwordVisible by remember { mutableStateOf(false) }
@@ -66,10 +74,14 @@ fun LoginScreen(
 
     var emailText by remember { mutableStateOf("") }
 
+    var loading by remember { mutableStateOf(false) }
+
+
     val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(color = BasBackground)
             .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -79,7 +91,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BasYellow)
-                .padding(top =  50.dp, bottom = 30.dp)
+                .padding(top = 50.dp, bottom = 30.dp)
         ){
             Image(
                 painter = painterResource(R.drawable.baslogo),
@@ -153,7 +165,7 @@ fun LoginScreen(
                 color = Color.Red,
                 modifier = Modifier
                     .padding(top = 8.dp, start = 20.dp)
-                    .align( Alignment.Start ),
+                    .align(Alignment.Start),
                 fontSize = 16.sp
             )
 
@@ -162,8 +174,39 @@ fun LoginScreen(
 
         LoginButton(modifier = Modifier,
             enabled = !showPasswordError && showMailError,
-            onLoginButtonClicked = onLoginClicked
+            onLoginButtonClicked = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    loading = true
+                    val result = authController.signIn(emailText, passwordText)
+
+
+                    when(result){
+                        is Resource.Success -> {
+                            loading = false
+                            Log.i("LOGIN SCREEN", "login exitoso, ${result.data?.token } ${result.data?.user?.firstName}")
+                        }
+
+                        is Resource.Error->{
+                            loading = false
+                            Log.e("LOGIN SCREEN", "error login: ${result.message.toString()}")
+                        }
+
+                        else ->{
+                            loading = false
+                            Log.e("LOGIN SCREEN", "error al iniciar sesion")
+                        }
+
+                    }
+                }
+
+                //onLoginClicked()
+            }
         )
+
+        if(loading){
+            Spacer(modifier = Modifier.padding(top = 24.dp))
+            Text("Cargandoo")
+        }
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -290,8 +333,9 @@ fun LoginButton(
     onLoginButtonClicked: () -> Unit
 ){
     Button(
-        onClick = { onLoginButtonClicked()  },
-        modifier.padding(horizontal = 20.dp)
+        onClick = onLoginButtonClicked,
+        modifier
+            .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .height(50.dp) ,
         shape = RoundedCornerShape(50),

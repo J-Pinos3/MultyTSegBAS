@@ -31,7 +31,8 @@ fun SplashNavigation(authController: AuthController) {
 
                 { navController.navigate(Home) },
                 { navController.navigate(ResetPasswordSc) },
-                { navController.navigate(Register) }
+                { navController.navigate(Register) },
+                authController = authController
             )
         }
 

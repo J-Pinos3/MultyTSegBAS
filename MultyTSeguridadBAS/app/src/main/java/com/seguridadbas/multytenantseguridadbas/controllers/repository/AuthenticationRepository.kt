@@ -12,7 +12,7 @@ class AuthenticationRepository @Inject constructor(
     //suspend fun signUp(user: User) = RetrofitHelper.consumeAPI.signUp(p = user)
     suspend fun verifyEmailRepo(token: String) = apiClient.verifyEmailApi(token = token)
 
-    suspend fun signInRepo(user: User) = apiClient.signInApi(user = user)
+    suspend fun signInRepo(user: User)= apiClient.signInApi(user = user)
 
     suspend fun authenticateMeRepo() = apiClient.authenticateMeApi()
 
