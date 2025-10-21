@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
+import android.content.Context
 import android.graphics.drawable.shapes.Shape
 import android.text.Layout
 import android.util.Log
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,10 +47,17 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.preferencesDataStore
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
+import com.seguridadbas.multytenantseguridadbas.model.UserDataStore
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
@@ -56,6 +65,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
+
+
 
 //@Preview(showSystemUi = true)
 @Composable
@@ -78,6 +91,10 @@ fun LoginScreen(
 
 
     val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
+
+    val context = LocalContext.current
+    val dataStoreController = DataStoreController(context)
+
 
     Column(
         modifier = Modifier
@@ -183,6 +200,16 @@ fun LoginScreen(
                     when(result){
                         is Resource.Success -> {
                             loading = false
+                            val userDataStore = UserDataStore(
+                                token = result.data?.token.toString(),
+                                id = result.data?.user?.id.toString(),
+                                email = result.data?.user?.email.toString(),
+                                firstName = result.data?.user?.firstName.toString(),
+                                lastName = result.data?.user?.lastName.toString() ?: ""
+                            )
+
+                            dataStoreController.saveToDataStore(userDataStore)
+                            onLoginClicked()
                             Log.i("LOGIN SCREEN", "login exitoso, ${result.data?.token } ${result.data?.user?.firstName}")
                         }
 
@@ -356,3 +383,11 @@ fun LoginButton(
         )
     }
 }
+
+
+
+
+
+
+
+

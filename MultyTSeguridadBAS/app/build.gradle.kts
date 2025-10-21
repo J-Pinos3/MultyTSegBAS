@@ -70,6 +70,8 @@ dependencies {
 
     implementation(libs.coil.compose)
 
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
 
 
     testImplementation(libs.junit)
