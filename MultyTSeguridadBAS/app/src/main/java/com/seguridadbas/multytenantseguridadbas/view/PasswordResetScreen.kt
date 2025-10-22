@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -32,16 +34,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.dialog.EmailResetPasswordDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
-fun ResetPasswordScreen( ){
+fun ResetPasswordScreen(
+    authController: AuthController
+){
 
     var emailText by remember { mutableStateOf("") }
     val validEmail = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
+    var showResetScreenDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -87,6 +101,7 @@ fun ResetPasswordScreen( ){
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
         if(!validEmail){
+            showResetScreenDialog = false
             Text(
                 text = "El formato de correo no es válido",
                 color = Color.Red,
@@ -103,10 +118,41 @@ fun ResetPasswordScreen( ){
             modifier = Modifier,
             enabled = validEmail,
             onResetClick = {
-                //LOGIC TO SEND MAIL
+                CoroutineScope(Dispatchers.IO).launch {
+                    val result = authController.sendResetPasswordEmail(emailText)
+
+                    withContext(Dispatchers.Main){
+                        when(result){
+                            is Resource.Success ->{
+                                showResetScreenDialog = true
+                                Toast.makeText(context, "Correo enviado: ${result.data.toString()}", Toast.LENGTH_SHORT).show()
+                            }
+                            is Resource.Error ->{
+                                showResetScreenDialog = false
+                                Toast.makeText(context, "Error el enviar el correo: ${result.message.toString()}", Toast.LENGTH_SHORT).show()
+                            }
+                            else ->{
+                                showResetScreenDialog = false
+                                Toast.makeText(context, "Error el enviar el correo: ${result.message.toString()}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+
+                }
             }
         )
 
+
+        if( showResetScreenDialog ){
+            EmailResetPasswordDialog(
+                email = emailText,
+                onClose = {
+                    showResetScreenDialog = false
+                    emailText = ""
+                }
+            )
+        }
 
 
 

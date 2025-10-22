@@ -45,7 +45,7 @@ fun SplashNavigation(authController: AuthController) {
         }
 
         composable<ResetPasswordSc>{
-            ResetPasswordScreen()
+            ResetPasswordScreen(authController = authController)
         }
 
         composable <Sites>{

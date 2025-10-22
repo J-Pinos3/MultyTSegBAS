@@ -14,15 +14,18 @@ class AuthenticationRepository @Inject constructor(
 
     suspend fun signInRepo(user: User)= apiClient.signInApi(user = user)
 
+    suspend fun sendEmailVerificationRepo(email: String, auth_token: String)
+            = apiClient.sendEmailVerificationApi(auth_token = auth_token,email = email)
+
+
+    suspend fun sendResetPasswordRepo(email: String)
+            = apiClient.sendResetPasswordApi(email = email)
+
+
     suspend fun authenticateMeRepo() = apiClient.authenticateMeApi()
 
     suspend fun changePasswordRepo(email: String) = apiClient.changePasswordApi(email = email)
 
-    suspend fun sendEmailVerificationRepo(email: String)
-        = apiClient.sendEmailVerificationApi(email = email)
-
-    suspend fun sendResetPasswordRepo(email: String)
-        = apiClient.sendResetPasswordApi(email = email)
 
     suspend fun resetPasswordRepo(email: String) = apiClient.resetPasswordApi(email = email)
 

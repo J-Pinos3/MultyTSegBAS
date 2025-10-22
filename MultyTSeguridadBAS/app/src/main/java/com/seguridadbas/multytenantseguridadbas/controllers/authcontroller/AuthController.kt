@@ -70,6 +70,33 @@ class AuthController @Inject constructor(
     }
 
 
+    suspend fun sendVerificationEmail(token: String, email: String): Resource<String>{
+        val response = authenticationRepository.sendEmailVerificationRepo(auth_token = token, email = email)
+
+        return if( response.isSuccessful ){
+            Resource.Success(response.body().toString())
+        }else{
+            Resource.Error( response.message().toString() +"--"+
+                    response.errorBody().toString()
+            )
+
+        }
+    }
+
+
+    suspend fun sendResetPasswordEmail(email: String): Resource<String>{
+        val response = authenticationRepository.sendResetPasswordRepo(email)
+
+        return if( response.isSuccessful ){
+            Resource.Success(response.body().toString())
+        }else{
+            Resource.Error( response.message().toString() +"--"+
+                    response.errorBody().toString()
+            )
+        }
+    }
+
+
 
     suspend fun verifyEmail(token: String): Resource<String> {
         val response = authenticationRepository.verifyEmailRepo(token)

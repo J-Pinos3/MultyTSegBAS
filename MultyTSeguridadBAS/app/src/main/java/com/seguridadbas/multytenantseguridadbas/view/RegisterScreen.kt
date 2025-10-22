@@ -76,6 +76,8 @@ fun RegisterScreen(
 
     var loading by remember {mutableStateOf(false)}
 
+    var user_token: String = ""
+
     val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
     var showVerificationDialog by remember { mutableStateOf(false) }
@@ -191,7 +193,7 @@ fun RegisterScreen(
                 text = "El formato de correo no es válido",
                 color = Color.Red,
                 modifier = Modifier
-                    .padding(top = 8.dp, start = 20.dp)
+                    .padding( start = 20.dp)
                     .align( Alignment.Start ),
                 fontSize = 16.sp
             )
@@ -204,7 +206,7 @@ fun RegisterScreen(
                 text = "Las contraseñas no coinciden",
                 color = Color.Red,
                 modifier = Modifier
-                    .padding(top = 8.dp, start = 20.dp)
+                    .padding( start = 20.dp)
                     .align( Alignment.Start ),
                 fontSize = 16.sp
             )
@@ -239,10 +241,10 @@ fun RegisterScreen(
                             when(result){
                                 is Resource.Success -> {
                                     showVerificationDialog = true
-                                    var token = "Bearer " + result.data.toString()
-                                    Log.i("REGISTER SCREEN", "registro exitoso, token: ${token}")
+                                    user_token = "Bearer " + result.data.toString()
+                                    Log.i("REGISTER SCREEN", "registro exitoso, token: ${user_token}")
 
-                                    verifyEmailWithToken(token, authController)
+                                    //verifyEmailWithToken(token, authController)
                                 }
 
                                 is Resource.Error->{
@@ -274,6 +276,8 @@ fun RegisterScreen(
             EmailVerificationDialog(
                 email = emailText,
                 onClose = {
+
+                    verifyEmailWithToken(user_token, authController, emailText)
 
                     /** logica para enviar correos*/
 
@@ -399,9 +403,9 @@ fun RegisterButton(
 }
 
 
-fun verifyEmailWithToken(token: String, controller: AuthController){
+fun verifyEmailWithToken(token: String, controller: AuthController, email:String){
     CoroutineScope(Dispatchers.IO).launch {
-        val result = controller.verifyEmail(token)
+        val result = controller.sendVerificationEmail(token, email)
         withContext(Dispatchers.Main){
             when(result){
                 is Resource.Success -> {

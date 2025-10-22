@@ -64,6 +64,7 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
@@ -208,8 +209,11 @@ fun LoginScreen(
                                 lastName = result.data?.user?.lastName.toString() ?: ""
                             )
 
-                            dataStoreController.saveToDataStore(userDataStore)
-                            onLoginClicked()
+                            withContext(Dispatchers.Main){
+                                dataStoreController.saveToDataStore(userDataStore)
+                                onLoginClicked()
+                            }
+
                             Log.i("LOGIN SCREEN", "login exitoso, ${result.data?.token } ${result.data?.user?.firstName}")
                         }
 
