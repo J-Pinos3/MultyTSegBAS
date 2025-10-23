@@ -62,6 +62,8 @@ fun RegisterScreen(
 
     /** AÑADIR VOLVER AL  LOGIN
     */
+    var fullName by remember { mutableStateOf("") }
+
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
 
@@ -101,6 +103,28 @@ fun RegisterScreen(
                 contentDescription = "Logo de bas"
             )
         }
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        Text(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .align(Alignment.Start),
+            text = "Ingrese su nombre completo",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        FullNameRegisterField(
+            modifier = Modifier,
+            fullName = fullName,
+            onFullNameChange = {
+                currentText -> fullName = currentText
+            }
+        )
+
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -235,7 +259,7 @@ fun RegisterScreen(
 
                     CoroutineScope(Dispatchers.IO).launch {
                         loading = true
-                        val result = authController.signUp(emailText, passwordText)
+                        val result = authController.signUp(emailText, passwordText, fullName)
                         withContext(Dispatchers.Main){
                             loading  =false
                             when(result){
@@ -296,7 +320,26 @@ fun RegisterScreen(
 }
 
 
-
+@Composable
+fun FullNameRegisterField(modifier: Modifier, fullName: String, onFullNameChange: (String) -> Unit){
+    TextField(
+        value = fullName,
+        onValueChange = onFullNameChange,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 15.dp),
+        placeholder = { Text(text="Nombre Completo:") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        singleLine = true, maxLines = 1,
+        colors = TextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White
+        )
+    )
+}
 
 
 @Composable

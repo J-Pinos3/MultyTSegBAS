@@ -7,8 +7,8 @@ data class User(
     val mail: String,
     @SerializedName("password")
     val password: String,
-    @SerializedName("invitationToken")
-    val invitationToken: String = "",
+    @SerializedName("fullName")
+    val fullName: String = "",
     @SerializedName("tenantId")
     val tenantID: String = ""
 )

@@ -22,9 +22,10 @@ class AuthenticationRepository @Inject constructor(
             = apiClient.sendResetPasswordApi(email = email)
 
 
-    suspend fun authenticateMeRepo() = apiClient.authenticateMeApi()
+    suspend fun changePasswordRepo(oldPassword: String, newPassword: String) = apiClient.changePasswordApi(oldPassword = oldPassword, newPassword = newPassword)
 
-    suspend fun changePasswordRepo(email: String) = apiClient.changePasswordApi(email = email)
+
+    suspend fun authenticateMeRepo() = apiClient.authenticateMeApi()
 
 
     suspend fun resetPasswordRepo(email: String) = apiClient.resetPasswordApi(email = email)

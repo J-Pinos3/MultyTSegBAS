@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -29,10 +31,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 
@@ -42,6 +46,14 @@ fun MyAccountScreen(
     modifier: Modifier = Modifier
 ) {
 
+    var oldPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+
+    var showOldPasswordError by remember { mutableStateOf(false) }
+    var showNewPasswordError by remember { mutableStateOf(false) }
+    var passwordErrorMessage by remember { mutableStateOf("") }
+
+
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -50,7 +62,8 @@ fun MyAccountScreen(
     Column(
         modifier = modifier.fillMaxSize()
             .background(color = BasBackground)
-            .statusBarsPadding(),
+            .statusBarsPadding()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Box(
@@ -70,7 +83,8 @@ fun MyAccountScreen(
             modifier = Modifier
                 .padding(start = 10.dp)
                 .align(Alignment.CenterHorizontally),
-            text = "Mi Cuenta",
+            text = "Mi Perfil",
+            textDecoration = TextDecoration.Underline,
             fontSize = 40.sp,
             fontWeight = FontWeight.ExtraBold
         )
@@ -179,6 +193,113 @@ fun MyAccountScreen(
 
             }
         )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        Text(
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .align(Alignment.CenterHorizontally),
+            text = "Contraseña",
+            textDecoration = TextDecoration.Underline,
+            fontSize = 40.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        //contraseña vieja
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+        Text(
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .align(Alignment.Start),
+            textAlign = TextAlign.Start,
+            text = "Contraseña Actual",
+            fontSize = 19.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+        Spacer(modifier = Modifier.padding(top = 8.dp))
+
+        TextFieldsProfile(
+            modifier = Modifier,
+            textData = oldPassword,
+            onTextDataChange = {
+                    currentText -> oldPassword = currentText
+
+                passwordErrorMessage = validators.validatePassword(oldPassword)
+                if( passwordErrorMessage.isNullOrEmpty() ){
+                    showOldPasswordError = false
+                }else{
+                    showOldPasswordError = true
+                }
+            },
+            placeholder = "Contraseña actual",
+            keyboardTypes = KeyboardType.Text
+        )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        if(showOldPasswordError){
+            Text(
+                text = passwordErrorMessage,
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 20.dp, bottom =8.dp)
+                    .align( Alignment.Start ),
+                fontSize = 16.sp
+            )
+        }
+
+        // nueva contraseña
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+        Text(
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .align(Alignment.Start),
+            textAlign = TextAlign.Start,
+            text = "Contraseña Nueva",
+            fontSize = 19.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+        Spacer(modifier = Modifier.padding(top = 8.dp))
+
+        TextFieldsProfile(
+            modifier = Modifier,
+            textData = newPassword,
+            onTextDataChange = {
+                    currentText -> newPassword = currentText
+
+                passwordErrorMessage = validators.validatePassword(newPassword)
+                if( passwordErrorMessage.isNullOrEmpty() ){
+                    showNewPasswordError = false
+                }else{
+                    showNewPasswordError = true
+                }
+            },
+            placeholder = "Contraseña nueva",
+            keyboardTypes = KeyboardType.Text
+        )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        if(showNewPasswordError){
+            Text(
+                text = passwordErrorMessage,
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 20.dp, bottom =8.dp)
+                    .align( Alignment.Start ),
+                fontSize = 16.sp
+            )
+        }
+
+        UpdatePasswordButton(
+            modifier = Modifier,
+            enabled = !showOldPasswordError && !showNewPasswordError,
+            onUpdatePasswordClick = {
+
+            }
+        )
+
     }
 
 
@@ -241,7 +362,39 @@ fun UpdateProfileButton(
     )
     {
         Text(
-            text = "Actualizar",
+            text = "Actualizar Perfil",
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 30.sp
+        )
+    }
+
+}
+
+
+@Composable
+fun UpdatePasswordButton(
+    modifier: Modifier,
+    enabled: Boolean,
+    onUpdatePasswordClick: () -> Unit
+){
+
+    Button(
+        onClick = onUpdatePasswordClick,
+        modifier.padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .height(50.dp) ,
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (enabled) Color.Black else Color.Gray,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.White.copy(alpha = 0.6f)
+        ),
+        enabled = enabled
+    )
+    {
+        Text(
+            text = "Actualizar Contraseña",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 30.sp
         )

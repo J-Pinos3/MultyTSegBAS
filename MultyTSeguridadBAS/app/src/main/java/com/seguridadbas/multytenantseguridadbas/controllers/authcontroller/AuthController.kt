@@ -25,8 +25,8 @@ class AuthController @Inject constructor(
     private val TAG = "AUTH_CONTROLLER"
 
 
-    suspend fun signUp(email: String, password: String): Resource<String>{
-        val user = User(email, password)
+    suspend fun signUp(email: String, password: String, fullName: String): Resource<String>{
+        val user = User(email, password, fullName)
 
         val response = authenticationRepository.signUpRepo(user)
         return if(response.isSuccessful){
@@ -96,6 +96,16 @@ class AuthController @Inject constructor(
         }
     }
 
+
+    suspend fun changePassword(oldPass: String, newPass: String): Resource<String>{
+        val response = authenticationRepository.changePasswordRepo(oldPassword = oldPass, newPassword = newPass)
+
+        return if(response.isSuccessful){
+            Resource.Success( response.body()?.get("id").toString() ?: "" )
+        }else{
+            Resource.Error( "No se pudo cambiar la contraseña"    )
+        }
+    }
 
 
     suspend fun verifyEmail(token: String): Resource<String> {
