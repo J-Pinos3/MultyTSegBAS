@@ -32,7 +32,9 @@ interface ApiClient {
     suspend fun sendResetPasswordApi(@Body email: String): Response<ResponseBody>
 
     @GET("auth/me")
-    suspend fun authenticateMeApi(): Response<User>
+    suspend fun authenticateMeApi(
+        @Header("Authorization") auth_token: String
+    ): Response<JsonObject>
 
     @PUT("auth/change-password")
     suspend fun changePasswordApi(@Body oldPassword: String, @Body newPassword: String): Response<JsonObject>

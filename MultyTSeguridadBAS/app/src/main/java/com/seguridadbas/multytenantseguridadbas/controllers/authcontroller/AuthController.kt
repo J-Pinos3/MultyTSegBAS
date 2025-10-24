@@ -10,6 +10,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.repository.Authentic
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
+import com.seguridadbas.multytenantseguridadbas.model.UserProfile
 import com.seguridadbas.multytenantseguridadbas.model.UserSignInResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -104,6 +105,25 @@ class AuthController @Inject constructor(
             Resource.Success( response.body()?.get("id").toString() ?: "" )
         }else{
             Resource.Error( "No se pudo cambiar la contraseña"    )
+        }
+    }
+
+    suspend fun authenticateProfileME(token: String): Resource<UserProfile>{
+        val response = authenticationRepository.authenticateMeRepo(auth_token = token)
+
+        val userProfile = UserProfile(
+            id = response.body()?.get("id").toString(),
+            fullName = response.body()?.get("fullName").toString(),
+            firstName = response.body()?.get("firstName").toString(),
+            lastName = response.body()?.get("lastName").toString(),
+            email = response.body()?.get("email").toString(),
+            provider = response.body()?.get("provider").toString(),
+        )
+
+        return if( response.isSuccessful ){
+            Resource.Success( userProfile )
+        }else{
+            Resource.Error( "No se pudo autenticar el usuario" )
         }
     }
 

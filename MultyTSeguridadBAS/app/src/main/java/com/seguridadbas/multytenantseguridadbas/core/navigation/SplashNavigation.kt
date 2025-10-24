@@ -37,7 +37,7 @@ fun SplashNavigation(authController: AuthController) {
         }
 
         composable <Home>{
-            BottonNavScreen(navController)
+            BottonNavScreen(navController, authController)
         }
 
         composable <Register>{

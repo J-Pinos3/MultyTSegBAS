@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,14 +38,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
 fun MyAccountScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    authController: AuthController
 ) {
 
     var oldPassword by remember { mutableStateOf("") }
@@ -54,10 +63,39 @@ fun MyAccountScreen(
     var passwordErrorMessage by remember { mutableStateOf("") }
 
 
-    var name by remember { mutableStateOf("") }
+    var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
+
+    //GETTING TOKEN FROM DATASTORE PREFERENCES
+
+
+    LaunchedEffect(Unit) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = authController.authenticateProfileME("Bearer ey")
+
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Resource.Success -> {
+                        fullName = result.data?.fullName.toString()
+                        email = result.data?.email.toString()
+                        phone = result.data?.phoneNumber.toString()
+                    }
+
+                    is Resource.Error -> {
+                        fullName = "---"
+                        email = "---"
+                        phone = "---"
+                    }
+
+                    else -> {
+                        Log.e("MyAccount","No se pudo traer el perfil del usuario")
+                    }
+                }
+            }
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -104,9 +142,9 @@ fun MyAccountScreen(
 
         TextFieldsProfile(
             modifier = Modifier,
-            textData = name,
+            textData = fullName,
             onTextDataChange = {
-                newName -> name = newName
+                newName -> fullName = newName
             },
             placeholder = "Nombre: ",
             keyboardTypes = KeyboardType.Text
@@ -158,30 +196,6 @@ fun MyAccountScreen(
             },
             placeholder = "numero de telefono: ",
             keyboardTypes = KeyboardType.Phone
-        )
-
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.Start),
-            textAlign = TextAlign.Start,
-            text = "Dirección del Cliente",
-            fontSize = 19.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.padding(top = 8.dp))
-
-        TextFieldsProfile(
-            modifier = Modifier,
-            textData = address,
-            onTextDataChange = {
-                newAddress -> address = newAddress
-            },
-            placeholder = "Direccion del cliente: ",
-            keyboardTypes = KeyboardType.Text
         )
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
@@ -296,7 +310,23 @@ fun MyAccountScreen(
             modifier = Modifier,
             enabled = !showOldPasswordError && !showNewPasswordError,
             onUpdatePasswordClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val result =authController.changePassword(oldPassword, newPassword)
 
+                    withContext(Dispatchers.Main){
+                        when(result){
+                            is Resource.Success -> {
+                                Log.i("MyAccount", "Contraseña actualizada, USER ID = ${result.data.toString()}")
+                            }
+                            is Resource.Error -> {
+                                Log.e("MyAccount", result.message.toString())
+                            }
+                            else -> {
+                                Log.e("MyAccount", result.message.toString())
+                            }
+                        }
+                    }
+                }
             }
         )
 
