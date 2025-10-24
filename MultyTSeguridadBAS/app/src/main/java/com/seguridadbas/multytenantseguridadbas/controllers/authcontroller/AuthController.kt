@@ -98,8 +98,8 @@ class AuthController @Inject constructor(
     }
 
 
-    suspend fun changePassword(oldPass: String, newPass: String): Resource<String>{
-        val response = authenticationRepository.changePasswordRepo(oldPassword = oldPass, newPassword = newPass)
+    suspend fun changePassword( token: String, oldPass: String, newPass: String): Resource<String>{
+        val response = authenticationRepository.changePasswordRepo(auth_token = token,  oldPassword = oldPass, newPassword = newPass)
 
         return if(response.isSuccessful){
             Resource.Success( response.body()?.get("id").toString() ?: "" )
@@ -123,7 +123,7 @@ class AuthController @Inject constructor(
         return if( response.isSuccessful ){
             Resource.Success( userProfile )
         }else{
-            Resource.Error( "No se pudo autenticar el usuario" )
+            Resource.Error( "No se pudo autenticar el usuario: ${response.message()} + ${response.errorBody().toString()}" )
         }
     }
 

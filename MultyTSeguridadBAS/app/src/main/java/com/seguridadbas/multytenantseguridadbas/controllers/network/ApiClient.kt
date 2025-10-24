@@ -37,7 +37,11 @@ interface ApiClient {
     ): Response<JsonObject>
 
     @PUT("auth/change-password")
-    suspend fun changePasswordApi(@Body oldPassword: String, @Body newPassword: String): Response<JsonObject>
+    suspend fun changePasswordApi(
+        @Header("Authorization") auth_token: String,
+        @Body oldPassword: String,
+        @Body newPassword: String
+    ): Response<JsonObject>
 
 
     @PUT("auth/password-reset")

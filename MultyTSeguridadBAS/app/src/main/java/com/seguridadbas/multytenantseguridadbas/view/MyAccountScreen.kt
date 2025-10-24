@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,12 +40,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -66,33 +69,47 @@ fun MyAccountScreen(
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
+    var token: String = ""
+
 
     //GETTING TOKEN FROM DATASTORE PREFERENCES
+    val context = LocalContext.current
+    val dataStoreController = DataStoreController(context)
+
 
 
     LaunchedEffect(Unit) {
 
         CoroutineScope(Dispatchers.IO).launch {
-            val result = authController.authenticateProfileME("Bearer ey")
+            val storedData = dataStoreController.getDataFromStore().first()
+            token = storedData.token
+            token = token.replace("\"","").trim()
 
-            withContext(Dispatchers.Main){
-                when(result){
-                    is Resource.Success -> {
-                        fullName = result.data?.fullName.toString()
-                        email = result.data?.email.toString()
-                        phone = result.data?.phoneNumber.toString()
-                    }
+            if( !token.isNullOrEmpty() ){
+                val result = authController.authenticateProfileME("Bearer $token")
+                Log.i("MI CUENTA", "Bearer2 $token")
+                withContext(Dispatchers.Main){
+                    when(result){
+                        is Resource.Success -> {
+                            fullName = result.data?.fullName.toString()
+                            email = result.data?.email.toString()
+                            phone = result.data?.phoneNumber.toString()
+                        }
 
-                    is Resource.Error -> {
-                        fullName = "---"
-                        email = "---"
-                        phone = "---"
-                    }
+                        is Resource.Error -> {
+                            fullName = "---"
+                            email = "---"
+                            phone = "---"
+                            Log.e("MyAccount",result.message.toString())
+                        }
 
-                    else -> {
-                        Log.e("MyAccount","No se pudo traer el perfil del usuario")
+                        else -> {
+                            Log.e("MyAccount","No se pudo traer el perfil del usuario")
+                        }
                     }
                 }
+            }else{
+                Log.e("MyAccount", "Datastore esta vacío")
             }
         }
     }
@@ -311,7 +328,7 @@ fun MyAccountScreen(
             enabled = !showOldPasswordError && !showNewPasswordError,
             onUpdatePasswordClick = {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val result =authController.changePassword(oldPassword, newPassword)
+                    val result =authController.changePassword(token, oldPassword, newPassword)
 
                     withContext(Dispatchers.Main){
                         when(result){
