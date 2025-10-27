@@ -3,6 +3,7 @@ package com.seguridadbas.multytenantseguridadbas.controllers.network
 import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
+import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -48,7 +49,10 @@ interface ApiClient {
     suspend fun resetPasswordApi(@Body email: String): Response<User>
 
     @PUT("auth/profile")
-    suspend fun updateProfileApi(@Body email: String): Response<User>
+    suspend fun updateProfileApi(
+        @Header("Authorization") auth_token: String,
+        @Body data: UserProfileRequest
+    ): Response<ResponseBody>
 
 
 

@@ -11,6 +11,7 @@ import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfile
+import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import com.seguridadbas.multytenantseguridadbas.model.UserSignInResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -128,6 +129,19 @@ class AuthController @Inject constructor(
     }
 
 
+    suspend fun updateProfile(token: String, newUserProfile: UserProfileRequest): Resource<String>{
+        val response = authenticationRepository.updateProfileRepo(auth_token = token, data = newUserProfile)
+
+        return if( response.isSuccessful ){
+            Resource.Success( response.body().toString() )
+        }else{
+            Resource.Error( response.message() + " " + response.errorBody().toString() )
+        }
+    }
+
+
+
+    /*
     suspend fun verifyEmail(token: String): Resource<String> {
         val response = authenticationRepository.verifyEmailRepo(token)
 
@@ -141,6 +155,7 @@ class AuthController @Inject constructor(
 
         }
     }
+    */
 
 }
 

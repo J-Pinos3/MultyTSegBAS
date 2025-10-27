@@ -43,6 +43,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthC
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
+import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import kotlinx.coroutines.CoroutineScope
@@ -114,243 +115,293 @@ fun MyAccountScreen(
         }
     }
 
-    Column(
-        modifier = modifier.fillMaxSize()
+    Box(
+        modifier = modifier
+            .fillMaxSize()
             .background(color = BasBackground)
             .statusBarsPadding()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(bottom = 130.dp)
     ){
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BasYellow)
-                .padding(top =  50.dp, bottom = 30.dp)
-        ){
-            Image(
-                painter = painterResource(R.drawable.baslogo),
-                contentDescription = "Logo de bas"
-            )
-        }
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.CenterHorizontally),
-            text = "Mi Perfil",
-            textDecoration = TextDecoration.Underline,
-            fontSize = 40.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.Start),
-            textAlign = TextAlign.Start,
-            text = "Nombre del cliente",
-            fontSize = 19.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.padding(top = 8.dp))
-
-        TextFieldsProfile(
-            modifier = Modifier,
-            textData = fullName,
-            onTextDataChange = {
-                newName -> fullName = newName
-            },
-            placeholder = "Nombre: ",
-            keyboardTypes = KeyboardType.Text
-        )
-
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.Start),
-            textAlign = TextAlign.Start,
-            text = "Correo Electrónico",
-            fontSize = 19.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.padding(top = 8.dp))
-
-        TextFieldsProfile(
-            modifier = Modifier,
-            textData = email,
-            onTextDataChange = {
-                    newEmail -> email = newEmail
-            },
-            placeholder = "correo electronico: ",
-            keyboardTypes = KeyboardType.Email
-        )
-
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.Start),
-            textAlign = TextAlign.Start,
-            text = "Número de Teléfono",
-            fontSize = 19.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.padding(top = 8.dp))
-
-        TextFieldsProfile(
-            modifier = Modifier,
-            textData = phone,
-            onTextDataChange = {
-                newPhone -> phone = newPhone
-            },
-            placeholder = "numero de telefono: ",
-            keyboardTypes = KeyboardType.Phone
-        )
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        UpdateProfileButton(
-            modifier = Modifier,
-            enabled = true,
-            onUpdateProfileClick = {
-
+                .verticalScroll(rememberScrollState())
+                ,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(BasYellow)
+                    .padding(top = 50.dp, bottom = 30.dp)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.baslogo),
+                    contentDescription = "Logo de bas"
+                )
             }
-        )
+            Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.CenterHorizontally),
-            text = "Contraseña",
-            textDecoration = TextDecoration.Underline,
-            fontSize = 40.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-
-        //contraseña vieja
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-        Text(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.Start),
-            textAlign = TextAlign.Start,
-            text = "Contraseña Actual",
-            fontSize = 19.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.padding(top = 8.dp))
-
-        TextFieldsProfile(
-            modifier = Modifier,
-            textData = oldPassword,
-            onTextDataChange = {
-                    currentText -> oldPassword = currentText
-
-                passwordErrorMessage = validators.validatePassword(oldPassword)
-                if( passwordErrorMessage.isNullOrEmpty() ){
-                    showOldPasswordError = false
-                }else{
-                    showOldPasswordError = true
-                }
-            },
-            placeholder = "Contraseña actual",
-            keyboardTypes = KeyboardType.Text
-        )
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        if(showOldPasswordError){
             Text(
-                text = passwordErrorMessage,
-                color = Color.Red,
                 modifier = Modifier
-                    .padding(top = 8.dp, start = 20.dp, bottom =8.dp)
-                    .align( Alignment.Start ),
-                fontSize = 16.sp
+                    .padding(start = 10.dp)
+                    .align(Alignment.CenterHorizontally),
+                text = "Mi Perfil",
+                textDecoration = TextDecoration.Underline,
+                fontSize = 40.sp,
+                fontWeight = FontWeight.ExtraBold
             )
-        }
 
-        // nueva contraseña
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-        Text(
-            modifier = Modifier
-                .padding(start = 10.dp)
-                .align(Alignment.Start),
-            textAlign = TextAlign.Start,
-            text = "Contraseña Nueva",
-            fontSize = 19.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(modifier = Modifier.padding(top = 8.dp))
+            Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        TextFieldsProfile(
-            modifier = Modifier,
-            textData = newPassword,
-            onTextDataChange = {
-                    currentText -> newPassword = currentText
-
-                passwordErrorMessage = validators.validatePassword(newPassword)
-                if( passwordErrorMessage.isNullOrEmpty() ){
-                    showNewPasswordError = false
-                }else{
-                    showNewPasswordError = true
-                }
-            },
-            placeholder = "Contraseña nueva",
-            keyboardTypes = KeyboardType.Text
-        )
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        if(showNewPasswordError){
             Text(
-                text = passwordErrorMessage,
-                color = Color.Red,
                 modifier = Modifier
-                    .padding(top = 8.dp, start = 20.dp, bottom =8.dp)
-                    .align( Alignment.Start ),
-                fontSize = 16.sp
+                    .padding(start = 10.dp)
+                    .align(Alignment.Start),
+                textAlign = TextAlign.Start,
+                text = "Nombre del cliente",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.ExtraBold
             )
-        }
+            Spacer(modifier = Modifier.padding(top = 8.dp))
 
-        UpdatePasswordButton(
-            modifier = Modifier,
-            enabled = !showOldPasswordError && !showNewPasswordError,
-            onUpdatePasswordClick = {
-                CoroutineScope(Dispatchers.IO).launch {
-                    val result =authController.changePassword(token, oldPassword, newPassword)
+            TextFieldsProfile(
+                modifier = Modifier,
+                textData = fullName,
+                onTextDataChange = { newName ->
+                    fullName = newName
+                },
+                placeholder = "Nombre: ",
+                keyboardTypes = KeyboardType.Text
+            )
 
-                    withContext(Dispatchers.Main){
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            Text(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.Start),
+                textAlign = TextAlign.Start,
+                text = "Correo Electrónico",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+
+            TextFieldsProfile(
+                modifier = Modifier,
+                textData = email,
+                onTextDataChange = { newEmail ->
+                    email = newEmail
+                },
+                placeholder = "correo electronico: ",
+                keyboardTypes = KeyboardType.Email
+            )
+
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            Text(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.Start),
+                textAlign = TextAlign.Start,
+                text = "Número de Teléfono",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+
+            TextFieldsProfile(
+                modifier = Modifier,
+                textData = phone,
+                onTextDataChange = { newPhone ->
+                    phone = newPhone
+                },
+                placeholder = "numero de telefono: ",
+                keyboardTypes = KeyboardType.Phone
+            )
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            UpdateProfileButton(
+                modifier = Modifier,
+                enabled = true,
+                onUpdateProfileClick = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val userProfile = UserProfileRequest(
+                            firstName = fullName.split(" ")[0],
+                            lastName = fullName.split(" ")[1],
+                            phoneNumber = phone
+                        )
+
+                        val result = authController.updateProfile(token, userProfile)
+
                         when(result){
                             is Resource.Success -> {
-                                Log.i("MyAccount", "Contraseña actualizada, USER ID = ${result.data.toString()}")
+                                Log.i(
+                                    "MyAccount",
+                                    "Perfil actualizado exitosamente, ${result.data.toString()}"
+                                )
+
+                                updateTextFieldsWithApi(
+                                    token,  authController,
+                                    { newName -> fullName = newName },
+                                    { newPhone -> phone = newPhone },
+                                )
                             }
+
                             is Resource.Error -> {
-                                Log.e("MyAccount", result.message.toString())
+                                Log.i(
+                                    "MyAccount",
+                                    "Error al actualizar el perfil, ${result.message.toString()}"
+                                )
                             }
-                            else -> {
-                                Log.e("MyAccount", result.message.toString())
+
+                            else -> Unit
+                        }
+
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            Text(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.CenterHorizontally),
+                text = "Contraseña",
+                textDecoration = TextDecoration.Underline,
+                fontSize = 40.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+
+            //contraseña vieja
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+            Text(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.Start),
+                textAlign = TextAlign.Start,
+                text = "Contraseña Actual",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+
+            TextFieldsProfile(
+                modifier = Modifier,
+                textData = oldPassword,
+                onTextDataChange = { currentText ->
+                    oldPassword = currentText
+
+                    passwordErrorMessage = validators.validatePassword(oldPassword)
+                    if (passwordErrorMessage.isNullOrEmpty()) {
+                        showOldPasswordError = false
+                    } else {
+                        showOldPasswordError = true
+                    }
+                },
+                placeholder = "Contraseña actual",
+                keyboardTypes = KeyboardType.Text
+            )
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            if (showOldPasswordError) {
+                Text(
+                    text = passwordErrorMessage,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .padding(top = 8.dp, start = 20.dp, bottom = 8.dp)
+                        .align(Alignment.Start),
+                    fontSize = 16.sp
+                )
+            }
+
+            // nueva contraseña
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+            Text(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.Start),
+                textAlign = TextAlign.Start,
+                text = "Contraseña Nueva",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+
+            TextFieldsProfile(
+                modifier = Modifier,
+                textData = newPassword,
+                onTextDataChange = { currentText ->
+                    newPassword = currentText
+
+                    passwordErrorMessage = validators.validatePassword(newPassword)
+                    if (passwordErrorMessage.isNullOrEmpty()) {
+                        showNewPasswordError = false
+                    } else {
+                        showNewPasswordError = true
+                    }
+                },
+                placeholder = "Contraseña nueva",
+                keyboardTypes = KeyboardType.Text
+            )
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            if (showNewPasswordError) {
+                Text(
+                    text = passwordErrorMessage,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .padding(top = 8.dp, start = 20.dp, bottom = 8.dp)
+                        .align(Alignment.Start),
+                    fontSize = 16.sp
+                )
+            }
+
+            UpdatePasswordButton(
+                modifier = Modifier,
+                enabled = !showOldPasswordError && !showNewPasswordError,
+                onUpdatePasswordClick = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val result = authController.changePassword(token, oldPassword, newPassword)
+
+                        withContext(Dispatchers.Main) {
+                            when (result) {
+                                is Resource.Success -> {
+                                    Log.i(
+                                        "MyAccount",
+                                        "Contraseña actualizada, USER ID = ${result.data.toString()}"
+                                    )
+                                }
+
+                                is Resource.Error -> {
+                                    Log.e("MyAccount", result.message.toString())
+                                }
+
+                                else -> {
+                                    Log.e("MyAccount", result.message.toString())
+                                }
                             }
                         }
                     }
                 }
-            }
-        )
+            )
 
+        }
+
+        //Spacer(modifier = Modifier.height(20.dp))
     }
 
 
 }
+
+
 
 
 @Composable
@@ -395,7 +446,8 @@ fun UpdateProfileButton(
 
     Button(
         onClick = onUpdateProfileClick,
-        modifier.padding(horizontal = 20.dp)
+        modifier
+            .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .height(50.dp) ,
         shape = RoundedCornerShape(50),
@@ -427,7 +479,8 @@ fun UpdatePasswordButton(
 
     Button(
         onClick = onUpdatePasswordClick,
-        modifier.padding(horizontal = 20.dp)
+        modifier
+            .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .height(50.dp) ,
         shape = RoundedCornerShape(50),
@@ -445,6 +498,34 @@ fun UpdatePasswordButton(
             fontWeight = FontWeight.ExtraBold,
             fontSize = 30.sp
         )
+    }
+
+}
+
+
+
+suspend fun updateTextFieldsWithApi(
+    token: String,
+    authController: AuthController,
+    updateFullName: (String) -> Unit,
+    updatePhone: (String) -> Unit,
+){
+    val result = authController.authenticateProfileME("Bearer $token")
+
+    withContext(Dispatchers.Main){
+        when(result){
+            is Resource.Success -> {
+                updateFullName( result.data?.fullName.toString()  )
+                updatePhone( result.data?.fullName.toString()  )
+            }
+
+            is Resource.Error -> {
+                updateFullName( "---" )
+                updatePhone( "---" )
+            }
+
+            else -> Unit
+        }
     }
 
 }

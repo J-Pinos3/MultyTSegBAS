@@ -2,6 +2,7 @@ package com.seguridadbas.multytenantseguridadbas.controllers.repository
 
 import com.seguridadbas.multytenantseguridadbas.controllers.network.ApiClient
 import com.seguridadbas.multytenantseguridadbas.model.User
+import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import javax.inject.Inject
 
 class AuthenticationRepository @Inject constructor(
@@ -31,7 +32,9 @@ class AuthenticationRepository @Inject constructor(
 
     suspend fun resetPasswordRepo(email: String) = apiClient.resetPasswordApi(email = email)
 
-    suspend fun updateProfileRepo(email: String) = apiClient.updateProfileApi(email = email)
+    suspend fun updateProfileRepo(
+        auth_token: String, data: UserProfileRequest
+    ) = apiClient.updateProfileApi(auth_token = auth_token, data = data)
 
 
 }
