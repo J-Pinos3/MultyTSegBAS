@@ -13,6 +13,7 @@ import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfile
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import com.seguridadbas.multytenantseguridadbas.model.UserSignInResponse
+import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -99,8 +100,8 @@ class AuthController @Inject constructor(
     }
 
 
-    suspend fun changePassword( token: String, oldPass: String, newPass: String): Resource<String>{
-        val response = authenticationRepository.changePasswordRepo(auth_token = token,  oldPassword = oldPass, newPassword = newPass)
+    suspend fun changePassword( token: String, passwords: oldNewPasswords): Resource<String>{
+        val response = authenticationRepository.changePasswordRepo(auth_token = token, passwords = passwords)
 
         return if(response.isSuccessful){
             Resource.Success( response.body()?.get("id").toString() ?: "" )
@@ -119,6 +120,7 @@ class AuthController @Inject constructor(
             lastName = response.body()?.get("lastName").toString(),
             email = response.body()?.get("email").toString(),
             provider = response.body()?.get("provider").toString(),
+            phoneNumber = response.body()?.get("phoneNumber").toString()
         )
 
         return if( response.isSuccessful ){
@@ -135,7 +137,7 @@ class AuthController @Inject constructor(
         return if( response.isSuccessful ){
             Resource.Success( response.body().toString() )
         }else{
-            Resource.Error( response.message() + " " + response.errorBody().toString() )
+            Resource.Error( response.message() + response.code() + " " + response.errorBody().toString() )
         }
     }
 

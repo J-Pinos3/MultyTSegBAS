@@ -43,7 +43,9 @@ import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthC
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
+import com.seguridadbas.multytenantseguridadbas.model.ProfileData
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
+import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import kotlinx.coroutines.CoroutineScope
@@ -70,7 +72,7 @@ fun MyAccountScreen(
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-    var token: String = ""
+    var token by remember { mutableStateOf("") }
 
 
     //GETTING TOKEN FROM DATASTORE PREFERENCES
@@ -79,7 +81,7 @@ fun MyAccountScreen(
 
 
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(1) {
 
         CoroutineScope(Dispatchers.IO).launch {
             val storedData = dataStoreController.getDataFromStore().first()
@@ -92,9 +94,9 @@ fun MyAccountScreen(
                 withContext(Dispatchers.Main){
                     when(result){
                         is Resource.Success -> {
-                            fullName = result.data?.fullName.toString()
-                            email = result.data?.email.toString()
-                            phone = result.data?.phoneNumber.toString()
+                            fullName = result.data?.fullName.toString().replace("\"","")
+                            email = result.data?.email.toString().replace("\"","")
+                            phone = result.data?.phoneNumber.toString().replace("\"","")
                         }
 
                         is Resource.Error -> {
@@ -229,14 +231,18 @@ fun MyAccountScreen(
                 modifier = Modifier,
                 enabled = true,
                 onUpdateProfileClick = {
+                    Log.v("UPDATE","EL TOKEN: $token")
                     CoroutineScope(Dispatchers.IO).launch {
                         val userProfile = UserProfileRequest(
-                            firstName = fullName.split(" ")[0],
-                            lastName = fullName.split(" ")[1],
-                            phoneNumber = phone
+                            data = ProfileData(
+                                firstName = fullName.split(" ")[0],
+                                lastName = fullName.split(" ")[1],
+                                phoneNumber = phone
+                            )
+
                         )
 
-                        val result = authController.updateProfile(token, userProfile)
+                        val result = authController.updateProfile("Bearer $token", userProfile)
 
                         when(result){
                             is Resource.Success -> {
@@ -247,8 +253,8 @@ fun MyAccountScreen(
 
                                 updateTextFieldsWithApi(
                                     token,  authController,
-                                    { newName -> fullName = newName },
-                                    { newPhone -> phone = newPhone },
+                                    { newName -> fullName = newName.replace("\'","") },
+                                    { newPhone -> phone = newPhone.replace("\'","") },
                                 )
                             }
 
@@ -369,7 +375,7 @@ fun MyAccountScreen(
                 enabled = !showOldPasswordError && !showNewPasswordError,
                 onUpdatePasswordClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val result = authController.changePassword(token, oldPassword, newPassword)
+                        val result = authController.changePassword("Bearer $token", oldNewPasswords(oldPassword, newPassword))
 
                         withContext(Dispatchers.Main) {
                             when (result) {
@@ -515,8 +521,8 @@ suspend fun updateTextFieldsWithApi(
     withContext(Dispatchers.Main){
         when(result){
             is Resource.Success -> {
-                updateFullName( result.data?.fullName.toString()  )
-                updatePhone( result.data?.fullName.toString()  )
+                updateFullName( result.data?.fullName.toString().replace("\'","")  )
+                updatePhone( result.data?.phoneNumber.toString().replace("\'","")  )
             }
 
             is Resource.Error -> {

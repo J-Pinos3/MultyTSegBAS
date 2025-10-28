@@ -1,9 +1,11 @@
 package com.seguridadbas.multytenantseguridadbas.controllers.network
 
 import com.google.gson.JsonObject
+import com.seguridadbas.multytenantseguridadbas.model.AuthMeResponse
 import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
+import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -40,8 +42,7 @@ interface ApiClient {
     @PUT("auth/change-password")
     suspend fun changePasswordApi(
         @Header("Authorization") auth_token: String,
-        @Body oldPassword: String,
-        @Body newPassword: String
+        @Body passwords: oldNewPasswords
     ): Response<JsonObject>
 
 
