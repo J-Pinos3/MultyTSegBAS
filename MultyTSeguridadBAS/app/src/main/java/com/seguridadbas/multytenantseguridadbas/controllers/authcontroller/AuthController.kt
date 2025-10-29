@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
+import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.AuthenticationRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
@@ -18,6 +19,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okio.IOException
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,13 +35,21 @@ class AuthController @Inject constructor(
         val user = User(email, password, fullName)
 
         val response = authenticationRepository.signUpRepo(user)
-        return if(response.isSuccessful){
-            val bodyString = response.body()?.string() ?: ""
-            Resource.Success(bodyString)
-        }else{
-            Resource.Error( response.message().toString() +"--"+
-            response.body().toString()
-            )
+        return try{
+            if(response.isSuccessful){
+                val bodyString = response.body()?.string() ?: ""
+                Resource.Success(bodyString)
+            }else{
+                Resource.Error( response.message().toString() +"--"+
+                        response.body().toString()
+                )
+
+            }
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> {Resource.Error(ex.message.toString())}
+                is IOException -> {Resource.Error(ex.message.toString())}
+            }
 
         }
 
@@ -46,29 +57,40 @@ class AuthController @Inject constructor(
 
 
     suspend fun signIn(email: String, password: String): Resource<SignInResponse>{
-        val user = User(email, password)
 
-        val response = authenticationRepository.signInRepo(user)
 
-        return if( response.isSuccessful ){
-            val body = response.body()
+        return try{
+            val user = User(email, password)
 
-            val userResponse = SignInResponse(
-                token = body?.get("token").toString(),
-                user = UserSignInResponse(
-                    id = body?.getAsJsonObject("user")?.get("id").toString(),
-                    email = body?.getAsJsonObject("user")?.get("email").toString(),
-                    firstName = body?.getAsJsonObject("user")?.get("firstName").toString(),
-                    lastName = body?.getAsJsonObject("user")?.get("lastName").toString()
+            val response = authenticationRepository.signInRepo(user)
+
+            if( response.isSuccessful ){
+                val body = response.body()
+
+                val userResponse = SignInResponse(
+                    token = body?.get("token").toString(),
+                    user = UserSignInResponse(
+                        id = body?.getAsJsonObject("user")?.get("id").toString(),
+                        email = body?.getAsJsonObject("user")?.get("email").toString(),
+                        firstName = body?.getAsJsonObject("user")?.get("firstName").toString(),
+                        lastName = body?.getAsJsonObject("user")?.get("lastName").toString()
+                    )
                 )
-            )
 
-             Resource.Success(userResponse)
-        }else{
-            Resource.Error( response.message().toString() +"--"+
-                    response.errorBody()
-            )
+                Resource.Success(userResponse)
+            }else{
+                Resource.Error( response.message().toString() +"--"+
+                        response.errorBody()
+                )
 
+            }
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión a tardado mucho tiempo")
+        } catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> {Resource.Error(ex.message.toString())}
+                is IOException -> {Resource.Error(ex.message.toString())}
+            }
         }
     }
 
