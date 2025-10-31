@@ -85,7 +85,7 @@ class AuthController @Inject constructor(
 
             }
         }catch (e: SocketTimeoutException){
-            Resource.Error("La conexión a tardado mucho tiempo")
+            Resource.Error("La conexión ha tardado mucho tiempo")
         } catch (ex: NoNetworkException){
             when(ex){
                 is NoNetworkException -> {Resource.Error(ex.message.toString())}

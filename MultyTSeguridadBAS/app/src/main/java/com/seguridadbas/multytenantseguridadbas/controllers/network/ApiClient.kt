@@ -1,10 +1,14 @@
 package com.seguridadbas.multytenantseguridadbas.controllers.network
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.seguridadbas.multytenantseguridadbas.model.AllGuardsResponse
 import com.seguridadbas.multytenantseguridadbas.model.AuthMeResponse
+import com.seguridadbas.multytenantseguridadbas.model.GuardDataResponse
 import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
+import com.seguridadbas.multytenantseguridadbas.model.autocompletGuardsResponse
 import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -13,6 +17,8 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiClient {
 
@@ -23,7 +29,8 @@ interface ApiClient {
     suspend fun verifyEmailApi(@Body token: String): Response<ResponseBody>
 
     @POST("auth/sign-in")
-    suspend fun signInApi(@Body user: User): Response<JsonObject>
+    suspend fun
+            signInApi(@Body user: User): Response<JsonObject>
 
     @POST("auth/send-email-address-verification-email")
     suspend fun sendEmailVerificationApi(
@@ -54,6 +61,36 @@ interface ApiClient {
         @Header("Authorization") auth_token: String,
         @Body data: UserProfileRequest
     ): Response<ResponseBody>
+
+
+
+
+    /**  🧑‍✈️ ENDPOINTS FOR TENANT   */
+    //lISTA DE GUARDIAS DE SEGURIDAD
+    @GET("/tenant/{tenantId}/security-guard")
+    suspend fun getSecurityGuardsApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String
+    ): Response<AllGuardsResponse>
+
+
+    //DETALLES DE UN GUARDIA
+    @GET("/tenant/{tenantId}/security-guard/{id}")
+    suspend fun getSecGuardDetailsApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Path("id") id: String
+    ): Response<GuardDataResponse>
+
+
+    //BUSCAR GUARDIA
+    @GET("/tenant/{tenantId}/security-guard/autocomplete")
+    suspend fun searchSecGuardApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Query("query") query: String,
+        @Query("limit") limit: Int
+    ): Response<autocompletGuardsResponse>
 
 
 
