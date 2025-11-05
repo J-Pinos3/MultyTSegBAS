@@ -1,34 +1,63 @@
 package com.seguridadbas.multytenantseguridadbas.model
 
+import com.google.gson.annotations.SerializedName
+
+//todo replace List<any> for a proper datatype
 data class GuardDataResponse(
+    @SerializedName("academicInstruction")
     val academicInstruction: String,
-    val address: Any,
+    @SerializedName("address")
+    val address: String? = "",
+    @SerializedName("birthDate")
     val birthDate: String,
+    @SerializedName("birthPlace")
     val birthPlace: String,
+    @SerializedName("bloodType")
     val bloodType: String,
+    @SerializedName("createdAt")
     val createdAt: String,
-    val createdById: Any,
-    val credentialImage: List<Any>,
-    val deletedAt: Any,
+    @SerializedName("createdById")
+    val createdById: String? = "",
+    @SerializedName("credentialImage")
+    val credentialImage: List<Any?> = emptyList<Any>(),
+    @SerializedName("deletedAt")
+    val deletedAt: String? = "",
+    @SerializedName("fullName")
     val fullName: String,
+    @SerializedName("gender")
     val gender: String,
+    @SerializedName("governmentId")
     val governmentId: String,
+    @SerializedName("guard")
     val guard: Guard,
+    @SerializedName("guardCredentials")
     val guardCredentials: String,
     val guardId: String,
     val hiringContractDate: String,
+    @SerializedName("id")
     val id: String,
-    val importHash: Any,
+    @SerializedName("importHash")
+    val importHash: String? = "",
+    @SerializedName("isOnDuty")
     val isOnDuty: Boolean,
+    @SerializedName("maritalStatus")
     val maritalStatus: String,
-    val memos: List<Any>,
-    val profileImage: List<Any>,
-    val recordPolicial: List<Any>,
-    val requests: List<Any>,
+    @SerializedName("memos")
+    val memos: List<Any?> = emptyList<Any>(),
+    @SerializedName("profileImage")
+    val profileImage: List<Any?> = emptyList<Any>(),
+    @SerializedName("recordPolicial")
+    val recordPolicial: List<Any?> = emptyList<Any>(),
+    @SerializedName("requests")
+    val requests: List<Any?> = emptyList<Any>(),
+    @SerializedName("tenantId")
     val tenantId: String,
-    val tutoriales: List<Any>,
+    @SerializedName("tutoriales")
+    val tutoriales: List<Any?> = emptyList<Any>(),
+    @SerializedName("updatedAt")
     val updatedAt: String,
-    val updatedById: Any
+    @SerializedName("updatedById")
+    val updatedById: String? = ""
 ){
     fun toPresentation_SecurityGuardProfile(): SecurityGuardProfile{
         return SecurityGuardProfile(

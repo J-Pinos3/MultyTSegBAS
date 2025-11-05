@@ -9,6 +9,7 @@ import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import com.seguridadbas.multytenantseguridadbas.model.autocompletGuardsResponse
+import com.seguridadbas.multytenantseguridadbas.model.autocompletGuardsResponseItem
 import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -67,30 +68,30 @@ interface ApiClient {
 
     /**  🧑‍✈️ ENDPOINTS FOR TENANT   */
     //lISTA DE GUARDIAS DE SEGURIDAD
-    @GET("/tenant/{tenantId}/security-guard")
+    @GET("tenant/{tenantId}/security-guard")
     suspend fun getSecurityGuardsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String
-    ): Response<AllGuardsResponse>
+    ): Response<JsonObject>
 
 
     //DETALLES DE UN GUARDIA
-    @GET("/tenant/{tenantId}/security-guard/{id}")
+    @GET("tenant/{tenantId}/security-guard/{id}")
     suspend fun getSecGuardDetailsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
         @Path("id") id: String
-    ): Response<GuardDataResponse>
+    ): Response<JsonObject>
 
 
     //BUSCAR GUARDIA
-    @GET("/tenant/{tenantId}/security-guard/autocomplete")
+    @GET("tenant/{tenantId}/security-guard/autocomplete")
     suspend fun searchSecGuardApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
         @Query("query") query: String,
         @Query("limit") limit: Int
-    ): Response<autocompletGuardsResponse>
+    ): Response<JsonArray>
 
 
 
