@@ -20,6 +20,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface ApiClient {
 
@@ -66,7 +67,7 @@ interface ApiClient {
 
 
 
-    /**  🧑‍✈️ ENDPOINTS FOR TENANT   */
+    /**  🧑‍✈️ ENDPOINTS FOR GUARDS  */
     //lISTA DE GUARDIAS DE SEGURIDAD
     @GET("tenant/{tenantId}/security-guard")
     suspend fun getSecurityGuardsApi(
@@ -94,6 +95,34 @@ interface ApiClient {
     ): Response<JsonArray>
 
 
+
+    /**🧑‍✈️ ENDPOINTS FOR GUARD SHIFTS*/
+    //TURNOS DE GUARDIAS
+    @GET("tenant/{tenantId}/guard-shift")
+    suspend fun getAllGuardsShiftsApi(
+        @Header("Authorization") auth_token: String,
+        @QueryMap filters: Map<String, String>,
+        @Query("limit") limit: Int
+    ): Response<JsonArray>
+
+
+    //TURNOS DE UN GUARDIA EN ESPECÍFICO
+    @GET("tenant/{tenantId}/guard-shift/{id}")
+    suspend fun getShiftsByGuardApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Path("id") id: String,
+    ): Response<JsonObject>
+
+
+    //BUSCAR TURNOS
+    @GET("tenant/{tenantId}/guard-shift/autocomplete")
+    suspend fun searchGuardsShiftsApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Query("query") query: String,
+        @Query("limit") limit: Int
+    ): Response<JsonArray>
 
 
 
