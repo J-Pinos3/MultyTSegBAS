@@ -72,16 +72,55 @@ class GuardShiftsController @Inject constructor(
 
 
 
-    /*todo suspend fun getGuardShiftsDetail(token: String, tenantId: String, id: String): Resource<GuardShift>{
+     suspend fun getGuardShiftsDetail(token: String, tenantId: String, id: String): Resource<GuardShift>{
         val response = guardShiftsRepository.getShiftsByGuardRepo(token, tenantId, id)
 
-        if(response.isSuccessful){
+         return try {
 
-        }
+             if(response.isSuccessful){
+                 val guardShift = response.body()
+                 Resource.Success(
 
-        return GuardShift()
+                     GuardShift(
+                         completeInventoryCheck = guardShift?.get("completeInventoryCheck")?.asInt ?: 0,
+                         dailyIncidents = guardShift?.getAsJsonArray("dailyIncidents")?.toList() ?: emptyList(),
+                         guardName = guardShift?.get("guardName")?.asString ?: "",
+                         guardNameId = guardShift?.get("guardNameId")?.asString ?: "",
+                         id = guardShift?.get("id")?.asString ?: "",
+                         numberOfIncidentsDuringShift = guardShift?.get("numberOfIncidentsDurindShift")?.asInt ?: 0,
+                         numberOfPatrolsDuringShift = guardShift?.get("numberOfPatrolsDuringShift")?.asInt ?: 0,
+                         observations = guardShift?.get("observations")?.asString ?: "",
+                         patrolsDone = guardShift?.getAsJsonArray("patrolsDone")?.toList() ?: emptyList(),
+                         punchInTime = guardShift?.get("punchInTime")?.asString ?: "",
+                         punchOutTime = guardShift?.get("punchOutTime")?.asString ?: "",
+                         shiftSchedule = guardShift?.get("shiftSchedule")?.asString ?: "",
+                         tenantId = guardShift?.get("tenantId")?.asString ?: "",
+                         latitude = guardShift?.get("stationName")?.asJsonObject?.get("latitud")?.asString ?: "",
+                         longitude = guardShift?.get("stationName")?.asJsonObject?.get("longitud")?.asString ?: "",
+                         numberOfGuardsInStation = guardShift?.get("stationName")?.asJsonObject?.get("numberOfGuardsInStation")?.asInt ?: 0,
+                         stationName = guardShift?.get("stationName")?.asJsonObject?.get("stationName")?.asString ?: "",
+
+                         )
+
+                 )
+             }else{
+                 Resource.Error(response.message().toString() + "--" + response.raw().message )
+
+             }
+
+
+         }catch (e: SocketTimeoutException){
+             Resource.Error("La conexión ha tardado mucho tiempo")
+         }catch (ex: NoNetworkException){
+             when(ex){
+                 is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                 is IOException -> { Resource.Error(ex.message.toString()) }
+             }
+         }
+
+
     }
-    */
+
 
 
     private fun parseAllGuardShiftsResponse(jsonObject: JsonObject): AllGuardShiftsResponse{
