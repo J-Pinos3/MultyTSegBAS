@@ -10,9 +10,11 @@ class GuardShiftsRepository @Inject constructor(
 
     suspend fun getAllGuardShiftsRepo(
         token: String,
-        filters: Map<String, String>,
-        limit: Int
-    ) = apiClient.getAllGuardsShiftsApi(token, filters, limit)
+        tenantID: String,
+        limit: Int,
+        offset: Int,
+        orderBy: String? = ""
+    ) = apiClient.getAllGuardsShiftsApi(token, tenantID,limit, offset, orderBy )
 
 
     suspend fun getShiftsByGuardRepo(
@@ -27,7 +29,7 @@ class GuardShiftsRepository @Inject constructor(
         tenantId: String,
         query: String,
         limit: Int
-    ) = apiClient.searchGuardsShiftsApi(token, tenantId, query, limit)
+    ) = apiClient.searchGuardsShiftsApi(token, tenantId, limit, query)
 
 
 

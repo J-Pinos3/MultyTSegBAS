@@ -7,7 +7,13 @@ class TenantGuardsRepository @Inject constructor(
     private val apiClient: ApiClient
 ) {
 
-    suspend fun getSecGuardsRepo(token: String, tenantId: String) = apiClient.getSecurityGuardsApi(auth_token = token, tenantId = tenantId)
+    suspend fun getSecGuardsRepo(
+        token: String,
+        tenantId: String,
+        limit: Int,
+        offset: Int,
+        orderBy: String? = ""
+    ) = apiClient.getSecurityGuardsApi(auth_token = token, tenantId = tenantId, limit = limit, offset = offset, orderBy = orderBy)
 
 
     suspend fun getSecGuardDetailsRepo(

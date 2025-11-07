@@ -74,8 +74,14 @@ class TenantGuardsController @Inject constructor(
     }
 
 
-    suspend fun getSecGuards(token:String, tenantID: String): Resource<List<Guard>> {
-        val response = tenantGuardsRepository.getSecGuardsRepo(token, tenantID)
+    suspend fun getSecGuards(
+        token: String,
+        tenantID: String,
+        limit: Int,
+        offset: Int,
+        orderBy: String? = ""
+    ): Resource<List<Guard>> {
+        val response = tenantGuardsRepository.getSecGuardsRepo(token, tenantID, limit, offset, orderBy)
 
         return try{
 

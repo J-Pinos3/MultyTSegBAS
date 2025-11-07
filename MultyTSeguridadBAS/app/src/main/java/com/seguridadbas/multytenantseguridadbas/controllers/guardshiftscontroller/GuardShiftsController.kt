@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller
 
+import androidx.lifecycle.ViewModel
 import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.GuardShiftsRepository
@@ -7,6 +8,7 @@ import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.guard_shifts.AllGuardShiftsResponse
 import com.seguridadbas.multytenantseguridadbas.model.guard_shifts.GuardShift
 import com.seguridadbas.multytenantseguridadbas.model.guard_shifts.GuardShiftsDataResponse
+import com.seguridadbas.multytenantseguridadbas.model.guard_shifts.ShortGuardShift
 import com.seguridadbas.multytenantseguridadbas.model.guard_shifts.StationName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okio.IOException
@@ -17,11 +19,17 @@ import javax.inject.Inject
 @HiltViewModel
 class GuardShiftsController @Inject constructor(
     private val guardShiftsRepository: GuardShiftsRepository
-) {
+): ViewModel() {
 
 
-    suspend fun getGuardShifts(token: String, filters: Map<String, String>, limit: Int): Resource<List<GuardShift>>{
-        val response = guardShiftsRepository.getAllGuardShiftsRepo(token, filters, limit)
+    suspend fun getGuardShifts(
+        token: String,
+        tenantId: String,
+        limit: Int,
+        offset: Int,
+        orderBy: String? = ""
+    ): Resource<List<ShortGuardShift>>{
+        val response = guardShiftsRepository.getAllGuardShiftsRepo(token, tenantId,limit, offset, orderBy)
 
         return try{
 
@@ -33,23 +41,13 @@ class GuardShiftsController @Inject constructor(
 
                 Resource.Success(
                     guardShiftsResponse.rows.map {
-                        GuardShift(
-                            completeInventoryCheck = it.completeInventoryCheck ?: 0,
-                            dailyIncidents = it.dailyIncidents,
+                        ShortGuardShift(
+
                             guardName = it.guardName ?: "",
-                            guardNameId = it.guardNameId,
                             id = it.id,
-                            numberOfIncidentsDuringShift = it.numberOfIncidentsDurindShift,
-                            numberOfPatrolsDuringShift = it.numberOfPatrolsDuringShift,
-                            observations = it.observations,
-                            patrolsDone = it.patrolsDone,
-                            punchInTime = it.punchInTime,
-                            punchOutTime = it.punchOutTime,
-                            shiftSchedule = it.shiftSchedule,
+                            numberOfIncidents = it.numberOfIncidentsDurindShift,
+                            numberOfPatrols = it.numberOfPatrolsDuringShift,
                             tenantId = it.tenantId,
-                            latitude = it.stationName.latitud,
-                            longitude = it.stationName.longitud,
-                            numberOfGuardsInStation = it.stationName.numberOfGuardsInStation.toInt(),
                             stationName = it.stationName.stationName
                         )
                     }

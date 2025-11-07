@@ -72,7 +72,10 @@ interface ApiClient {
     @GET("tenant/{tenantId}/security-guard")
     suspend fun getSecurityGuardsApi(
         @Header("Authorization") auth_token: String,
-        @Path("tenantId") tenantId: String
+        @Path("tenantId") tenantId: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("orderBy") orderBy: String? = null
     ): Response<JsonObject>
 
 
@@ -101,8 +104,10 @@ interface ApiClient {
     @GET("tenant/{tenantId}/guard-shift")
     suspend fun getAllGuardsShiftsApi(
         @Header("Authorization") auth_token: String,
-        @QueryMap filters: Map<String, String>,
-        @Query("limit") limit: Int
+        @Path("tenantId") tenantId: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("orderBy") orderBy: String? = null
     ): Response<JsonArray>
 
 
@@ -115,15 +120,39 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
-    //BUSCAR TURNOS
+    //BUSCAR TURNOS corregir
     @GET("tenant/{tenantId}/guard-shift/autocomplete")
     suspend fun searchGuardsShiftsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
-        @Query("query") query: String,
-        @Query("limit") limit: Int
+        @Query("limit") limit: Int,
+        @Query("query") query: String?,
     ): Response<JsonArray>
 
+
+    /**⏱️️ ENDPOINTS FOR SHIFTS */
+    //TODOS LOS TURNOS CREADOS
+    @GET("tenant/{tenantId}/shift")
+    suspend fun getAllShiftsApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("orderBy") orderBy: String? = null
+    ): Response<JsonArray>
+
+
+    //BUSCAR TURNOS CREADOS POR ID
+    @GET("tenant/{tenantId}/shift/{id}")
+    suspend fun shiftDetailApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantID: String,
+        @Path("id") id: String
+    ): Response<JsonObject>
+
+
+    //AUTOCOMPLETAR TURNOS corregir
+    //@GET("tenant/{tenantId}/shift/autocomplete")
 
 
 }
