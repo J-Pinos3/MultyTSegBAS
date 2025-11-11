@@ -25,11 +25,12 @@ class GuardShiftsController @Inject constructor(
     suspend fun getGuardShifts(
         token: String,
         tenantId: String,
+        filter: Map<String, String>,
         limit: Int,
         offset: Int,
         orderBy: String? = ""
     ): Resource<List<ShortGuardShift>>{
-        val response = guardShiftsRepository.getAllGuardShiftsRepo(token, tenantId,limit, offset, orderBy)
+        val response = guardShiftsRepository.getAllGuardShiftsRepo(token, tenantId, filter,limit, offset, orderBy)
 
         return try{
 

@@ -73,6 +73,7 @@ interface ApiClient {
     suspend fun getSecurityGuardsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
+        @QueryMap filter: Map<String, String>,
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
         @Query("orderBy") orderBy: String? = null
@@ -105,6 +106,7 @@ interface ApiClient {
     suspend fun getAllGuardsShiftsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
+        @QueryMap filter: Map<String, String>,
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
         @Query("orderBy") orderBy: String? = null
@@ -130,12 +132,15 @@ interface ApiClient {
     ): Response<JsonArray>
 
 
+
+
     /**⏱️️ ENDPOINTS FOR SHIFTS */
     //TODOS LOS TURNOS CREADOS
     @GET("tenant/{tenantId}/shift")
     suspend fun getAllShiftsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
+        @QueryMap filter: Map<String, String>,
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
         @Query("orderBy") orderBy: String? = null
@@ -153,6 +158,25 @@ interface ApiClient {
 
     //AUTOCOMPLETAR TURNOS corregir
     //@GET("tenant/{tenantId}/shift/autocomplete")
+
+
+
+    /** 🌍 ENDPOINTS FOR STATIONS */
+    @GET("tenant/{tenantId}/station")
+    suspend fun getAllStationsApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+    ): Response<JsonObject>
+
+
+    @GET("tenant/{tenantId}/station/{id}")
+    suspend fun getStationDetailsApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Path("id") id: String
+    ): Response<JsonObject>
+
+
 
 
 }

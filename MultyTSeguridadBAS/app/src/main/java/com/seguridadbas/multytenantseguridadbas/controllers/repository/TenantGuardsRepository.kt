@@ -10,10 +10,11 @@ class TenantGuardsRepository @Inject constructor(
     suspend fun getSecGuardsRepo(
         token: String,
         tenantId: String,
+        filter: Map<String, String>,
         limit: Int,
         offset: Int,
         orderBy: String? = ""
-    ) = apiClient.getSecurityGuardsApi(auth_token = token, tenantId = tenantId, limit = limit, offset = offset, orderBy = orderBy)
+    ) = apiClient.getSecurityGuardsApi(auth_token = token, tenantId = tenantId, filter=filter, limit = limit, offset = offset, orderBy = orderBy)
 
 
     suspend fun getSecGuardDetailsRepo(

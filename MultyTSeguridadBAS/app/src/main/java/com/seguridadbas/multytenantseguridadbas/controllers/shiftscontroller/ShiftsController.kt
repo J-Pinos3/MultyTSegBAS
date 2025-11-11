@@ -7,6 +7,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.repository.ShiftsRep
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.shifts.AllShiftsResponse
 import com.seguridadbas.multytenantseguridadbas.model.shifts.Guard
+import com.seguridadbas.multytenantseguridadbas.model.shifts.ShiftsData
 import com.seguridadbas.multytenantseguridadbas.model.shifts.ShiftsDataResponse
 import com.seguridadbas.multytenantseguridadbas.model.shifts.ShortShiftData
 import com.seguridadbas.multytenantseguridadbas.model.shifts.Station
@@ -22,10 +23,10 @@ class ShiftsController @Inject constructor(
 ): ViewModel() {
 
 
-    suspend fun getAllShifts(token: String, tenantId: String,
+    suspend fun getAllShifts(token: String, tenantId: String, filter: Map<String, String>,
        limit: Int, offset: Int, orderBy: String? = ""): Resource<List<ShortShiftData>> {
 
-        val response = shiftsRepository.getAllShiftsRepo(token, tenantId, limit, offset, orderBy)
+        val response = shiftsRepository.getAllShiftsRepo(token, tenantId,  filter,limit, offset, orderBy)
 
         return try{
 
@@ -62,6 +63,52 @@ class ShiftsController @Inject constructor(
 
     }
 
+
+    suspend fun getShiftDetail(token: String, tenantId: String, id: String): Resource<ShiftsData>{
+        val response = shiftsRepository.shiftDetailRepo(token, tenantId, id)
+
+
+        return try{
+
+            if(response.isSuccessful && response.body() != null){
+
+                val jsonBody = response.body()!!
+
+                Resource.Success(
+                    ShiftsData(
+                        endTime = jsonBody.get("endTime").asString,
+                                startTime = jsonBody.get("startTime").asString,
+                                guardEmail = jsonBody.get("guardEmail").asString,
+                                guardFirstName = jsonBody.get("guardFirstName").asString,
+                                guardId = jsonBody.get("guardId").asString,
+                                guardLastName = jsonBody.get("guardLastName").asString,
+                                shiftId = jsonBody.get("shiftId").asString,
+                                finishTimeInDay = jsonBody.get("finishTimeInDay").asString,
+                                latitude = jsonBody.get("latitude").asString,
+                                longitude = jsonBody.get("longitude").asString,
+                                numberOfGuardsInStation = jsonBody.get("numberOfGuardsInStation").asString,
+                                startingTimeInDay = jsonBody.get("startingTimeInDay").asString,
+                                stationName = jsonBody.get("stationName").asString,
+                                stationSchedule = jsonBody.get("stationSchedule").asString,
+                                tenantId = jsonBody.get("tenantId").asString
+                    )
+                )
+
+            }else{
+                Resource.Error(response.message().toString() + "--" + response.raw().message )
+            }
+
+
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión ha tardado mucho tiempo")
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                is IOException -> { Resource.Error(ex.message.toString()) }
+            }
+        }
+
+    }
 
     private fun parseAllShiftsResponse(jsonObject: JsonObject): AllShiftsResponse {
 
