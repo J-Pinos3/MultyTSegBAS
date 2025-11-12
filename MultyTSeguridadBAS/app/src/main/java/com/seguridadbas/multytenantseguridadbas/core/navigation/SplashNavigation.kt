@@ -31,16 +31,16 @@ fun SplashNavigation(authController: AuthController,
         composable <Login>{
             LoginScreen(
 
-                { navController.navigate(Home) },
+                {it-> navController.navigate(Home(tenantId = it)) },
                 { navController.navigate(ResetPasswordSc) },
                 { navController.navigate(Register) },
                 authController = authController
             )
         }
 
-        composable <Home>{
-
-            BottonNavScreen(navController, authController, stationsController)
+        composable <Home>{ backstackEntry ->
+            val home =backstackEntry.toRoute<Home>()
+            BottonNavScreen(navController, authController, stationsController, home.tenantId)
         }
 
         composable <Register>{
@@ -61,7 +61,10 @@ fun SplashNavigation(authController: AuthController,
 
         composable <Business>{ backStackEntry ->
             val business = backStackEntry.toRoute<Business>()
-            BusinessScreen(postSiteName = business.siteName ) { navController.popBackStack() }
+            BusinessScreen(
+                siteId = business.siteName,
+                navigateBackToPostSites = { navController.popBackStack() },
+                stationsController = stationsController)
         }
     }
 

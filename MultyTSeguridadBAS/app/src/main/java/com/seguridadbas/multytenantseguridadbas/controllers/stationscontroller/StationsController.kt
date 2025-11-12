@@ -75,11 +75,12 @@ class StationsController @Inject constructor(
                         finishTimeInDay = jsonBody.get("finishTimeInDay").asString ?: "",
                         id = jsonBody.get("id").asString ?: "",
                         incidents = jsonBody.getAsJsonArray("incidents").toList(),
-                        latitude = jsonBody.get("latitude").asString,
-                        longitude = jsonBody.get("longitude").asString,
+                        latitude = jsonBody.get("latitud").asString,
+                        longitude = jsonBody.get("longitud").asString,
                         stationName = jsonBody.get("stationName").asString,
                         stationSchedule = jsonBody.get("stationSchedule").asString,
-                        tasks = jsonBody.getAsJsonArray("tasks").toList()
+                        tasks = jsonBody.getAsJsonArray("tasks").toList(),
+                        numberOfGuardsInStation = jsonBody.get("numberOfGuardsInStation").asInt
                     )
 
                 )

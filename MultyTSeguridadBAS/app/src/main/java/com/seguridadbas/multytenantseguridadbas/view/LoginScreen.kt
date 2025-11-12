@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.shapes.Shape
 import android.text.Layout
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,7 +75,7 @@ import kotlin.coroutines.coroutineContext
 //@Preview(showSystemUi = true)
 @Composable
 fun LoginScreen(
-    onLoginClicked:() -> Unit = {},
+    onLoginClicked:(String) -> Unit = {},
     onForgotPasswordClicked: () -> Unit = {},
     onCreateAccount: () -> Unit = {},
     authController: AuthController
@@ -90,6 +91,7 @@ fun LoginScreen(
 
     var loading by remember { mutableStateOf(false) }
 
+    var tenantid by remember { mutableStateOf("") }
 
     val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
@@ -208,10 +210,29 @@ fun LoginScreen(
                                 firstName = result.data?.user?.firstName.toString(),
                                 lastName = result.data?.user?.lastName.toString() ?: ""
                             )
+                            val token = result.data?.token.toString().replace("\"","").trim()
+                            val resultTenant = authController.authenticateProfileME("Bearer $token")
+                                when(resultTenant){
+                                    is Resource.Success -> {
+
+                                        tenantid = resultTenant.data?.tenantId.toString().replace("\"","").trim() ?: ""
+                                        dataStoreController.saveTenantId( tenantid   )
+
+                                        Log.i("Login","tenantId GUARDADO $tenantid")
+                                    }
+
+                                    is Resource.Error -> {
+                                        Log.e("Login",result.message.toString())
+                                    }
+
+                                    else -> {
+                                        Log.e("Login","No se pudo traer el perfil del usuario")
+                                    }
+                                }
 
                             withContext(Dispatchers.Main){
                                 dataStoreController.saveToDataStore(userDataStore)
-                                onLoginClicked()
+                                onLoginClicked(tenantid)
                             }
 
                             Log.i("LOGIN SCREEN", "login exitoso, ${result.data?.token } ${result.data?.user?.firstName}")

@@ -9,5 +9,6 @@ data class StationData(
     val longitude: String,
     val stationName: String,
     val stationSchedule: String,
-    val tasks: List<Any> = emptyList()
+    val tasks: List<Any> = emptyList(),
+    val numberOfGuardsInStation: Int = 0
 )

@@ -48,7 +48,6 @@ import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
-import com.seguridadbas.multytenantseguridadbas.view.dialog.LoadingDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -61,9 +60,10 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    authController: AuthController
+    authController: AuthController,
+    tenantId: String
 ){
-    var tenantid by remember{ mutableStateOf("") }
+
     var bearerToken by remember { mutableStateOf("") }
     var showProgress by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -75,32 +75,7 @@ fun HomeScreen(
             bearerToken = storedData.token
             bearerToken = bearerToken.replace("\"","").trim()
 
-
-            Log.i("Home","tenantId existe $tenantid")
             if( !bearerToken.isNullOrEmpty()  ){
-                val result = authController.authenticateProfileME("Bearer $bearerToken")
-
-                withContext(Dispatchers.Main){
-                    when(result){
-                        is Resource.Success -> {
-
-                            tenantid = result.data?.tenantId.toString().replace("\"","").trim()
-                            dataStoreController.saveTenantId( tenantid   )
-
-                            Log.i("Home","tenantId GUARDADO $tenantid")
-                            Toast.makeText(context, "Estamos recuperando información del servidor 😁", Toast.LENGTH_SHORT).show()
-                        }
-
-                        is Resource.Error -> {
-                            Log.e("Home",result.message.toString())
-                        }
-
-                        else -> {
-                            Log.e("Home","No se pudo traer el perfil del usuario")
-                        }
-                    }
-
-                }
 
             }else{
                 Log.e("HomeTab", "Datastore esta vacío")

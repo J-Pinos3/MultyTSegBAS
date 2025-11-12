@@ -17,7 +17,7 @@ object Splash
 object Login
 
 @Serializable
-object Home
+data class Home(val tenantId: String)
 
 @Serializable
 object ResetPasswordSc

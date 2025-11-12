@@ -22,9 +22,9 @@ import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
 
 @Composable
 fun BottonNavScreen(navController: NavController, authController: AuthController,
-                    stationsController: StationsController){
-    //var selectedIndex by remember{ mutableStateOf(0) }
-    var selectedIndex by rememberSaveable { mutableStateOf(0) }
+                    stationsController: StationsController, tenantId: String){
+    var selectedIndex by remember{ mutableStateOf(0) }
+
 
     val navigateToBusiness: (String) -> Unit = {
         siteName ->
@@ -47,7 +47,8 @@ fun BottonNavScreen(navController: NavController, authController: AuthController
             Modifier.padding(it),
             navigateToBusiness = navigateToBusiness,
             authController = authController,
-            stationsController = stationsController
+            stationsController = stationsController,
+            tenantId = tenantId
         )
     }
 }
@@ -59,10 +60,11 @@ fun ContentScreen(
     modifier: Modifier,
     navigateToBusiness: (String) -> Unit = {},
     authController: AuthController,
-    stationsController: StationsController
+    stationsController: StationsController,
+    tenantId: String
 ){
     when(selectedIndex){
-        0-> HomeScreen(Modifier, authController)
+        0-> HomeScreen(Modifier, authController, tenantId)
 
         1 -> PostSitesScreen(Modifier, navigateToBusiness, stationsController)
 
