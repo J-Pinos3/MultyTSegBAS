@@ -142,7 +142,9 @@ class AuthController @Inject constructor(
             lastName = response.body()?.get("lastName").toString(),
             email = response.body()?.get("email").toString(),
             provider = response.body()?.get("provider").toString(),
-            phoneNumber = response.body()?.get("phoneNumber").toString()
+            phoneNumber = response.body()?.get("phoneNumber").toString(),
+
+            tenantId = response.body()?.getAsJsonArray("tenants")?.first()?.asJsonObject?.get("tenantId").toString()
         )
 
         return if( response.isSuccessful ){

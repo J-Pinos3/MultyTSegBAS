@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.SplashNavigation
 import com.seguridadbas.multytenantseguridadbas.ui.theme.MultyTenantSeguridadBASTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,13 +16,15 @@ import kotlin.getValue
 class MainActivity : ComponentActivity() {
 
     private val authController by viewModels<AuthController>()
+    private val stationsController by viewModels<StationsController>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MultyTenantSeguridadBASTheme {
-                SplashNavigation(authController)
+                SplashNavigation(authController, stationsController)
                 //SplashScreen()
             }
         }

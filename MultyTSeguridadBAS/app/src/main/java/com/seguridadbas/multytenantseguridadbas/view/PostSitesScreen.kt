@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,12 +21,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,35 +39,70 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
+import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
+import com.seguridadbas.multytenantseguridadbas.core.util.Resource
+import com.seguridadbas.multytenantseguridadbas.model.station.ShortStation
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
 fun PostSitesScreen(
     modifier: Modifier = Modifier,
-    onPostSiteClicked: (String) -> Unit = {}
+    onPostSiteClicked: (String) -> Unit = {},
+    stationsController: StationsController
 
 ){
 
-    val postSiteList =   listOf(
-        PostSite(
-            postSiteName = "Cuenca", postSiteAddress = "Puente Roto 1"
-        ),
+    var token by remember { mutableStateOf("") }
+    var tenantId by remember { mutableStateOf("") }
+    var sitesList by remember { mutableStateOf<List<ShortStation>>( emptyList() ) }
 
-        PostSite(
-            postSiteName = "La Prensa", postSiteAddress = "Prensa y Machala"
-        ),
 
-        PostSite(
-            postSiteName = "La Prensa Edificio", postSiteAddress = "Prensa y Avenida del Maestro"
-        ),
+    val context = LocalContext.current
+    val dataStoreController = DataStoreController(context)
 
-        PostSite(
-            postSiteName = "BAS Matriz", postSiteAddress = "America y Bartolome de las Casas"
-        ),
-    )
+    LaunchedEffect(Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val storedData = dataStoreController.getDataFromStore().first()
+            token = storedData.token
+            token = token.replace("\"","").trim()
+
+            tenantId = dataStoreController.getTenantId().first()
+
+            tenantId = tenantId.replace("\"","").trim()
+            Log.i("Sites","Token: $token \n TenantId: $tenantId")
+
+            if( !token.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+                val result = stationsController.getAllStations("Bearer $token", tenantId)
+
+                when(result){
+                    is Resource.Success -> {
+
+                        sitesList = result.data?.toList()!!
+                        Log.i("Sites","objetos: ${sitesList[0].stationName} ---")
+                    }
+                    is Resource.Error -> {
+                        sitesList = emptyList()
+                        Log.e("Sites","No se pudo traer los sitios ${result.message.toString()}")
+                    }
+                    else -> {
+                        Log.e("Sites","No se pudo traer los sitios")
+                    }
+                }
+            }
+
+//            if( !token.isNullOrEmpty() ){
+//                val result = stationsController.getAllStations("Bearer $token", "")
+//            }
+        }
+    }
 
 
     //val listState = rememberLazyListState()
@@ -74,7 +115,7 @@ fun PostSitesScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 
-        items(postSiteList){ site ->
+        items(sitesList){ site ->
             PostSiteItemList(
                 site, modifier, onPostSiteClicked
             )
@@ -86,7 +127,7 @@ fun PostSitesScreen(
 
 @Composable
 fun PostSiteItemList(
-    postSite: PostSite,
+    sitesList: ShortStation,
     modifier: Modifier,
     onPostSiteClicked: (String) -> Unit = {}
     ){
@@ -105,7 +146,7 @@ fun PostSiteItemList(
             .height(100.dp)
             .background(Color.White)
             .clickable{
-                onPostSiteClicked(postSite.postSiteName)
+                onPostSiteClicked(sitesList.stationId)
             }
     ){
        Column(
@@ -115,7 +156,7 @@ fun PostSiteItemList(
            horizontalAlignment = Alignment.Start
        ){
            Text(
-               text = postSite.postSiteName,
+               text = sitesList.stationName,
                fontSize = 20.sp,
                textAlign = TextAlign.Start,
                fontWeight = FontWeight.Bold
@@ -124,7 +165,7 @@ fun PostSiteItemList(
            Spacer(modifier = Modifier.padding(top = 10.dp))
 
            Text(
-               text = postSite.postSiteAddress,
+               text = sitesList.stationSchedule,
                fontSize = 16.sp,
                textAlign = TextAlign.Start,
                fontWeight = FontWeight.Bold

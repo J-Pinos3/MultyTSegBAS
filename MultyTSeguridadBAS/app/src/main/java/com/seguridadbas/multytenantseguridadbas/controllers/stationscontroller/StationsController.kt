@@ -11,6 +11,7 @@ import com.seguridadbas.multytenantseguridadbas.model.station.ShortStation
 import com.seguridadbas.multytenantseguridadbas.model.station.StationData
 import com.seguridadbas.multytenantseguridadbas.model.station.StationsDataResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.serialization.json.JsonElement
 import okio.IOException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -114,10 +115,10 @@ class StationsController @Inject constructor(
                 checkpoints = row.getAsJsonArray("checkpoints").toList(),
                 createdAt = row.get("createdAt").asString,
                 createdById = row.get("createdById").asString,
-                deletedAt = row.get("deletedAt").asString,
+                deletedAt =  if( !row.get("deletedAt").isJsonNull  ) row.get("deletedAt").asString else "" ,
                 finishTimeInDay = row.get("finishTimeInDay").asString,
                 id = row.get("id").asString,
-                importHash = row.get("importHash").asString,
+                importHash = if( !row.get("importHash").isJsonNull  ) row.get("importHash").asString else "",
                 incidents = row.getAsJsonArray("incidents").toList(),
                 latitud = row.get("latitud").asString,
                 longitud = row.get("longitud").asString,
@@ -127,18 +128,23 @@ class StationsController @Inject constructor(
                 shift = row.getAsJsonArray("shift").toList(),
                 startingTimeInDay = row.get("startingTimeInDay").asString,
                 stationName = row.get("stationName").asString,
-                stationOrigin = row.get("stationOrigin").asString,
-                stationOriginId = row.get("stationOriginId").asString,
+                stationOrigin = row.isNullField("stationOrigin"),
+                stationOriginId = row.isNullField("stationOriginId"),
                 stationSchedule = row.get("stationSchedule").asString,
                 tasks = row.getAsJsonArray("tasks").toList(),
                 tenantId = row.get("tenantId").asString,
                 updatedAt = row.get("updatedAt").asString,
-                updatedById = row.get("updatedById").asString
+                updatedById = row.isNullField("updatedById")
             )
 
         }
 
         return AllStationsResponse(count, rows)
+    }
+
+
+    private fun JsonObject?.isNullField(field: String):String{
+        return if(this?.get(field)?.isJsonNull == false) this.get(field).asString  else ""
     }
 
 }

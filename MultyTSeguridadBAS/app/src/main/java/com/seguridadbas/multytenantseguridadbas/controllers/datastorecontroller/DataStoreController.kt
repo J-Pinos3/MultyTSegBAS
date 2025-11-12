@@ -22,8 +22,19 @@ class DataStoreController(val context: Context) {
         val EMAIL = stringPreferencesKey("EMAIL")
         val FIRSTNAME = stringPreferencesKey("FIRSTNAME")
         val LASTNAME = stringPreferencesKey("LASTNAME")
+
+        val TENANTID = stringPreferencesKey("TENANTID")
     }
 
+    suspend fun saveTenantId(tenantId: String){
+        context.preferencesDataStore.edit { preferences ->
+            preferences[TENANTID] = tenantId
+        }
+    }
+
+    suspend fun getTenantId() = context.preferencesDataStore.data.map{
+        it[TENANTID] ?: ""
+    }
 
     suspend fun saveToDataStore(userDataStore: UserDataStore){
         context.preferencesDataStore.edit { preferences ->

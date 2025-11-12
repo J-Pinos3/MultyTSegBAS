@@ -1,11 +1,10 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
-import android.graphics.drawable.shapes.OvalShape
-import android.provider.CalendarContract
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,43 +16,99 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
+import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.dialog.LoadingDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Date
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    authController: AuthController
 ){
+    var tenantid by remember{ mutableStateOf("") }
+    var bearerToken by remember { mutableStateOf("") }
+    var showProgress by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val dataStoreController = DataStoreController(context)
+
+    LaunchedEffect(Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val storedData = dataStoreController.getDataFromStore().first()
+            bearerToken = storedData.token
+            bearerToken = bearerToken.replace("\"","").trim()
+
+
+            Log.i("Home","tenantId existe $tenantid")
+            if( !bearerToken.isNullOrEmpty()  ){
+                val result = authController.authenticateProfileME("Bearer $bearerToken")
+
+                withContext(Dispatchers.Main){
+                    when(result){
+                        is Resource.Success -> {
+
+                            tenantid = result.data?.tenantId.toString().replace("\"","").trim()
+                            dataStoreController.saveTenantId( tenantid   )
+
+                            Log.i("Home","tenantId GUARDADO $tenantid")
+                            Toast.makeText(context, "Estamos recuperando información del servidor 😁", Toast.LENGTH_SHORT).show()
+                        }
+
+                        is Resource.Error -> {
+                            Log.e("Home",result.message.toString())
+                        }
+
+                        else -> {
+                            Log.e("Home","No se pudo traer el perfil del usuario")
+                        }
+                    }
+
+                }
+
+            }else{
+                Log.e("HomeTab", "Datastore esta vacío")
+            }
+        }
+
+
+    }
 
     Column(
         modifier = Modifier
@@ -72,6 +127,7 @@ fun HomeScreen(
             fontSize = 40.sp,
             fontWeight = FontWeight.ExtraBold,
         )
+
 
         Box(
             modifier = Modifier

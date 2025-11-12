@@ -16,7 +16,9 @@ data class UserProfile(
     @SerializedName("provider")
     val provider: String? = null,
     @SerializedName("phoneNumber")
-    val phoneNumber: String? = null
+    val phoneNumber: String? = null,
+    @SerializedName("tenantId")
+    val tenantId: String = ""
 )
 
 data class UserProfileRequest(
