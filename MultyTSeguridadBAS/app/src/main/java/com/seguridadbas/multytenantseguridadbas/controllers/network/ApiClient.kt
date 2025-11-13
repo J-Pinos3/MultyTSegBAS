@@ -178,5 +178,21 @@ interface ApiClient {
 
 
 
+    /** ENDPOINTS FOR CERTIRFICATION AND SERVICES*/
+    @GET("tenant/{tenantId}/certification")
+    suspend fun getAllCertificationsApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+    ): Response<JsonObject>
+
+
+    @GET("tenant/{tenantId}/service")
+    suspend fun getAllServicesApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+    ): Response<JsonObject>
+
 
 }
+
+
