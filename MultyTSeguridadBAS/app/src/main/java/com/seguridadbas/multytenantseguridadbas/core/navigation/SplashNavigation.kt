@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
@@ -18,7 +19,9 @@ import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
 
 @Composable
 fun SplashNavigation(authController: AuthController,
-                     stationsController: StationsController) {
+                     stationsController: StationsController,
+                     certificationServicesController: CertificationServicesController
+                     ) {
 
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Splash){
@@ -40,7 +43,7 @@ fun SplashNavigation(authController: AuthController,
 
         composable <Home>{ backstackEntry ->
             val home =backstackEntry.toRoute<Home>()
-            BottonNavScreen(navController, authController, stationsController, home.tenantId)
+            BottonNavScreen(navController, authController, stationsController, certificationServicesController,home.tenantId)
         }
 
         composable <Register>{

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -43,11 +44,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
+import com.seguridadbas.multytenantseguridadbas.model.certifications.CertificationDataResponse
+import com.seguridadbas.multytenantseguridadbas.model.services.ServiceDataResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.badgeshome.CertificationBadgeItems
+import com.seguridadbas.multytenantseguridadbas.view.badgeshome.ServiceBadgeItems
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -60,12 +66,15 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    authController: AuthController,
+    certificationServicesController: CertificationServicesController,
     tenantId: String
 ){
 
     var bearerToken by remember { mutableStateOf("") }
-    var showProgress by remember { mutableStateOf(false) }
+
+    var certificationsList by remember{ mutableStateOf<List<CertificationDataResponse>>( emptyList() ) }
+    var servicesList by remember { mutableStateOf<List<ServiceDataResponse>>( emptyList() ) }
+
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
 
@@ -75,10 +84,35 @@ fun HomeScreen(
             bearerToken = storedData.token
             bearerToken = bearerToken.replace("\"","").trim()
 
-            if( !bearerToken.isNullOrEmpty()  ){
+            Log.i("Home","token: ${bearerToken.substring(0,6)} and tenantId: $tenantId")
 
-            }else{
-                Log.e("HomeTab", "Datastore esta vacío")
+            if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+                val certificationsResult = certificationServicesController.getAllCertifications("Bearer $bearerToken", tenantId)
+
+                when(certificationsResult){
+                    is Resource.Success -> {
+                        certificationsList = certificationsResult.data?.toList()!!
+                    }
+                    is Resource.Error -> {
+                        certificationsList = emptyList()
+                        Log.e("Sites","Error al traer los certificados: ${certificationsResult.message}")
+                    }
+                    else -> {Log.e("Sites","No se pudo traer los certificados")}
+                }
+
+                val servicesResult = certificationServicesController.getAllServices("Bearer $bearerToken", tenantId)
+
+                when(servicesResult){
+                    is Resource.Success -> {
+                        servicesList = servicesResult.data?.toList()!!
+                    }
+
+                    is Resource.Error -> {
+                        Log.e("Sites","Error al traer los servicios: ${servicesResult.message}")
+                    }
+
+                    else ->{ Log.e("Sites","No se pudo traer los servicios") }
+                }
             }
         }
 
@@ -122,8 +156,17 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.padding(top = 10.dp))
 
-        LazyRow {
-            /** TODO ADD ITEMS*/
+        LazyRow(
+            modifier = Modifier.fillMaxWidth().height(200.dp),
+            //verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            items(servicesList){ service ->
+                ServiceBadgeItems(
+                    Modifier.fillMaxWidth().width(160.dp).height(200.dp),
+                    service
+                )
+            }
         }
 
         Spacer(modifier = Modifier.padding(top = 30.dp))
@@ -133,7 +176,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.padding(top = 10.dp))
 
         BillingComposable(
-            modifier,
+            modifier.padding(horizontal = 2.dp),
             "$ 12312.00",
             "20/01/23"
         )
@@ -142,9 +185,19 @@ fun HomeScreen(
 
         titleTexts(  modifier = Modifier.align(Alignment.Start), "Certificaciones y Permisos:"  )
 
-        LazyRow {
-
+        LazyRow(
+            modifier = Modifier.fillMaxWidth().height(220.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            items(certificationsList){ certification ->
+                CertificationBadgeItems(
+                    Modifier.width(160.dp).height(200.dp),
+                    certification)
+            }
         }
+
+        Spacer(modifier = Modifier.height(90.dp) )
 
     }
 

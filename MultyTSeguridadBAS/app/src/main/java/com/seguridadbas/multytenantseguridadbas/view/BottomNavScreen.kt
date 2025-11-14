@@ -15,14 +15,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.BottomNavBar
 import com.seguridadbas.multytenantseguridadbas.core.navigation.Business
 import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
 
 @Composable
-fun BottonNavScreen(navController: NavController, authController: AuthController,
-                    stationsController: StationsController, tenantId: String){
+fun BottonNavScreen(
+    navController: NavController,
+    authController: AuthController,
+    stationsController: StationsController,
+    certificationServicesController: CertificationServicesController,
+    tenantId: String
+){
     var selectedIndex by remember{ mutableStateOf(0) }
 
 
@@ -48,6 +54,7 @@ fun BottonNavScreen(navController: NavController, authController: AuthController
             navigateToBusiness = navigateToBusiness,
             authController = authController,
             stationsController = stationsController,
+            certificationServicesController =certificationServicesController,
             tenantId = tenantId
         )
     }
@@ -61,10 +68,11 @@ fun ContentScreen(
     navigateToBusiness: (String) -> Unit = {},
     authController: AuthController,
     stationsController: StationsController,
+    certificationServicesController: CertificationServicesController,
     tenantId: String
 ){
     when(selectedIndex){
-        0-> HomeScreen(Modifier, authController, tenantId)
+        0-> HomeScreen(Modifier, certificationServicesController, tenantId)
 
         1 -> PostSitesScreen(Modifier, navigateToBusiness, stationsController)
 

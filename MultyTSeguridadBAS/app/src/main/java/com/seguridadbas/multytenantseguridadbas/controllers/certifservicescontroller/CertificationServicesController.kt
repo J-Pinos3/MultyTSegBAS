@@ -136,17 +136,17 @@ class CertificationServicesController @Inject constructor(
                 code = row.get("code").asString,
                 createdAt = row.get("createdAt").asString,
                 createdById = row.get("createdById").asString,
-                deletedAt = row.get("deletedAt").asString,
+                deletedAt = row.isNullField("deletedAt"),
                 description = row.get("description").asString,
                 expirationDate = row.get("expirationDate").asString,
                 icon = row.getAsJsonArray("icon").toList(),
                 id = row.get("id").asString,
                 image = row.getAsJsonArray("image").toList(),
-                importHash = row.get("importHash").asString,
+                importHash = row.isNullField("importHash") ,
                 tenantId = row.get("tenantId").asString,
                 title = row.get("title").asString,
                 updatedAt = row.get("updatedAt").asString,
-                updatedById = row.get("updatedById").asString
+                updatedById = row.isNullField("updatedBy")
             )
 
         }
@@ -167,11 +167,11 @@ class CertificationServicesController @Inject constructor(
             ServiceDataResponse(
                 createdAt = row.get("createdAt").asString,
                 createdById = row.get("createdById").asString,
-                deletedAt = row.get("deletedAt").asString,
+                deletedAt = row.isNullField("deletedAt"),
                 description = row.get("description").asString,
                 iconImage = row.getAsJsonArray("iconImage").toList(),
                 id = row.get("id").asString,
-                importHash = row.get("importHash").asString,
+                importHash = row.isNullField("importHash"),
                 price = row.get("price").asString,
                 serviceImages = row.getAsJsonArray("serviceImages").toList(),
                 specifications = row.get("specifications").asString ,
@@ -179,7 +179,7 @@ class CertificationServicesController @Inject constructor(
                 tenantId = row.get("tenantId").asString,
                 title = row.get("title").asString,
                 updatedAt = row.get("updatedAt").asString,
-                updatedById = row.get("updatedById").asString
+                updatedById = row.isNullField("updatedById")
             )
 
         }
@@ -192,5 +192,8 @@ class CertificationServicesController @Inject constructor(
 
 
 
+    private fun JsonObject?.isNullField(field: String): String{
+        return if(this?.get(field)?.isJsonNull == false) this.get(field).asString else ""
+    }
 
 }
