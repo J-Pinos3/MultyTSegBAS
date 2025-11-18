@@ -193,6 +193,49 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
+    /** 🏠 ENDPOINTS FOR REPORTS FOR A GIVEN STATION*/
+    @GET("tenant/{tenantId}/guard-shift")
+    suspend fun getGuardShiftsByStationApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Query("filter[stationName]") stationId: String? = null,
+        @Query("filter[guardName]") guardId: String? = null
+    ): Response<JsonObject>
+
+
+    @GET("tenant/{tenantId}/report")
+    suspend fun getReportsByStationApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Query("filter[station]") stationId: String? = null,
+        @Query("filter[generatedDateRange][]") generatedDateRange: List<String>? = null
+    ): Response<JsonObject>
+
+    @GET("tenant/{tenantId}/incident")
+    suspend fun getIncidentsApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Query("filter[title]") title: String? = null,
+        @Query("filter[dateRange][]") dateRange: List<String>? = null,
+    ): Response<JsonObject>
+
+
+    @GET("tenant/{tenantId}/patrol")
+    suspend fun getPatrolsByStationApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Query("filter[station]") stationId: String
+    ): Response<JsonObject>
+
+
+    @GET("tenant/{tenantId}/inventory")
+    suspend fun getInventoryByStationApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Query("filter[belongsToStation]") stationName: String
+    ): Response<JsonObject>
+
+
 }
 
 
