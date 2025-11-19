@@ -11,10 +11,13 @@ import com.seguridadbas.multytenantseguridadbas.model.stationreports.GuardShiftB
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.GuardShiftByStationResponse
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.IncidentsByStationData
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.IncidentsbyStationResponse
+import com.seguridadbas.multytenantseguridadbas.model.stationreports.InventoryByStationData
+import com.seguridadbas.multytenantseguridadbas.model.stationreports.InventoryByStationResponse
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.PatrolByStationData
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.PatrolByStationResponse
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.ReportsByStationData
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.ReportsByStationResponse
+import com.seguridadbas.multytenantseguridadbas.model.stationreports.StationObj
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okio.IOException
 import java.net.SocketTimeoutException
@@ -86,6 +89,7 @@ class StationReportsController  @Inject constructor(
         }
     }
 
+
     suspend fun getIncidents(
         token: String, tenantId: String,
         title: String?, dateRange: List<String>?
@@ -115,6 +119,7 @@ class StationReportsController  @Inject constructor(
         }
     }
 
+
     suspend fun getPatrolsByStation(
         token: String, tenantId: String, stationId: String
     ):Resource<List<PatrolByStationData>>  {
@@ -128,6 +133,37 @@ class StationReportsController  @Inject constructor(
 
                 Resource.Success(
                     patrolsByStation.rows
+                )
+
+            }else{
+                Resource.Error(response.message().toString() + "--" + response.raw().message )
+            }
+
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión ha tardado mucho tiempo")
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                is IOException -> { Resource.Error(ex.message.toString()) }
+            }
+        }
+
+    }
+
+
+    suspend fun getInventoryByStation(
+        token: String, tenantId: String, stationName: String
+    ): Resource<List<InventoryByStationData>> {
+        val response = stationReportsRepository.getInventoryByStationRepo(token, tenantId, stationName)
+
+        return try{
+
+            if(response.isSuccessful && response.body() != null ){
+                val jsonBody = response.body()!!
+                val inventory = parseInventoryByStationResponse(jsonBody as JsonObject)
+
+                Resource.Success(
+                    inventory.rows
                 )
 
             }else{
@@ -171,28 +207,20 @@ class StationReportsController  @Inject constructor(
                 punchInTime = row.get("punchInTime").asString,
                 punchOutTime = row.get("punchOutTime").asString,
                 shiftSchedule = row.get("shiftSchedule").asString,
-                stationName = StationsDataResponse(
-                    assignedGuards = stationObj.getAsJsonArray("assignedGuards").toList(),
-                    checkpoints = stationObj.getAsJsonArray("checkpoints").toList(),
+                stationName = StationObj(
                     createdAt = stationObj.get("createdAt").asString,
                     createdById = stationObj.get("createdById").asString,
                     deletedAt = stationObj.get("deletedAt").asString,
                     finishTimeInDay = stationObj.get("finishTimeInDay").asString,
                     id = stationObj.get("id").asString,
                     importHash = stationObj.get("importHash").asString,
-                    incidents = stationObj.getAsJsonArray("incidents").toList(),
                     latitud = stationObj.get("latitud").asString,
                     longitud = stationObj.get("longitud").asString,
                     numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
-                    patrol = stationObj.getAsJsonArray("patrol").toList(),
-                    reports = stationObj.getAsJsonArray("reports").toList(),
-                    shift = stationObj.getAsJsonArray("shift").toList(),
                     startingTimeInDay = stationObj.get("startingTimeInDay").asString,
                     stationName = stationObj.get("stationName").asString,
-                    stationOrigin = stationObj.get("stationOrigin").asString,
                     stationOriginId = stationObj.get("stationOriginId").asString,
                     stationSchedule = stationObj.get("stationSchedule").asString,
-                    tasks = stationObj.getAsJsonArray("tasks").toList(),
                     tenantId = stationObj.get("tenantId").asString,
                     updatedAt = stationObj.get("updatedAt").asString,
                     updatedById = stationObj.get("updatedById").asString
@@ -227,28 +255,20 @@ class StationReportsController  @Inject constructor(
                         generatedDate = row.get("generatedDate").asString,
                         id = row.get("id").asString,
                         importHash = row.get("importHash").asString,
-                        station = StationsDataResponse(
-                            assignedGuards = stationObj.getAsJsonArray("assignedGuards").toList(),
-                            checkpoints = stationObj.getAsJsonArray("checkpoints").toList(),
+                        station = StationObj(
                             createdAt = stationObj.get("createdAt").asString,
                             createdById = stationObj.get("createdById").asString,
                             deletedAt = stationObj.get("deletedAt").asString,
                             finishTimeInDay = stationObj.get("finishTimeInDay").asString,
                             id = stationObj.get("id").asString,
                             importHash = stationObj.get("importHash").asString,
-                            incidents = stationObj.getAsJsonArray("incidents").toList(),
                             latitud = stationObj.get("latitud").asString,
                             longitud = stationObj.get("longitud").asString,
                             numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
-                            patrol = stationObj.getAsJsonArray("patrol").toList(),
-                            reports = stationObj.getAsJsonArray("reports").toList(),
-                            shift = stationObj.getAsJsonArray("shift").toList(),
                             startingTimeInDay = stationObj.get("startingTimeInDay").asString,
                             stationName = stationObj.get("stationName").asString,
-                            stationOrigin = stationObj.get("stationOrigin").asString,
                             stationOriginId = stationObj.get("stationOriginId").asString,
                             stationSchedule = stationObj.get("stationSchedule").asString,
-                            tasks = stationObj.getAsJsonArray("tasks").toList(),
                             tenantId = stationObj.get("tenantId").asString,
                             updatedAt = stationObj.get("updatedAt").asString,
                             updatedById = stationObj.get("updatedById").asString
@@ -327,28 +347,20 @@ class StationReportsController  @Inject constructor(
                 importHash = row.get("importHash").asString,
                 logs = row.getAsJsonArray("logs").toList(),
                 scheduledTime = row.get("scheduledTime").asString,
-                station = StationsDataResponse(
-                    assignedGuards = stationObj.getAsJsonArray("assignedGuards").toList(),
-                    checkpoints = stationObj.getAsJsonArray("checkpoints").toList(),
+                station = StationObj(
                     createdAt = stationObj.get("createdAt").asString,
                     createdById = stationObj.get("createdById").asString,
                     deletedAt = stationObj.get("deletedAt").asString,
                     finishTimeInDay = stationObj.get("finishTimeInDay").asString,
                     id = stationObj.get("id").asString,
                     importHash = stationObj.get("importHash").asString,
-                    incidents = stationObj.getAsJsonArray("incidents").toList(),
                     latitud = stationObj.get("latitud").asString,
                     longitud = stationObj.get("longitud").asString,
                     numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
-                    patrol = stationObj.getAsJsonArray("patrol").toList(),
-                    reports = stationObj.getAsJsonArray("reports").toList(),
-                    shift = stationObj.getAsJsonArray("shift").toList(),
                     startingTimeInDay = stationObj.get("startingTimeInDay").asString,
                     stationName = stationObj.get("stationName").asString,
-                    stationOrigin = stationObj.get("stationOrigin").asString,
                     stationOriginId = stationObj.get("stationOriginId").asString,
                     stationSchedule = stationObj.get("stationSchedule").asString,
-                    tasks = stationObj.getAsJsonArray("tasks").toList(),
                     tenantId = stationObj.get("tenantId").asString,
                     updatedAt = stationObj.get("updatedAt").asString,
                     updatedById = stationObj.get("updatedById").asString
@@ -365,4 +377,46 @@ class StationReportsController  @Inject constructor(
     }
 
 
+    private fun parseInventoryByStationResponse(jsonObject: JsonObject): InventoryByStationResponse {
+        val count = jsonObject.get("count").asInt
+        val rowsArray = jsonObject.get("rows").asJsonArray
+
+        val rows = rowsArray.map { rowElement ->
+            val row = rowElement.asJsonObject
+            InventoryByStationData(
+                armor = row.get("armor").asBoolean,
+                        armorSerialNumber = row.get("armorSerialNumber").asString,
+                        armorType = row.get("armorType").asString,
+                        belongsTo = row.get("belongsTo").asString,
+                        belongsToId = row.get("belongsToId").asString,
+                        belongsToStation = row.get("belongsToStation").asString,
+                        caseta = row.get("caseta").asBoolean,
+                        cintoCompleto = row.get("cintoCompleto").asBoolean,
+                        createdAt = row.get("createdAt").asString,
+                        createdById = row.get("createdById").asString,
+                        deletedAt = row.get("deletedAt").asString,
+                        detectorDeMetales = row.get("detectorDeMetales").asBoolean,
+                        gun = row.get("gun").asBoolean,
+                        gunSerialNumber = row.get("gunSerialNumber").asString,
+                        gunType = row.get("gunType").asString,
+                        id = row.get("id").asString,
+                        importHash = row.get("importHash").asString,
+                        linterna = row.get("linterna").asBoolean,
+                        observations = row.get("observations").asString,
+                        pito = row.get("pito").asBoolean,
+                        ponchoDeAguas = row.get("ponchoDeAguas").asBoolean,
+                        radio = row.get("radio").asBoolean,
+                        radioSerialNumber = row.get("radioSerialNumber").asString,
+                        radioType = row.get("radioType").asString,
+                        tenantId = row.get("tenantId").asString,
+                        tolete = row.get("tolete").asBoolean,
+                        transportation = row.get("transportation").asString,
+                        updatedAt = row.get("updatedAt").asString,
+                        updatedById = row.get("updatedById").asString,
+                        vitacora = row.get("vitacora").asBoolean,
+            )
+        }
+
+        return InventoryByStationResponse(count, rows)
+    }
 }

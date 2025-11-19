@@ -30,7 +30,7 @@ data class PatrolByStationData(
     @SerializedName("scheduledTime")
     val scheduledTime: String,
     @SerializedName("station")
-    val station: StationsDataResponse,
+    val station: StationObj,
     @SerializedName("stationId")
     val stationId: String,
     @SerializedName("status")

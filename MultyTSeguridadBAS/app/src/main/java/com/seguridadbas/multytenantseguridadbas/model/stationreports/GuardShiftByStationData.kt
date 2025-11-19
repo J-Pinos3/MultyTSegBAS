@@ -40,7 +40,7 @@ data class GuardShiftByStationData(
     @SerializedName("shiftSchedule")
     val shiftSchedule: String,
     @SerializedName("stationName")
-    val stationName: StationsDataResponse,
+    val stationName: StationObj,
     @SerializedName("stationNameId")
     val stationNameId: String,
     @SerializedName("tenantId")

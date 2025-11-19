@@ -19,7 +19,7 @@ data class ReportsByStationData(
     @SerializedName("importHash")
     val importHash: String? = null,
     @SerializedName("station")
-    val station: StationsDataResponse,
+    val station: StationObj,
     @SerializedName("stationId")
     val stationId: String,
     @SerializedName("tenantId")
