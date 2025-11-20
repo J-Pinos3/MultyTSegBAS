@@ -98,15 +98,11 @@ fun PostSitesScreen(
                 }
             }
 
-//            if( !token.isNullOrEmpty() ){
-//                val result = stationsController.getAllStations("Bearer $token", "")
-//            }
+
         }
     }
 
 
-    //val listState = rememberLazyListState()
-    //rememberScrollState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -126,7 +122,7 @@ fun PostSitesScreen(
 
 
 @Composable
-fun PostSiteItemList(
+private fun PostSiteItemList(
     sitesList: ShortStation,
     modifier: Modifier,
     onPostSiteClicked: (String) -> Unit = {}
@@ -175,7 +171,3 @@ fun PostSiteItemList(
 }
 
 
-data class PostSite(
-    val postSiteName: String,
-    val postSiteAddress: String
-)

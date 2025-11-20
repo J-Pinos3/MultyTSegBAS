@@ -71,6 +71,7 @@ fun BusinessScreen(
     modifier: Modifier = Modifier,
     siteId: String = "",
     navigateBackToPostSites: () -> Unit = {},
+    onGuardShiftByStationClicked: (siteId: String) -> Unit = {},
     stationsController: StationsController
 ) {
 
@@ -113,13 +114,11 @@ fun BusinessScreen(
     // Simulación de datos desde API
     val reportItems = remember {
         listOf(
-            ReportItem("Reportes de entrada / salida", "Aquí puede encontrar los reportes de ingreso de los guardias"),
-            ReportItem("Reportes de sitio", "Aquí puede encontrar las vueltas completadas por los guardias"),
+            ReportItem("Turnos Realizados", "Aquí puede encontrar reportes de turnos realizados por los guardias"),
+            ReportItem("Reportes de sitio", "Aquí puede encontrar reportes de esta estación"),
             ReportItem("Reportes de incidentes", "Registro de situaciones inusuales"),
-            ReportItem("Horas extras", "Registro de horas adicionales"),
-            ReportItem("Equipamiento", "Control de equipos asignados"),
-            ReportItem("Incendio", "Informe incendios"),
-            ReportItem("Traspaso", "Informe intruso en edificio"),
+            ReportItem("Patrullas", "Aquí puede encontrar reportes de las patrullas realizadas en esta estación"),
+            ReportItem("Inventario", "Aquí puede encontrar reportes del inventario de esta estación"),
         )
     }
 
@@ -221,14 +220,21 @@ fun BusinessScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                items(reportItems) { report ->
+                items(reportItems.size) { reportIndex ->
 
                     BadgeButtonReports(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
-                        title = report.title,
-                        description = report.description
+
+                        title = reportItems[reportIndex].title,
+                        description = reportItems[reportIndex].description,
+                        onClick = {
+
+                            if(reportIndex == 0){
+                                onGuardShiftByStationClicked(siteId)
+                            }
+                        }
                     )
                 }
 
