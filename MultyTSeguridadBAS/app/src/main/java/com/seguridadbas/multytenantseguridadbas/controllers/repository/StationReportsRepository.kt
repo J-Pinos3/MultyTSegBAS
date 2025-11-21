@@ -15,6 +15,12 @@ class StationReportsRepository @Inject constructor(
     ) = apiClient.getGuardShiftsByStationApi(token, tenantId, stationId, guardId)
 
 
+    suspend fun getGrdShiftByStationDetRepo(
+        token: String,
+        tenantId: String,
+        id: String
+    ) = apiClient.getGrdShiftByStationDetApi(token, tenantId, id)
+
     suspend fun getReportsByStationRepo(
         token: String,
         tenantId: String,

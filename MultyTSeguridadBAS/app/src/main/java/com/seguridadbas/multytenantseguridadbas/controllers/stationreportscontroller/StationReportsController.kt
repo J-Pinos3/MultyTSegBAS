@@ -59,6 +59,76 @@ class StationReportsController  @Inject constructor(
     }
 
 
+    suspend fun getGrdShiftByStationDetail(
+        token: String, tenantId:String, id: String
+    ): Resource<GuardShiftByStationData>{
+        val response = stationReportsRepository.getGrdShiftByStationDetRepo( token, tenantId, id)
+
+        return try {
+
+            if(response.isSuccessful && response.body() != null){
+                val jsonBody = response.body()!!
+                val stationObj = jsonBody.getAsJsonObject("stationName")
+
+                Resource.Success(
+                    GuardShiftByStationData(
+                        completeInventoryCheck = jsonBody.isNullBooleanField("completeInventoryCheck"),
+                        completeInventoryCheckId = jsonBody.isNullStringField("completeInventoryCheckId"),
+                        createdAt = jsonBody.get("createdAt").asString,
+                        createdById = jsonBody.isNullStringField("createdById"),
+                        dailyIncidents = jsonBody.getAsJsonArray("dailyIncidents").toList(),
+                        deletedAt = jsonBody.isNullStringField("deletedAt"),
+                        guardName = jsonBody.isNullStringField("guardName"),
+                        guardNameId = jsonBody.isNullStringField("guardNameId"),
+                        id = jsonBody.isNullStringField("id"),
+                        importHash = jsonBody.isNullStringField("importHash"),
+                        numberOfIncidentsDurindShift = jsonBody.get("numberOfIncidentsDurindShift").asInt,
+                        numberOfPatrolsDuringShift = jsonBody.get("numberOfPatrolsDuringShift").asInt,
+                        observations = jsonBody.get("observations").asString,
+                        patrolsDone = jsonBody.getAsJsonArray("patrolsDone").toList(),
+                        punchInTime = jsonBody.get("punchInTime").asString,
+                        punchOutTime = jsonBody.get("punchOutTime").asString,
+                        shiftSchedule = jsonBody.get("shiftSchedule").asString,
+                        stationName = StationObj(
+                            createdAt = stationObj.get("createdAt").asString,
+                            createdById = stationObj.get("createdById").asString,
+                            deletedAt = stationObj.isNullStringField("deletedAt"),
+                            finishTimeInDay = stationObj.get("finishTimeInDay").asString,
+                            id = stationObj.get("id").asString,
+                            importHash = stationObj.isNullStringField("importHash"),
+                            latitud = stationObj.get("latitud").asString,
+                            longitud = stationObj.get("longitud").asString,
+                            numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
+                            startingTimeInDay = stationObj.get("startingTimeInDay").asString,
+                            stationName = stationObj.get("stationName").asString,
+                            stationOriginId = stationObj.isNullStringField("stationOriginId"),
+                            stationSchedule = stationObj.get("stationSchedule").asString,
+                            tenantId = stationObj.get("tenantId").asString,
+                            updatedAt = stationObj.get("updatedAt").asString,
+                            updatedById = stationObj.isNullStringField("updatedById")
+                        ),
+                        stationNameId  = jsonBody.get("stationNameId").asString,
+                        tenantId  = jsonBody.get("tenantId").asString,
+                        updatedAt  = jsonBody.get("updatedAt").asString,
+                        updatedById  = jsonBody.isNullStringField("updatedById"),
+                    )
+                )
+            }else{
+                Resource.Error(response.message().toString() + "--" + response.raw().message )
+            }
+
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión ha tardado mucho tiempo")
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                is IOException -> { Resource.Error(ex.message.toString()) }
+            }
+        }
+    }
+
+
+
     suspend fun getReportsByStation(
         token: String,
         tenantId: String, stationId: String?, generatedDateRange: List<String>?

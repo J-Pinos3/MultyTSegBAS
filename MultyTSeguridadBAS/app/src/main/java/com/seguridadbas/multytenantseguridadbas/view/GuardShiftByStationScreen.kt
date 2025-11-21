@@ -142,7 +142,11 @@ fun GuardShiftByStationScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 items(guardShiftsByStationList){ item ->
-                    GuardShiftByStationItem(item, modifier)
+                    GuardShiftByStationItem(
+                        item,
+                        modifier,
+                        onReportClicked = onGuardShiftReportClicked
+                    )
                 }
             }
         }else{
@@ -176,7 +180,7 @@ fun GuardShiftByStationScreen(
 private fun GuardShiftByStationItem(
     report: GuardShiftByStationData,
     modifier: Modifier,
-    onPostSiteClicked: (String) -> Unit = {}
+    onReportClicked: (reportId: String) -> Unit = {}
 ){
 
     Box(
@@ -193,7 +197,7 @@ private fun GuardShiftByStationItem(
             .height(100.dp)
             .background(Color.White)
             .clickable {
-                onPostSiteClicked(report.id)
+                onReportClicked(report.id)
             }
     ){
         Column(

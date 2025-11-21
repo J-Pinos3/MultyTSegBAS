@@ -203,6 +203,14 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
+    @GET("tenant/{tenantId}/guard-shift/{id}")
+    suspend fun getGrdShiftByStationDetApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Path("id") id: String
+    ): Response<JsonObject>
+
+
     @GET("tenant/{tenantId}/report")
     suspend fun getReportsByStationApi(
         @Header("Authorization") auth_token: String,

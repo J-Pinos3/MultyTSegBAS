@@ -12,6 +12,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontro
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
+import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
 import com.seguridadbas.multytenantseguridadbas.view.PostSitesScreen
@@ -80,9 +81,23 @@ fun SplashNavigation(authController: AuthController,
                 guarsh.siteId,
                 Modifier,
                 navigateBackToBusiness = { navController.popBackStack() },
+                onGuardShiftReportClicked = { reportId -> navController.navigate(GuarShiftStationReprDetail(reportId)) },
                 stationsReportsController = stationsReportsController
             )
         }
+
+
+
+        composable <GuarShiftStationReprDetail>{ backStackEntry ->
+            val report = backStackEntry.toRoute<GuarShiftStationReprDetail>()
+
+            GuardShiftByStationDetail(
+                Modifier,
+                reportId = report.reportId,
+                navigateBackToGuardShiftsByStation = {navController.popBackStack()}
+            )
+        }
+
     }
 
 }
