@@ -62,7 +62,7 @@ fun ReportsByStationScreen(
     siteId: String,
     modifier: Modifier = Modifier,
     navigateBackToBusiness: () -> Unit = {},
-    onStationReportClicked: (reportId: String) -> Unit = {},//not yet implemented
+    onStationReportClicked: (reportId: String) -> Unit = {},
     stationsReportsController: StationReportsController
 ){
 
@@ -145,7 +145,7 @@ fun ReportsByStationScreen(
                     ReportByStationItem(
                         item,
                         modifier,
-                        onReportClicked = {}
+                        onReportClicked = onStationReportClicked
                     )
                 }
             }

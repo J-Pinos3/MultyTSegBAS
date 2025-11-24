@@ -160,6 +160,76 @@ class StationReportsController  @Inject constructor(
     }
 
 
+    suspend fun getReportByStationDetail(
+        token: String, tenantId: String, id: String
+    ): Resource<ReportsByStationData>{
+        val response = stationReportsRepository.getReportByStationDetRepo( token,   tenantId,   id )
+
+        return try {
+
+            if( response.isSuccessful && response.body() != null ){
+                val jsonBody = response.body()!!
+                val stationObj = jsonBody.getAsJsonObject("station")
+
+                Resource.Success(
+
+                    ReportsByStationData(
+                        content = jsonBody.get("content").asString,
+                        createdAt = jsonBody.get("createdAt").asString,
+                        createdById = jsonBody.get("createdById").asString,
+                        deletedAt = jsonBody.isNullStringField("deletedAt"),
+                        generatedDate = jsonBody.get("generatedDate").asString,
+                        id = jsonBody.get("id").asString,
+                        importHash = jsonBody.isNullStringField("importHash"),
+                        station = StationObj(
+                            createdAt = stationObj.get("createdAt").asString,
+                            createdById = stationObj.get("createdById").asString,
+                            deletedAt = stationObj.isNullStringField("deletedAt"),
+                            finishTimeInDay = stationObj.get("finishTimeInDay").asString,
+                            id = stationObj.get("id").asString,
+                            importHash = stationObj.isNullStringField("importHash"),
+                            latitud = stationObj.get("latitud").asString,
+                            longitud = stationObj.get("longitud").asString,
+                            numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
+                            startingTimeInDay = stationObj.get("startingTimeInDay").asString,
+                            stationName = stationObj.get("stationName").asString,
+                            stationOriginId = stationObj.isNullStringField("stationOriginId"),
+                            stationSchedule = stationObj.get("stationSchedule").asString,
+                            tenantId = stationObj.get("tenantId").asString,
+                            updatedAt = stationObj.get("updatedAt").asString,
+                            updatedById = stationObj.isNullStringField("updatedById")
+                        ),
+                        stationId = jsonBody.get("stationId").asString,
+                        tenantId = jsonBody.get("tenantId").asString,
+                        title = jsonBody.get("title").asString,
+                        updatedAt = jsonBody.get("updatedAt").asString,
+                        updatedById = jsonBody.isNullStringField("updatedById"),
+                    )
+
+                )
+
+
+
+            }else{
+                Resource.Error(response.message().toString() + "--" + response.raw().message )
+            }
+
+
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión ha tardado mucho tiempo")
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                is IOException -> { Resource.Error(ex.message.toString()) }
+            }
+        }
+
+    }
+
+
+
+
+
     suspend fun getIncidents(
         token: String, tenantId: String,
         title: String?, dateRange: List<String>?

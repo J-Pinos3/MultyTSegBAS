@@ -219,6 +219,16 @@ interface ApiClient {
         @Query("filter[generatedDateRange][]") generatedDateRange: List<String>? = null
     ): Response<JsonObject>
 
+
+   @GET("tenant/{tenantId}/report/{id}")
+   suspend fun getReportByStationDetApi(
+       @Header("Authorization") auth_token: String,
+       @Path("tenantId") tenantId: String,
+       @Path("id") id: String
+   ): Response<JsonObject>
+
+
+
     @GET("tenant/{tenantId}/incident")
     suspend fun getIncidentsApi(
         @Header("Authorization") auth_token: String,

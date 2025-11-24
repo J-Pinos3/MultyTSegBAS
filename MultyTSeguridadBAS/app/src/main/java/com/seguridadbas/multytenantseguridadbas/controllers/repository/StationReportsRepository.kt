@@ -29,6 +29,11 @@ class StationReportsRepository @Inject constructor(
     ) = apiClient.getReportsByStationApi(token, tenantId, stationId, generatedDateRange)
 
 
+    suspend fun getReportByStationDetRepo(
+        token: String, tenantId: String, id: String
+    ) = apiClient.getReportByStationDetApi(token, tenantId, id)
+
+
     suspend fun getIncidentsRepo(
         token: String,
         tenantId: String,

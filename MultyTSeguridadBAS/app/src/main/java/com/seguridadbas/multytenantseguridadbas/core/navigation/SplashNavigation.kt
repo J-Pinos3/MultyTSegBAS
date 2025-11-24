@@ -17,6 +17,7 @@ import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
 import com.seguridadbas.multytenantseguridadbas.view.PostSitesScreen
 import com.seguridadbas.multytenantseguridadbas.view.RegisterScreen
+import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.ResetPasswordScreen
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
@@ -110,9 +111,21 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 navigateBackToBusiness = { navController.popBackStack() },
                 // ↓ reportId -> navController.navigate(GuarShiftStationReprDetail(reportId))
-                onStationReportClicked = {  },
+                onStationReportClicked = { reportId -> navController.navigate(ReportsByStationDetail(reportId))  },
                 stationsReportsController = stationsReportsController
 
+            )
+
+        }
+
+        composable <ReportsByStationDetail>{ backStackEntry ->
+            val report = backStackEntry.toRoute<ReportsByStationDetail>()
+
+            ReportsByStationDetail(
+                Modifier,
+                reportId = report.reportId,
+                navigateBackToReportsByStation = {navController.popBackStack()},
+                stationReportsController = stationsReportsController
             )
 
         }
