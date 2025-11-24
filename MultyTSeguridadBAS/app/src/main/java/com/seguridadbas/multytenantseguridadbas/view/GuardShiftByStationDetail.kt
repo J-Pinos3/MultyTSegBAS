@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,20 +37,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
+import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
+import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.GuardShiftByStationData
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
 fun GuardShiftByStationDetail (
     modifier: Modifier = Modifier,
     reportId: String = "",
-    navigateBackToGuardShiftsByStation: () -> Unit = {}
+    navigateBackToGuardShiftsByStation: () -> Unit = {},
+    stationReportsController: StationReportsController
 ){
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
@@ -60,10 +68,38 @@ fun GuardShiftByStationDetail (
     var bearerToken by remember { mutableStateOf("") }
 
     val context = LocalContext.current
-    val dataStoreCOntroller = DataStoreController(context)
+    val dataStoreController = DataStoreController(context)
 
     LaunchedEffect(Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val storedData = dataStoreController.getDataFromStore().first()
+            bearerToken = storedData.token
+            bearerToken =bearerToken.replace("\"","").trim()
 
+            tenantId = dataStoreController.getTenantId().first()
+            tenantId = tenantId.replace("\"","").trim()
+
+            if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+                val result = stationReportsController.getGrdShiftByStationDetail("Bearer $bearerToken",
+                    tenantId, reportId)
+
+                when(result){
+                    is Resource.Success -> {
+                        guardShiftData = result.data
+                    }
+
+                    is Resource.Error -> {
+                        Log.e("REPORT grd-shift","No se pudo traer los datos del reporte: ${result.message}")
+                    }
+
+                    else -> {
+                        Log.e("REPORT grd-shift","No se pudo traer los datos del reporte")
+                    }
+                }
+
+            }
+
+        }
     }
 
     Scaffold(
@@ -114,7 +150,7 @@ fun GuardShiftByStationDetail (
             )
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Quito Norte",
+                text=guardShiftData?.stationName?.stationName ?: "----",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -123,14 +159,14 @@ fun GuardShiftByStationDetail (
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Hora de inicio: 09:12",
+                text=guardShiftData?.stationName?.startingTimeInDay?:"00:00:00",//hora inicio
                 fontSize = 14.sp,
             )
             Spacer(modifier = modifier.height(8.dp))
             Text(
                 //finishtimeinday
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Hora de finalizacion: 16:30",
+                text=guardShiftData?.stationName?.finishTimeInDay ?:"00:00:00",//hora finalizacion
                 fontSize = 14.sp,
             )
 
@@ -144,7 +180,7 @@ fun GuardShiftByStationDetail (
             ){
                 //stationschedule
                 Text(
-                    text="Horario de la estación : Diurno",
+                    text=guardShiftData?.shiftSchedule ?:"",
                     fontSize = 14.sp,
                 )
 
@@ -161,13 +197,13 @@ fun GuardShiftByStationDetail (
             )
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Julio Guardia",
+                text= guardShiftData?.guardName ?:"Guardia",
                 fontSize = 14.sp
             )
             Spacer(modifier = modifier.height(8.dp))
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = "Credenciales: 18272394u4",
+                text = guardShiftData?.guardNameId ?:"Credenciales: 1111111111",
                 fontSize = 14.sp
             )
 
@@ -180,7 +216,7 @@ fun GuardShiftByStationDetail (
             )
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="N° Incidentes ocurridos: 3",
+                text="N° Incidentes ocurridos: ${guardShiftData?.numberOfIncidentsDurindShift}",
                 fontSize = 14.sp
             )
 
@@ -188,14 +224,14 @@ fun GuardShiftByStationDetail (
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="N° Patrullajes realizados: 7",
+                text="N° Patrullajes realizados: ${guardShiftData?.numberOfPatrolsDuringShift}",
                 fontSize = 14.sp
             )
             Spacer(modifier = modifier.height(8.dp))
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(horizontal = 10.dp),
-                text="Observaciones: No hay observaciones",
+                text="Observaciones: ${guardShiftData?.observations ?: "No hay observaciones"}",
                 fontSize = 14.sp,
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis
@@ -205,7 +241,7 @@ fun GuardShiftByStationDetail (
             Text(
                 //punch in time, inicio del turno-patrullaje
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Inicio del turno: 10:12",
+                text="Inicio del turno: ${guardShiftData?.punchInTime}",
                 fontSize = 14.sp
             )
             Spacer(modifier = modifier.height(8.dp))
@@ -213,7 +249,7 @@ fun GuardShiftByStationDetail (
             Text(
                 //punch out time, inicio del turno-patrullaje
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Fin del turno: 10:12",
+                text="Fin del turno: ${guardShiftData?.punchOutTime}",
                 fontSize = 14.sp
             )
 

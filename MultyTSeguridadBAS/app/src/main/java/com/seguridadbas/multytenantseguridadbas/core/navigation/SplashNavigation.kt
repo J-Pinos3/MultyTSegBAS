@@ -94,7 +94,8 @@ fun SplashNavigation(authController: AuthController,
             GuardShiftByStationDetail(
                 Modifier,
                 reportId = report.reportId,
-                navigateBackToGuardShiftsByStation = {navController.popBackStack()}
+                navigateBackToGuardShiftsByStation = {navController.popBackStack()},
+                stationReportsController = stationsReportsController
             )
         }
 
