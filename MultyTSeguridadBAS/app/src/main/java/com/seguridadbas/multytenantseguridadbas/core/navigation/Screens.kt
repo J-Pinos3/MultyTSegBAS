@@ -37,6 +37,8 @@ data class GuarShiftByStationReport(val siteId: String)
 @Serializable
 data class  GuarShiftStationReprDetail(val reportId: String)
 
+@Serializable
+data class ReportsByStation(val siteId: String)
 
 @Serializable
 data class Business(val siteName: String)
