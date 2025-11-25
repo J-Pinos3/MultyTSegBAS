@@ -185,7 +185,7 @@ fun GuardShiftByStationDetail (
                 )
 
                 Text(
-                    text = "N° Guardias: 6"
+                    text = "N° Guardias: ${guardShiftData?.stationName?.numberOfGuardsInStation}"
                 )
             }
             Spacer(modifier = modifier.height(8.dp))
