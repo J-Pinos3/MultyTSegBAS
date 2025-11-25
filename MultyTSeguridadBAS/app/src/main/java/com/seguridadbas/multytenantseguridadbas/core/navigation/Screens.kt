@@ -45,6 +45,9 @@ data class ReportsByStation(val siteId: String)
 data class ReportsByStationDetail(val reportId: String)
 
 @Serializable
+object IncidentsByStationScreen
+
+@Serializable
 data class Business(val siteName: String)
 
 object NavItemList{

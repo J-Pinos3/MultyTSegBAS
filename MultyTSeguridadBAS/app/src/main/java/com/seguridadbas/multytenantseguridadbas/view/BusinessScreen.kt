@@ -73,6 +73,7 @@ fun BusinessScreen(
     navigateBackToPostSites: () -> Unit = {},
     onGuardShiftByStationClicked: (siteId: String) -> Unit = {},
     onReportsByStationClicked: (siteId: String) -> Unit ={},
+    onIncidentsByStationClicked: ()->Unit = {},
     stationsController: StationsController
 ) {
 
@@ -236,6 +237,8 @@ fun BusinessScreen(
                                 0 -> {onGuardShiftByStationClicked(siteId)}
 
                                 1 -> {onReportsByStationClicked(siteId)}
+
+                                2 ->  { onIncidentsByStationClicked()  }
                             }
 
                         }

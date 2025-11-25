@@ -14,6 +14,7 @@ import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationScreen
+import com.seguridadbas.multytenantseguridadbas.view.IncidentsByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
 import com.seguridadbas.multytenantseguridadbas.view.PostSitesScreen
 import com.seguridadbas.multytenantseguridadbas.view.RegisterScreen
@@ -75,6 +76,7 @@ fun SplashNavigation(authController: AuthController,
                 navigateBackToPostSites = { navController.popBackStack() },
                 onGuardShiftByStationClicked = {siteId -> navController.navigate(GuarShiftByStationReport(siteId)) },
                 onReportsByStationClicked = { siteId ->navController.navigate(ReportsByStation(siteId)) },
+                onIncidentsByStationClicked = { navController.navigate(IncidentsByStationScreen) },
                 stationsController = stationsController)
         }
 
@@ -127,7 +129,14 @@ fun SplashNavigation(authController: AuthController,
                 navigateBackToReportsByStation = {navController.popBackStack()},
                 stationReportsController = stationsReportsController
             )
+        }
 
+        composable <IncidentsByStationScreen>{
+            IncidentsByStationScreen(
+                Modifier,
+                navigateBackToBusiness = {navController.popBackStack()},
+                stationsReportsController = stationsReportsController
+            )
         }
 
     }
