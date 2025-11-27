@@ -52,7 +52,7 @@ class StationReportsRepository @Inject constructor(
     suspend fun getInventoryByStationRepo(
         token: String,
         tenantId: String,
-        stationName: String
+        stationName: String?
     ) = apiClient.getInventoryByStationApi(token, tenantId, stationName)
 
 

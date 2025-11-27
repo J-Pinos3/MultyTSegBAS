@@ -250,7 +250,7 @@ interface ApiClient {
     suspend fun getInventoryByStationApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
-        @Query("filter[belongsToStation]") stationName: String
+        @Query("filter[belongsToStation]") stationName: String? = null
     ): Response<JsonObject>
 
 

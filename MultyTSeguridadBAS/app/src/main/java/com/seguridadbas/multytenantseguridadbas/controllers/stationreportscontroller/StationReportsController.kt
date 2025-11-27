@@ -292,7 +292,7 @@ class StationReportsController  @Inject constructor(
 
 
     suspend fun getInventoryByStation(
-        token: String, tenantId: String, stationName: String
+        token: String, tenantId: String, stationName: String?
     ): Resource<List<InventoryByStationData>> {
         val response = stationReportsRepository.getInventoryByStationRepo(token, tenantId, stationName)
 
