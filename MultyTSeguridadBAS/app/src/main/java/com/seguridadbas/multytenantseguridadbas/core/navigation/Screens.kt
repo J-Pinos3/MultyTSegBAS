@@ -44,6 +44,10 @@ data class ReportsByStation(val siteId: String)
 @Serializable
 data class ReportsByStationDetail(val reportId: String)
 
+
+@Serializable
+data class PatrolsByStation(val siteId: String)
+
 @Serializable
 object IncidentsByStationScreen
 

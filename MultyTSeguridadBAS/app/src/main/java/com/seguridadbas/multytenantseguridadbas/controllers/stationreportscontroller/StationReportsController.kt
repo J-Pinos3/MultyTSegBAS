@@ -473,43 +473,43 @@ class StationReportsController  @Inject constructor(
                 assignedGuard = Guard(
                     email = guardObj.get("email").asString,
                     firstName = guardObj.get("firstName").asString,
-                    id = guardObj.get("id").asString,
-                    lastName = guardObj.get("lastName").asString
+                    id = guardObj.isNullStringField("id"),
+                    lastName = guardObj.isNullStringField("lastName")
                 ),
                 assignedGuardId = row.get("assignedGuardId").asString,
                 checkpoints = row.getAsJsonArray("checkpoints").toList(),
                 completed = row.get("completed").asBoolean,
-                completionTime = row.get("completionTime").asString,
+                completionTime = row.isNullStringField("completionTime"),
                 createdAt = row.get("createdAt").asString,
                 createdById = row.get("createdById").asString,
-                deletedAt = row.get("deletedAt").asString,
+                deletedAt = row.isNullStringField("deletedAt"),
                 id = row.get("id").asString,
-                importHash = row.get("importHash").asString,
+                importHash = row.isNullStringField("importHash"),
                 logs = row.getAsJsonArray("logs").toList(),
                 scheduledTime = row.get("scheduledTime").asString,
                 station = StationObj(
                     createdAt = stationObj.get("createdAt").asString,
                     createdById = stationObj.get("createdById").asString,
-                    deletedAt = stationObj.get("deletedAt").asString,
+                    deletedAt = stationObj.isNullStringField("deletedAt"),
                     finishTimeInDay = stationObj.get("finishTimeInDay").asString,
                     id = stationObj.get("id").asString,
-                    importHash = stationObj.get("importHash").asString,
+                    importHash = stationObj.isNullStringField("importHash"),
                     latitud = stationObj.get("latitud").asString,
                     longitud = stationObj.get("longitud").asString,
                     numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
                     startingTimeInDay = stationObj.get("startingTimeInDay").asString,
                     stationName = stationObj.get("stationName").asString,
-                    stationOriginId = stationObj.get("stationOriginId").asString,
+                    stationOriginId = stationObj.isNullStringField("stationOriginId"),
                     stationSchedule = stationObj.get("stationSchedule").asString,
                     tenantId = stationObj.get("tenantId").asString,
                     updatedAt = stationObj.get("updatedAt").asString,
-                    updatedById = stationObj.get("updatedById").asString
+                    updatedById = stationObj.isNullStringField("updatedById")
                 ),
                 stationId = row.get("stationId").asString,
                 status = row.get("status").asString,
                 tenantId = row.get("tenantId").asString,
                 updatedAt = row.get("updatedAt").asString,
-                updatedById = row.get("updatedById").asString
+                updatedById = row.isNullStringField("updatedById")
             )
         }
 

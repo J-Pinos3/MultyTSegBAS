@@ -74,6 +74,7 @@ fun BusinessScreen(
     onGuardShiftByStationClicked: (siteId: String) -> Unit = {},
     onReportsByStationClicked: (siteId: String) -> Unit ={},
     onIncidentsByStationClicked: ()->Unit = {},
+    onPatrolsByStationClicked: (siteId: String) -> Unit = {},
     stationsController: StationsController
 ) {
 
@@ -239,6 +240,8 @@ fun BusinessScreen(
                                 1 -> {onReportsByStationClicked(siteId)}
 
                                 2 ->  { onIncidentsByStationClicked()  }
+
+                                3 -> { onPatrolsByStationClicked(siteId) }
                             }
 
                         }
