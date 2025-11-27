@@ -40,8 +40,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
@@ -148,6 +150,23 @@ fun PatrolsByStationScreen(
                     )
                 }
             }
+        }else{
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ){
+                Text(
+                    text = "NO hay reportes",
+                    textAlign = TextAlign.Center,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red,
+                    textDecoration = TextDecoration.Underline,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
         }
 
     }
@@ -165,23 +184,23 @@ private fun ReportByStationItem(
 
     Box(
         modifier = modifier
-            .padding(10.dp)
-            .clip(RoundedCornerShape(24))
+            .padding(14.dp)
+            .clip(RoundedCornerShape(20))
             .border(
-                2.dp,
+                1.dp,
                 BasGray,
                 shape = RoundedCornerShape(0, 24, 0, 24)
             )
-            .shadow(2.dp)
+            .shadow(1.dp)
             .fillMaxWidth()
-            .height(200.dp)
+            .height(210.dp)
             .background(Color.White)
             .clickable {      }
     ){
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(vertical = 14.dp, horizontal = 14.dp),
             horizontalAlignment = Alignment.Start
         ){
 
@@ -243,6 +262,7 @@ private fun ReportByStationItem(
 
                 Box(
                     modifier = Modifier
+                        .padding(end = 20.dp)
                         .size(10.dp)
                         .clip(CircleShape)
                         .border(1.dp, Color(0f,0f,0f,0.14f), CircleShape)
