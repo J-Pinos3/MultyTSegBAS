@@ -75,6 +75,7 @@ fun BusinessScreen(
     onReportsByStationClicked: (siteId: String) -> Unit ={},
     onIncidentsByStationClicked: ()->Unit = {},
     onPatrolsByStationClicked: (siteId: String) -> Unit = {},
+    onInventoryByStationClicked: () -> Unit = {},
     stationsController: StationsController
 ) {
 
@@ -242,6 +243,8 @@ fun BusinessScreen(
                                 2 ->  { onIncidentsByStationClicked()  }
 
                                 3 -> { onPatrolsByStationClicked(siteId) }
+
+                                4 -> { onInventoryByStationClicked() }
                             }
 
                         }

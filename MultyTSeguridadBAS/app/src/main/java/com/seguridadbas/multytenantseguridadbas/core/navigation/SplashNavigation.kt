@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
@@ -15,6 +16,7 @@ import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.IncidentsByStationScreen
+import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
 import com.seguridadbas.multytenantseguridadbas.view.PatrolsByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.PostSitesScreen
@@ -79,6 +81,7 @@ fun SplashNavigation(authController: AuthController,
                 onReportsByStationClicked = { siteId ->navController.navigate(ReportsByStation(siteId)) },
                 onIncidentsByStationClicked = { navController.navigate(IncidentsByStationScreen) },
                 onPatrolsByStationClicked = { siteId -> navController.navigate(PatrolsByStation(siteId)) },
+                onInventoryByStationClicked = { navController.navigate(InventoryByStation) },
                 stationsController = stationsController)
         }
 
@@ -149,6 +152,16 @@ fun SplashNavigation(authController: AuthController,
                 siteId = report.siteId,
                 navigateBackToBusiness = {navController.popBackStack()},
                 stationsReportsController = stationsReportsController
+            )
+        }
+
+        composable <InventoryByStation>{
+            InventoryByStationScreen(
+                Modifier,
+                navigateBackToBusiness = {navController.popBackStack()},
+                //reportId -> navController.navigate(ReportsByStationDetail(reportId))
+                onInventoryReportClicked = { },
+                stationsReportsController
             )
         }
 

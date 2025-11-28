@@ -48,6 +48,10 @@ data class ReportsByStationDetail(val reportId: String)
 @Serializable
 data class PatrolsByStation(val siteId: String)
 
+
+@Serializable
+object InventoryByStation
+
 @Serializable
 object IncidentsByStationScreen
 
