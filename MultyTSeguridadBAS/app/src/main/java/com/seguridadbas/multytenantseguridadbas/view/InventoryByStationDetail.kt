@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,9 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -24,6 +27,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,6 +42,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
@@ -47,10 +53,14 @@ import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.InventoryByStationData
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.BooleanItem
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.BooleanItemRow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.InventorySection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -61,481 +71,307 @@ fun InventoryByStationDetail(
     reportId: String = "",
     navigateBackToInventoryByStat: () -> Unit = {},
     stationsReportsController: StationReportsController
-){
-
+) {
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
-    val currentDate = sdf.format(Date())
 
+    // Estados
     var reportData by remember { mutableStateOf<InventoryByStationData?>(null) }
-    var tenantId by remember { mutableStateOf("") }
-    var bearerToken by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
 
+    // Formateador de fecha (se instancia una sola vez)
+    val dateFormat = remember { SimpleDateFormat("dd/M/yyyy hh:mm:ss") }
+    val currentDate = remember { dateFormat.format(Date()) }
+
+    // Contexto y controladores
     val context = LocalContext.current
-    val dataStoreController = DataStoreController(context)
+    val dataStoreController = remember { DataStoreController(context) }
 
-    LaunchedEffect(Unit) {
+    // Carga de datos
+    LaunchedEffect(reportId) {
+        loading = true
+        error = null
+
         CoroutineScope(Dispatchers.IO).launch {
-            val storedData = dataStoreController.getDataFromStore().first()
-            bearerToken = storedData.token
-            bearerToken =bearerToken.replace("\"","").trim()
+            try {
+                val storedData = dataStoreController.getDataFromStore().first()
+                val bearerToken = storedData.token.replace("\"", "").trim()
+                val tenantId = dataStoreController.getTenantId().first().replace("\"", "").trim()
 
-            tenantId = dataStoreController.getTenantId().first()
-            tenantId = tenantId.replace("\"","").trim()
+                if (bearerToken.isNotEmpty() && tenantId.isNotEmpty()) {
+                    val result = stationsReportsController.getInventoryByStationDetail(
+                        "Bearer $bearerToken",
+                        tenantId,
+                        reportId
+                    )
 
-            if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
-                val result = stationsReportsController.getInventoryByStationDetail("Bearer $bearerToken", tenantId, reportId)
-
-                when(result){
-                    is Resource.Success -> {
-                        reportData = result.data
+                    withContext(Dispatchers.Main) {
+                        when (result) {
+                            is Resource.Success -> {
+                                reportData = result.data
+                                loading = false
+                            }
+                            is Resource.Error -> {
+                                error = "Error: ${result.message}"
+                                loading = false
+                                Log.e("InventoryDetail", error!!)
+                            }
+                            else -> {
+                                error = "Error desconocido"
+                                loading = false
+                            }
+                        }
                     }
-
-                    is Resource.Error -> {
-                        Log.e("Report inventory By station Det","No se pudo traer los datos del reporte: ${result.message}")
-                    }
-
-                    else -> {
-                        Log.e("Report inventory By station Det","No se pudo traer los datos del reporte")
-                    }
+                } else {
+                    error = "Credenciales inválidas"
+                    loading = false
                 }
+            } catch (e: Exception) {
+                error = "Error de conexión: ${e.message}"
+                loading = false
+                Log.e("InventoryDetail", "Exception", e)
             }
         }
-    }//launched effect
-
-
-    Scaffold(
-        modifier = modifier.fillMaxSize()
-            .nestedScroll(scrollBehaviour.nestedScrollConnection),
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(text = "Detall del reporte $reportId", fontSize = 18.sp, fontWeight = FontWeight.Bold)  },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navigateBackToInventoryByStat() }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_back),
-                            contentDescription = "navigate back to business"
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehaviour,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = BasYellow,
-                    titleContentColor = Color.Black
-                )
-            )
-        }
-    ){
-        paddingVals ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = BasBackground)
-                .padding(paddingVals)
-        ){
-
-            Text(
-                modifier = modifier.align(Alignment.End).padding(end = 10.dp, top = 5.dp),
-                text = currentDate,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = modifier.height(8.dp))
-
-            HorizontalDivider(
-                modifier = modifier.padding(vertical = 6.dp),
-                thickness = 1.dp, Color(0f,0f,0f,0.14f)
-            )
-
-            Text(
-                modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = reportData?.belongsToStation.toString(),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = modifier.height(8.dp))
-
-            HorizontalDivider(
-                modifier = modifier.padding(vertical = 6.dp),
-                thickness = 1.dp, Color(0f,0f,0f,0.14f)
-            )
-
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Row{
-                    var checked = false
-                    Text(
-                        text = "Armadura", fontSize = 14.sp
-                    )
-                    if(reportData?.armor == true){ checked = true  }else { checked = false }
-                    RadioButton(
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(5.dp)
-                            .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                        selected = checked,
-                        onClick = {  },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = BasYellow,
-                            unselectedColor = BasBackground
-                        )
-                    )
-                }
-
-                Text(
-                    text = "N°: ${reportData?.armorSerialNumber}", fontSize = 14.sp
-                )
-
-            }
-            Spacer(modifier = modifier.height(4.dp))
-            Text(
-                modifier = modifier.padding(start = 10.dp).align(Alignment.Start),
-                text = "Tipo: ${reportData?.armorType}", fontSize = 14.sp
-            )
-
-            Spacer(modifier = modifier.height(8.dp))
-
-            HorizontalDivider(
-                modifier = modifier.padding(vertical = 6.dp),
-                thickness = 1.dp, Color(0f,0f,0f,0.14f)
-            )
-
-            //gun
-
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Row{
-                    var checked = false
-                    Text(
-                        text = "Arma", fontSize = 14.sp
-                    )
-                    if(reportData?.gun == true){ checked = true  }else { checked = false }
-                    RadioButton(
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(5.dp)
-                            .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                        selected = checked,
-                        onClick = {  },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = BasYellow,
-                            unselectedColor = BasBackground
-                        )
-                    )
-                }
-
-                Text(
-                    text = "N°: ${reportData?.gunSerialNumber}", fontSize = 14.sp
-                )
-
-            }
-            Spacer(modifier = modifier.height(4.dp))
-            Text(
-                modifier = modifier.padding(start = 10.dp).align(Alignment.Start),
-                text = "Tipo: ${reportData?.gunType}", fontSize = 14.sp
-            )
-
-            Spacer(modifier = modifier.height(8.dp))
-
-            HorizontalDivider(
-                modifier = modifier.padding(vertical = 6.dp),
-                thickness = 1.dp, Color(0f,0f,0f,0.14f)
-            )
-
-            // radio
-
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Row{
-                    var checked = false
-                    Text(
-                        text = "Radio", fontSize = 14.sp
-                    )
-                    if(reportData?.radio == true){ checked = true  }else { checked = false }
-                    RadioButton(
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(5.dp)
-                            .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                        selected = checked,
-                        onClick = {  },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = BasYellow,
-                            unselectedColor = BasBackground
-                        )
-                    )
-                }
-
-                Text(
-                    text = "N°: ${reportData?.radioSerialNumber}", fontSize = 14.sp
-                )
-
-            }
-            Spacer(modifier = modifier.height(4.dp))
-            Text(
-                modifier = modifier.padding(start = 10.dp).align(Alignment.Start),
-                text = "Tipo: ${reportData?.radioType}", fontSize = 14.sp
-            )
-
-            Spacer(modifier = modifier.height(8.dp))
-
-            HorizontalDivider(
-                modifier = modifier.padding(vertical = 6.dp),
-                thickness = 1.dp, Color(0f,0f,0f,0.14f)
-            )
-
-
-            // tolete
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var checked = false
-                Text(
-                    text = "Tolete", fontSize = 14.sp
-                )
-                if(reportData?.tolete == true){ checked = true  }else { checked = false }
-                RadioButton(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(5.dp)
-                        .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                    selected = checked,
-                    onClick = {  },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = BasYellow,
-                        unselectedColor = BasBackground
-                    )
-                )
-            }
-
-
-            //pito
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var checked = false
-                Text(
-                    text = "Pito", fontSize = 14.sp
-                )
-                if(reportData?.pito == true){ checked = true  }else { checked = false }
-                RadioButton(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(5.dp)
-                        .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                    selected = checked,
-                    onClick = {  },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = BasYellow,
-                        unselectedColor = BasBackground
-                    )
-                )
-            }
-
-
-
-            //linterna
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var checked = false
-                Text(
-                    text = "Linterna", fontSize = 14.sp
-                )
-                if(reportData?.linterna == true){ checked = true  }else { checked = false }
-                RadioButton(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(5.dp)
-                        .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                    selected = checked,
-                    onClick = {  },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = BasYellow,
-                        unselectedColor = BasBackground
-                    )
-                )
-            }
-
-
-            //Vitacora
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var checked = false
-                Text(
-                    text = "Vitácora", fontSize = 14.sp
-                )
-                if(reportData?.vitacora == true){ checked = true  }else { checked = false }
-                RadioButton(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(5.dp)
-                        .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                    selected = checked,
-                    onClick = {  },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = BasYellow,
-                        unselectedColor = BasBackground
-                    )
-                )
-            }
-
-            //cinto completo
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var checked = false
-                Text(
-                    text = "Cinto Completo", fontSize = 14.sp
-                )
-                if(reportData?.cintoCompleto == true){ checked = true  }else { checked = false }
-                RadioButton(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(5.dp)
-                        .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                    selected = checked,
-                    onClick = {  },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = BasYellow,
-                        unselectedColor = BasBackground
-                    )
-                )
-            }
-
-
-
-            //poncho de aguas
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var checked = false
-                Text(
-                    text = "Poncho de Aguas", fontSize = 14.sp
-                )
-                if(reportData?.ponchoDeAguas == true){ checked = true  }else { checked = false }
-                RadioButton(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(5.dp)
-                        .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                    selected = checked,
-                    onClick = {  },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = BasYellow,
-                        unselectedColor = BasBackground
-                    )
-                )
-            }
-
-
-            //detector de metales
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var checked = false
-                Text(
-                    text = "Detector de Metales", fontSize = 14.sp
-                )
-                if(reportData?.detectorDeMetales == true){ checked = true  }else { checked = false }
-                RadioButton(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(5.dp)
-                        .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                    selected = checked,
-                    onClick = {  },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = BasYellow,
-                        unselectedColor = BasBackground
-                    )
-                )
-            }
-
-
-            //caseta
-            Row(
-                modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                var checked = false
-                Text(
-                    text = "Caseta", fontSize = 14.sp
-                )
-                if(reportData?.caseta == true){ checked = true  }else { checked = false }
-                RadioButton(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(5.dp)
-                        .border(width = 0.5.dp, Color.Black, shape = CircleShape),
-                    selected = checked,
-                    onClick = {  },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = BasYellow,
-                        unselectedColor = BasBackground
-                    )
-                )
-            }
-
-
-            //transporte
-            Text(
-                modifier = modifier.padding(start = 10.dp).align(Alignment.Start),
-                text = reportData?.transportation.toString(), fontSize = 14.sp
-            )
-
-            //Observaciones
-            Spacer(modifier = modifier.height(8.dp))
-
-            HorizontalDivider(
-                modifier = modifier.padding(vertical = 6.dp),
-                thickness = 1.dp, Color(0f,0f,0f,0.14f)
-            )
-            Text(
-                modifier = modifier.padding(start = 10.dp).align(Alignment.Start),
-                text = "Observaciones", fontSize = 16.sp, fontWeight = FontWeight.Bold
-            )
-            Text(
-                modifier = modifier.padding(start = 10.dp).align(Alignment.Start),
-                text = reportData?.observations.toString(), fontSize = 14.sp,
-                maxLines = 2
-            )
-
-
-        }
-
     }
 
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            InventoryDetailTopBar(
+                reportId = reportId,
+                navigateBack = navigateBackToInventoryByStat,
+                scrollBehaviour = scrollBehaviour
+            )
+        }
+    ) { paddingValues ->
+        InventoryDetailContent(
+            modifier = Modifier.padding(paddingValues),
+            loading = loading,
+            error = error,
+            currentDate = currentDate,
+            reportData = reportData
+        )
+    }
+}
 
+// TopBar separado
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun InventoryDetailTopBar(
+    reportId: String,
+    navigateBack: () -> Unit,
+    scrollBehaviour: TopAppBarScrollBehavior
+) {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = "Detalle del Reporte",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = navigateBack) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_back),
+                    contentDescription = "Volver"
+                )
+            }
+        },
+        scrollBehavior = scrollBehaviour,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = BasYellow,
+            titleContentColor = Color.Black
+        )
+    )
+}
 
+// Contenido principal
+@Composable
+private fun InventoryDetailContent(
+    modifier: Modifier = Modifier,
+    loading: Boolean,
+    error: String?,
+    currentDate: String,
+    reportData: InventoryByStationData?
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = BasBackground)
+            .padding(horizontal = 16.dp)
+    ) {
+        when {
+            loading -> {
+                LoadingState()
+            }
+            error != null -> {
+                ErrorState(error = error)
+            }
+            reportData == null -> {
+                EmptyState()
+            }
+            else -> {
+                // Fecha actual
+                Text(
+                    text = currentDate,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    textAlign = TextAlign.End
+                )
+
+                // Contenido del reporte
+                InventoryReportContent(reportData = reportData)
+            }
+        }
+    }
+}
+
+// Estados de UI
+@Composable
+private fun LoadingState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun ErrorState(error: String) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            painter = painterResource(id = android.R.drawable.ic_dialog_alert),
+            contentDescription = "Error",
+            tint = Color.Red,
+            modifier = Modifier.size(48.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = error,
+            color = Color.Red,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun EmptyState() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "No se encontró el reporte",
+            color = Color.Gray
+        )
+    }
+}
+
+// Contenido del reporte
+@Composable
+private fun InventoryReportContent(
+    reportData: InventoryByStationData
+) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.padding(vertical = 16.dp)
+    ) {
+        // Estación
+        item {
+            InventorySection(title = "Estación") {
+                Text(
+                    text = reportData.belongsToStation ?: "No especificado",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+
+        // Items con número de serie y tipo
+        item {
+            InventorySection(title = "Equipamiento Principal") {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    BooleanItemRow(
+                        item = BooleanItem(
+                            label = "Armadura",
+                            value = reportData.armor,
+                            serialNumber = reportData.armorSerialNumber,
+                            type = reportData.armorType
+                        )
+                    )
+
+                    BooleanItemRow(
+                        item = BooleanItem(
+                            label = "Arma",
+                            value = reportData.gun,
+                            serialNumber = reportData.gunSerialNumber,
+                            type = reportData.gunType
+                        )
+                    )
+
+                    BooleanItemRow(
+                        item = BooleanItem(
+                            label = "Radio",
+                            value = reportData.radio,
+                            serialNumber = reportData.radioSerialNumber,
+                            type = reportData.radioType
+                        )
+                    )
+                }
+            }
+        }
+
+        // Items booleanos simples
+        item {
+            InventorySection(title = "Equipamiento Adicional") {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    listOf(
+                        BooleanItem("Tolete", reportData.tolete),
+                        BooleanItem("Pito", reportData.pito),
+                        BooleanItem("Linterna", reportData.linterna),
+                        BooleanItem("Vitácora", reportData.vitacora),
+                        BooleanItem("Cinto Completo", reportData.cintoCompleto),
+                        BooleanItem("Poncho de Aguas", reportData.ponchoDeAguas),
+                        BooleanItem("Detector de Metales", reportData.detectorDeMetales),
+                        BooleanItem("Caseta", reportData.caseta)
+                    ).forEach { item ->
+                        BooleanItemRow(item = item)
+                    }
+                }
+            }
+        }
+
+        // Transporte
+        item {
+            InventorySection(title = "Transporte") {
+                Text(
+                    text = reportData.transportation ?: "No especificado",
+                    fontSize = 14.sp
+                )
+            }
+        }
+
+        // Observaciones
+        item {
+            InventorySection(title = "Observaciones") {
+                Text(
+                    text = reportData.observations ?: "Sin observaciones",
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
+                )
+            }
+        }
+    }
 }
