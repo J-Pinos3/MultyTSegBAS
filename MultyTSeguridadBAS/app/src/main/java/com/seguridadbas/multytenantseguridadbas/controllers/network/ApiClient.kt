@@ -254,6 +254,14 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
+    @GET("tenant/{tenantId}/inventory/{id}")
+    suspend fun getInventoryByStationDetApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Path("id") id: String
+    ): Response<JsonObject>
+
+
 }
 
 

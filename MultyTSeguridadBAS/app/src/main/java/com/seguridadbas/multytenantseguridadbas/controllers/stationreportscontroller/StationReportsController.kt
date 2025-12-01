@@ -321,6 +321,72 @@ class StationReportsController  @Inject constructor(
 
     }
 
+
+
+    suspend fun getInventoryByStationDetail(
+        token: String, tenantId: String, id: String
+    ):Resource<InventoryByStationData> {
+
+        val response  = stationReportsRepository.getInventoryByStationDetRepo(token, tenantId, id)
+
+        return try{
+
+            if(response.isSuccessful && response.body() != null){
+
+                val jsonBody = response.body()!!
+
+                Resource.Success(
+                    InventoryByStationData(
+                        armor = jsonBody.get("armor").asBoolean,
+                        armorSerialNumber = jsonBody.get("armorSerialNumber").asString,
+                        armorType = jsonBody.get("armorType").asString,
+                        belongsTo = jsonBody.isNullStringField("belongsTo"),
+                        belongsToId = jsonBody.isNullStringField("belongsToId"),
+                        belongsToStation = jsonBody.isNullStringField("belongsToStation"),
+                        caseta = jsonBody.get("caseta").asBoolean,
+                        cintoCompleto = jsonBody.get("cintoCompleto").asBoolean,
+                        createdAt = jsonBody.get("createdAt").asString,
+                        createdById = jsonBody.get("createdById").asString,
+                        deletedAt = jsonBody.isNullStringField("deletedAt"),
+                        detectorDeMetales = jsonBody.get("detectorDeMetales").asBoolean,
+                        gun = jsonBody.get("gun").asBoolean,
+                        gunSerialNumber = jsonBody.get("gunSerialNumber").asString,
+                        gunType = jsonBody.get("gunType").asString,
+                        id = jsonBody.get("id").asString,
+                        importHash = jsonBody.isNullStringField("importHash"),
+                        linterna = jsonBody.get("linterna").asBoolean,
+                        observations = jsonBody.get("observations").asString,
+                        pito = jsonBody.get("pito").asBoolean,
+                        ponchoDeAguas = jsonBody.get("ponchoDeAguas").asBoolean,
+                        radio = jsonBody.get("radio").asBoolean,
+                        radioSerialNumber = jsonBody.get("radioSerialNumber").asString,
+                        radioType = jsonBody.get("radioType").asString,
+                        tenantId = jsonBody.get("tenantId").asString,
+                        tolete = jsonBody.get("tolete").asBoolean,
+                        transportation = jsonBody.get("transportation").asString,
+                        updatedAt = jsonBody.get("updatedAt").asString,
+                        updatedById = jsonBody.isNullStringField("updatedById"),
+                        vitacora = jsonBody.get("vitacora").asBoolean
+                    )
+                )
+
+            }else{
+                Resource.Error(response.message().toString() + "--" + response.raw().message )
+            }
+
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión ha tardado mucho tiempo")
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                is IOException -> { Resource.Error(ex.message.toString()) }
+            }
+        }
+
+    }
+
+
+
     private fun parseGuardShiftsByStationResponse(jsonObject: JsonObject): GuardShiftByStationResponse{
         val count = jsonObject.get("count").asInt
         val rowsArray = jsonObject.get("rows").asJsonArray
@@ -525,35 +591,35 @@ class StationReportsController  @Inject constructor(
             val row = rowElement.asJsonObject
             InventoryByStationData(
                 armor = row.get("armor").asBoolean,
-                        armorSerialNumber = row.get("armorSerialNumber").asString,
-                        armorType = row.get("armorType").asString,
-                        belongsTo = row.get("belongsTo").asString,
-                        belongsToId = row.get("belongsToId").asString,
-                        belongsToStation = row.get("belongsToStation").asString,
-                        caseta = row.get("caseta").asBoolean,
-                        cintoCompleto = row.get("cintoCompleto").asBoolean,
-                        createdAt = row.get("createdAt").asString,
-                        createdById = row.get("createdById").asString,
-                        deletedAt = row.get("deletedAt").asString,
-                        detectorDeMetales = row.get("detectorDeMetales").asBoolean,
-                        gun = row.get("gun").asBoolean,
-                        gunSerialNumber = row.get("gunSerialNumber").asString,
-                        gunType = row.get("gunType").asString,
-                        id = row.get("id").asString,
-                        importHash = row.get("importHash").asString,
-                        linterna = row.get("linterna").asBoolean,
-                        observations = row.get("observations").asString,
-                        pito = row.get("pito").asBoolean,
-                        ponchoDeAguas = row.get("ponchoDeAguas").asBoolean,
-                        radio = row.get("radio").asBoolean,
-                        radioSerialNumber = row.get("radioSerialNumber").asString,
-                        radioType = row.get("radioType").asString,
-                        tenantId = row.get("tenantId").asString,
-                        tolete = row.get("tolete").asBoolean,
-                        transportation = row.get("transportation").asString,
-                        updatedAt = row.get("updatedAt").asString,
-                        updatedById = row.get("updatedById").asString,
-                        vitacora = row.get("vitacora").asBoolean,
+                armorSerialNumber = row.get("armorSerialNumber").asString,
+                armorType = row.get("armorType").asString,
+                belongsTo = row.isNullStringField("belongsTo"),
+                belongsToId = row.isNullStringField("belongsToId"),
+                belongsToStation = row.isNullStringField("belongsToStation"),
+                caseta = row.get("caseta").asBoolean,
+                cintoCompleto = row.get("cintoCompleto").asBoolean,
+                createdAt = row.get("createdAt").asString,
+                createdById = row.get("createdById").asString,
+                deletedAt = row.isNullStringField("deletedAt"),
+                detectorDeMetales = row.get("detectorDeMetales").asBoolean,
+                gun = row.get("gun").asBoolean,
+                gunSerialNumber = row.get("gunSerialNumber").asString,
+                gunType = row.get("gunType").asString,
+                id = row.get("id").asString,
+                importHash = row.isNullStringField("importHash"),
+                linterna = row.get("linterna").asBoolean,
+                observations = row.get("observations").asString,
+                pito = row.get("pito").asBoolean,
+                ponchoDeAguas = row.get("ponchoDeAguas").asBoolean,
+                radio = row.get("radio").asBoolean,
+                radioSerialNumber = row.get("radioSerialNumber").asString,
+                radioType = row.get("radioType").asString,
+                tenantId = row.get("tenantId").asString,
+                tolete = row.get("tolete").asBoolean,
+                transportation = row.get("transportation").asString,
+                updatedAt = row.get("updatedAt").asString,
+                updatedById = row.isNullStringField("updatedById"),
+                vitacora = row.get("vitacora").asBoolean
             )
         }
 

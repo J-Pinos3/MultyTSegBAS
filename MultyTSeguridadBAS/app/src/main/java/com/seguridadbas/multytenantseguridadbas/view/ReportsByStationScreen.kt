@@ -190,7 +190,7 @@ private fun ReportByStationItem(
             .border(
                 2.dp,
                 BasGray,
-                shape = RoundedCornerShape(0, 24, 0, 24)
+                shape = RoundedCornerShape(24, 24, 24, 24)
             )
             .shadow(2.dp)
             .fillMaxWidth()

@@ -56,6 +56,9 @@ class StationReportsRepository @Inject constructor(
     ) = apiClient.getInventoryByStationApi(token, tenantId, stationName)
 
 
+    suspend fun getInventoryByStationDetRepo(
+        token: String, tenantId: String, id: String
+    ) = apiClient.getInventoryByStationDetApi(token, tenantId, id)
 }
 
 
