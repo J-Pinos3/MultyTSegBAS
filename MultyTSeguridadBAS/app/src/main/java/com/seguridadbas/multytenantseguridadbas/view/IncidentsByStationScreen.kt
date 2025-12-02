@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.seguridadbas.multytenantseguridadbas.view
 
 import android.util.Log
@@ -22,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,7 +33,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +49,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -64,7 +71,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Date
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,11 +95,9 @@ fun IncidentsByStationScreen(
     val dataStoreController = DataStoreController(context)
 
     var showDateDialog by remember { mutableStateOf(false) }
-    var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
-    var selectedStartDate by remember { mutableStateOf<LocalDate?>(null) }
-    var selectedEndDate by remember { mutableStateOf<LocalDate?>(null) }
+    var selectedStartDate by remember { mutableStateOf<String?>(null) }
+    var selectedEndDate by remember { mutableStateOf<String?>(null) }
 
 
     // Efecto para carga inicial
@@ -192,7 +200,17 @@ fun IncidentsByStationScreen(
         // Dialog para selección de fechas
         if (showDateDialog) {
             DateRangeDialog(
-                onDismiss = { showDateDialog = false },
+                onDismiss = {
+                    selectedStartDate = null
+                    selectedEndDate = null
+                    searchText = ""
+                    loadIncidents(null, null, bearerToken, tenantId,
+                        stationsReportsController,
+                        onSuccess = { incidents -> allIncidentsByStation = incidents},
+                        onError = {error -> Log.e("incidents by station screen", error)}
+                    )
+                    showDateDialog = false
+                },
                 onConfirm = { startDate, endDate ->
                     selectedStartDate = startDate
                     selectedEndDate = endDate
@@ -202,17 +220,6 @@ fun IncidentsByStationScreen(
                     loadIncidents(null, listOf(startDateStr, endDateStr), bearerToken, tenantId,
                         stationsReportsController,
                         onSuccess = { incidents -> allIncidentsByStation = incidents  },
-                        onError = {error -> Log.e("incidents by station screen", error)}
-                    )
-                    showDateDialog = false
-                },
-                onClearFilters = {
-                    selectedStartDate = null
-                    selectedEndDate = null
-                    searchText = ""
-                    loadIncidents(null, null, bearerToken, tenantId,
-                        stationsReportsController,
-                        onSuccess = { incidents -> allIncidentsByStation = incidents},
                         onError = {error -> Log.e("incidents by station screen", error)}
                     )
                     showDateDialog = false
@@ -287,11 +294,10 @@ fun IncidentsByStationScreen(
 @Composable
 fun DateRangeDialog(
     onDismiss: () -> Unit,
-    onConfirm: (LocalDate?, LocalDate?) -> Unit,
-    onClearFilters: () -> Unit
+    onConfirm: (String?, String?) -> Unit,
 ) {
-    var startDate by remember { mutableStateOf<LocalDate?>(null) }
-    var endDate by remember { mutableStateOf<LocalDate?>(null) }
+    var startDate by remember { mutableStateOf<String?>(null) }
+    var endDate by remember { mutableStateOf<String?>(null) }
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
@@ -300,8 +306,9 @@ fun DateRangeDialog(
     ) {
         Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .background(Color.White, RoundedCornerShape(16.dp))
-                .padding(24.dp)
+                .padding(10.dp)
         ) {
             Text(
                 text = "Seleccionar rango de fechas",
@@ -316,7 +323,7 @@ fun DateRangeDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = startDate?.toString() ?: "Seleccionar fecha inicial",
+                    text = startDate?.toString() ?: "Fecha inicial",
                     modifier = Modifier.padding(8.dp)
                 )
             }
@@ -329,7 +336,7 @@ fun DateRangeDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = endDate?.toString() ?: "Seleccionar fecha final",
+                    text = endDate?.toString() ?: "Fecha final",
                     modifier = Modifier.padding(8.dp)
                 )
             }
@@ -341,47 +348,41 @@ fun DateRangeDialog(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 OutlinedButton(
-                    onClick = onClearFilters
+                    onClick = onDismiss
                 ) {
-                    Text("Limpiar")
+                    Text("Cancelar")
                 }
 
-                Row {
-                    OutlinedButton(
-                        onClick = onDismiss
-                    ) {
-                        Text("Cancelar")
-                    }
+                Spacer(modifier = Modifier.width(8.dp))
 
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    OutlinedButton(
-                        onClick = { onConfirm(startDate, endDate) },
-                        enabled = startDate != null && endDate != null
-                    ) {
-                        Text("Aplicar")
-                    }
+                OutlinedButton(
+                    onClick = { onConfirm(startDate, endDate) },
+                    enabled = startDate != null && endDate != null
+                ) {
+                    Text("Aplicar")
                 }
             }
         }
     }
 
+    val format = SimpleDateFormat("yyyy-MM-dd")
     // Date Pickers
     if (showStartDatePicker) {
-        DatePickerDialog(
+        DatePickerDialogo(
             onDismissRequest = { showStartDatePicker = false },
             onDateSelected = { date ->
-                startDate = date
+                startDate = format.format(  Date(date?:0L) )  + "T00:00:00.000Z"
                 showStartDatePicker = false
             }
         )
     }
 
     if (showEndDatePicker) {
-        DatePickerDialog(
+        DatePickerDialogo(
             onDismissRequest = { showEndDatePicker = false },
             onDateSelected = { date ->
-                endDate = date
+                //endDate = Date(date?:0).toString() + "T23:59:00.000Z"
+                endDate = format.format(  Date(date?:0L) )  + "T23:59:00.000Z"
                 showEndDatePicker = false
             }
         )
@@ -389,19 +390,40 @@ fun DateRangeDialog(
 }
 
 // Date Picker Dialog (necesitarás implementar esto o usar uno existente)
+
 @Composable
-fun DatePickerDialog(
+fun DatePickerDialogo(
     onDismissRequest: () -> Unit,
-    onDateSelected: (LocalDate) -> Unit
+    onDateSelected: (Long?) -> Unit
 ) {
-    // Implementa tu DatePicker aquí
-    // Puedes usar DatePicker de Material3 o una librería externa
-    // Ejemplo básico:
+
     androidx.compose.ui.window.Dialog(
         onDismissRequest = onDismissRequest
     ) {
-        // Aquí iría tu implementación del DatePicker
-        Text("Implementa tu DatePicker aquí")
+        val datePickerState = rememberDatePickerState()
+        DatePickerDialog(
+            onDismissRequest = onDismissRequest,
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDateSelected(datePickerState.selectedDateMillis)
+                        onDismissRequest()
+                }) {
+                    Text("Aceptar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onDismissRequest
+                ) {
+                    Text("Cancelar")
+                }
+
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+
     }
 }
 
