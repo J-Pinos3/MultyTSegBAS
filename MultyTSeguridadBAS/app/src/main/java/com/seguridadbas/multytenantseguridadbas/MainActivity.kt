@@ -9,6 +9,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthC
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.SplashNavigation
 import com.seguridadbas.multytenantseguridadbas.ui.theme.MultyTenantSeguridadBASTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +22,8 @@ class MainActivity : ComponentActivity() {
     private val stationsController by viewModels<StationsController>()
     private val certificationServicesController by viewModels<CertificationServicesController>()
     private val stationsReportsController by viewModels<StationReportsController>()
+    private val tenantGuardsController by viewModels<TenantGuardsController>()
+
 
 
 
@@ -29,7 +32,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MultyTenantSeguridadBASTheme {
-                SplashNavigation(authController, stationsController, certificationServicesController, stationsReportsController)
+                SplashNavigation(authController, stationsController, certificationServicesController, stationsReportsController, tenantGuardsController)
                 //SplashScreen()
             }
         }

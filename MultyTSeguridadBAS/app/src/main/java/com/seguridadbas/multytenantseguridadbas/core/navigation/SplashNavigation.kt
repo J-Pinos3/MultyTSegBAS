@@ -11,6 +11,8 @@ import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthC
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.view.AllGuardsScreen
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
@@ -31,7 +33,8 @@ import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
 fun SplashNavigation(authController: AuthController,
                      stationsController: StationsController,
                      certificationServicesController: CertificationServicesController,
-                     stationsReportsController: StationReportsController
+                     stationsReportsController: StationReportsController,
+                     tenantGuardsController: TenantGuardsController
                      ) {
 
     val navController = rememberNavController()
@@ -54,7 +57,7 @@ fun SplashNavigation(authController: AuthController,
 
         composable <Home>{ backstackEntry ->
             val home =backstackEntry.toRoute<Home>()
-            BottonNavScreen(navController, authController, stationsController, certificationServicesController,home.tenantId)
+            BottonNavScreen(navController, authController, stationsController, certificationServicesController,tenantGuardsController,home.tenantId)
         }
 
         composable <Register>{
@@ -173,6 +176,12 @@ fun SplashNavigation(authController: AuthController,
                 reportId = report.reportId,
                 navigateBackToInventoryByStat = {navController.popBackStack()},
                 stationsReportsController = stationsReportsController
+            )
+        }
+
+        composable <GuardsScreen>{
+            AllGuardsScreen(
+                Modifier
             )
         }
 

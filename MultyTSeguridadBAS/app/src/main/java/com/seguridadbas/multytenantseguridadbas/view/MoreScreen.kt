@@ -36,15 +36,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
 
 fun MoreScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToGuardsScreen: () -> Unit ,
+    tenantGuardsController: TenantGuardsController
 ){
 
     Column(
@@ -59,8 +62,18 @@ fun MoreScreen(
 
         FeatureItems(
             modifier = modifier,
+            R.drawable.ic_groups,
+            "Guardias de Seguridad",
+            onNavigateToGuardsScreen
+        )
+
+        Spacer(modifier = modifier.padding(vertical = 8.dp))
+
+
+        FeatureItems(
+            modifier = modifier,
             R.drawable.ic_tracking,
-            "Historial de Trackeo GPS",
+            "Turnos Realizados",
             {}
         )
 
@@ -70,17 +83,7 @@ fun MoreScreen(
         FeatureItems(
             modifier = modifier,
             R.drawable.ic_orders,
-            "Órdenes",
-            {}
-        )
-
-        Spacer(modifier = modifier.padding(vertical = 8.dp))
-
-
-        FeatureItems(
-            modifier = modifier,
-            R.drawable.ic_groups,
-            "Equipos de Seguridad",
+            "Turnos Asignados",
             {}
         )
 

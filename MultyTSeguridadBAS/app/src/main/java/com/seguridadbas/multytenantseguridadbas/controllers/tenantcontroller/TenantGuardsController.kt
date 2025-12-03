@@ -40,9 +40,9 @@ class TenantGuardsController @Inject constructor(
                 birthPlace = row.get("birthPlace").asString,
                 bloodType = row.get("bloodType").asString,
                 createdAt = row.get("createdAt").asString,
-                createdById = row.get("createdAt").asString,
+                createdById = row.isNullStringField("createdAt"),
                 credentialImage = row.getAsJsonArray("credentialImage").toList(),
-                deletedAt = row.get("deletedAt").asString,
+                deletedAt = row.isNullStringField("deletedAt"),
                 fullName = row.get("fullName").asString,
                 gender = row.get("gender").asString,
                 governmentId = row.get("governmentId").asString,
@@ -50,13 +50,13 @@ class TenantGuardsController @Inject constructor(
                     email = guardObj.get("email").asString,
                     firstName = guardObj.get("firstName").asString,
                     id = guardObj.get("id").asString,
-                    lastName = guardObj.get("lastName")?.asString ?: ""
+                    lastName = guardObj.isNullStringField("lastName")
                 ),
-                guardCredentials = row.get("guardCredentials").asString,
+                guardCredentials = row.isNullStringField("guardCredentials"),
                 guardId = row.get("guardId").asString,
-                hiringContractDate = row.get("hiringContractDate").asString,
+                hiringContractDate = row.isNullStringField("hiringContractDate"),
                 id = row.get("id").asString,
-                importHash = row.get("importHash").asString,
+                importHash = row.isNullStringField("importHash"),
                 isOnDuty = row.get("isOnDuty").asBoolean,
                 maritalStatus = row.get("maritalStatus").asString,
                 memos = row.getAsJsonArray("memos").toList(),
@@ -66,7 +66,7 @@ class TenantGuardsController @Inject constructor(
                 tenantId = row.get("tenantId").asString,
                 tutoriales = row.getAsJsonArray("tutoriales").toList(),
                 updatedAt = row.get("updatedAt").asString,
-                updatedById = row.get("updatedById").asString
+                updatedById = row.isNullStringField("updatedById")
             )
         }
 
@@ -77,12 +77,11 @@ class TenantGuardsController @Inject constructor(
     suspend fun getSecGuards(
         token: String,
         tenantID: String,
-        filter: Map<String, String>,
-        limit: Int,
-        offset: Int,
-        orderBy: String? = ""
+        governmentId: String? = null,
+        fullName: String? = null,
+
     ): Resource<List<Guard>> {
-        val response = tenantGuardsRepository.getSecGuardsRepo(token, tenantID, filter,limit, offset, orderBy)
+        val response = tenantGuardsRepository.getSecGuardsRepo(token, tenantID, governmentId, fullName)
 
         return try{
 
@@ -197,6 +196,12 @@ class TenantGuardsController @Inject constructor(
     }
 
 
+    private fun JsonObject?.isNullStringField(field: String): String{
+        return if(this?.get(field)?.isJsonNull == false) this.get(field).asString else ""
+    }
 
+    private fun JsonObject?.isNullBooleanField(field: String): Boolean{
+        return if(this?.get(field)?.isJsonNull == false) this.get(field).asBoolean else false
+    }
 
 }

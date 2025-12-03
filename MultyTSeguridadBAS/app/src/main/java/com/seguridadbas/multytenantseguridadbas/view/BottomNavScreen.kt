@@ -17,8 +17,10 @@ import androidx.navigation.compose.rememberNavController
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.BottomNavBar
 import com.seguridadbas.multytenantseguridadbas.core.navigation.Business
+import com.seguridadbas.multytenantseguridadbas.core.navigation.GuardsScreen
 import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
 
 @Composable
@@ -27,6 +29,7 @@ fun BottonNavScreen(
     authController: AuthController,
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
+    tenantGuardsController: TenantGuardsController,
     tenantId: String
 ){
     var selectedIndex by remember{ mutableStateOf(0) }
@@ -36,6 +39,11 @@ fun BottonNavScreen(
         siteName ->
         navController.saveState()
         navController.navigate(Business(siteName = siteName) )
+    }
+
+    val navigateToGuards: () -> Unit = {
+        navController.saveState()
+        navController.navigate(GuardsScreen )
     }
 
     Scaffold(
@@ -52,9 +60,11 @@ fun BottonNavScreen(
             selectedIndex,
             Modifier.padding(it),
             navigateToBusiness = navigateToBusiness,
+            navigateToGuardsScreen = navigateToGuards,
             authController = authController,
             stationsController = stationsController,
             certificationServicesController =certificationServicesController,
+            tenantGuardsController = tenantGuardsController,
             tenantId = tenantId
         )
     }
@@ -66,9 +76,11 @@ fun ContentScreen(
     selectedIndex: Int,
     modifier: Modifier,
     navigateToBusiness: (String) -> Unit = {},
+    navigateToGuardsScreen: () -> Unit = {},
     authController: AuthController,
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
+    tenantGuardsController: TenantGuardsController,
     tenantId: String
 ){
     when(selectedIndex){
@@ -78,6 +90,6 @@ fun ContentScreen(
 
         2 -> MyAccountScreen(Modifier, authController)
 
-        3 -> MoreScreen()
+        3 -> MoreScreen(Modifier, navigateToGuardsScreen, tenantGuardsController)
     }
 }

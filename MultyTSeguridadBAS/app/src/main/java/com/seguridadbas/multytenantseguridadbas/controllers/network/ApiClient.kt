@@ -73,10 +73,8 @@ interface ApiClient {
     suspend fun getSecurityGuardsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
-        @QueryMap filter: Map<String, String>,
-        @Query("limit") limit: Int,
-        @Query("offset") offset: Int,
-        @Query("orderBy") orderBy: String? = null
+        @Query("filter[governmentId]") governmentId: String? = null,
+        @Query("filter[fullName]") fullName: String? = null,
     ): Response<JsonObject>
 
 
