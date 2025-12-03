@@ -29,7 +29,6 @@ fun BottonNavScreen(
     authController: AuthController,
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
-    tenantGuardsController: TenantGuardsController,
     tenantId: String
 ){
     var selectedIndex by remember{ mutableStateOf(0) }
@@ -64,7 +63,6 @@ fun BottonNavScreen(
             authController = authController,
             stationsController = stationsController,
             certificationServicesController =certificationServicesController,
-            tenantGuardsController = tenantGuardsController,
             tenantId = tenantId
         )
     }
@@ -80,7 +78,6 @@ fun ContentScreen(
     authController: AuthController,
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
-    tenantGuardsController: TenantGuardsController,
     tenantId: String
 ){
     when(selectedIndex){
@@ -90,6 +87,6 @@ fun ContentScreen(
 
         2 -> MyAccountScreen(Modifier, authController)
 
-        3 -> MoreScreen(Modifier, navigateToGuardsScreen, tenantGuardsController)
+        3 -> MoreScreen(Modifier, navigateToGuardsScreen)
     }
 }

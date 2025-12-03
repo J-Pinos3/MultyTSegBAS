@@ -46,8 +46,7 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 
 fun MoreScreen(
     modifier: Modifier = Modifier,
-    onNavigateToGuardsScreen: () -> Unit ,
-    tenantGuardsController: TenantGuardsController
+    onNavigateToGuardsScreen: () -> Unit
 ){
 
     Column(

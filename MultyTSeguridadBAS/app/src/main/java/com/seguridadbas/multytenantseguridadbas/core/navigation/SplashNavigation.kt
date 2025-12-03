@@ -57,7 +57,7 @@ fun SplashNavigation(authController: AuthController,
 
         composable <Home>{ backstackEntry ->
             val home =backstackEntry.toRoute<Home>()
-            BottonNavScreen(navController, authController, stationsController, certificationServicesController,tenantGuardsController,home.tenantId)
+            BottonNavScreen(navController, authController, stationsController, certificationServicesController,home.tenantId)
         }
 
         composable <Register>{
@@ -181,7 +181,9 @@ fun SplashNavigation(authController: AuthController,
 
         composable <GuardsScreen>{
             AllGuardsScreen(
-                Modifier
+                Modifier,
+                navigateBackToMore = {navController.popBackStack()},
+                tenantGuardsController = tenantGuardsController
             )
         }
 

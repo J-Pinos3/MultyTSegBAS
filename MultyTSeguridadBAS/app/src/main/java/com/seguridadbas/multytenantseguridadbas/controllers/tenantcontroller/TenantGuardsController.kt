@@ -35,7 +35,7 @@ class TenantGuardsController @Inject constructor(
 
             GuardDataResponse(
                 academicInstruction = row.get("academicInstruction").asString,
-                address = row.get("address").asString,
+                address = row.isNullStringField("address"),
                 birthDate = row.get("birthDate").asString,
                 birthPlace = row.get("birthPlace").asString,
                 bloodType = row.get("bloodType").asString,
@@ -95,8 +95,9 @@ class TenantGuardsController @Inject constructor(
                         Guard(
                             email = it.guard.email,
                             firstName =  it.guard.firstName,
-                            id = it.guard.id,
-                            lastName = it.guard.lastName
+                            id = it.guardId,
+                            lastName = it.guard.lastName,
+                            governmentId = it.governmentId
                         )
                     }
 
