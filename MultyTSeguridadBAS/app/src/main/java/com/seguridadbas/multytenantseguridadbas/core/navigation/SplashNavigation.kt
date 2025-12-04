@@ -27,6 +27,7 @@ import com.seguridadbas.multytenantseguridadbas.view.RegisterScreen
 import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.ResetPasswordScreen
+import com.seguridadbas.multytenantseguridadbas.view.SecGuardDetail
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
 
 @Composable
@@ -183,9 +184,21 @@ fun SplashNavigation(authController: AuthController,
             AllGuardsScreen(
                 Modifier,
                 navigateBackToMore = {navController.popBackStack()},
+                onGuardClicked = { guardId -> navController.navigate(GuardsScreenDetail(guardId)) },
                 tenantGuardsController = tenantGuardsController
             )
         }
+
+
+        composable <GuardsScreenDetail>{backStackEntry ->
+            val guard = backStackEntry.toRoute<GuardsScreenDetail>()
+            SecGuardDetail(
+                Modifier, guardId = guard.guardId,
+                navigateBackToAllGuards = { navController.popBackStack() },
+                tenantGuardsController = tenantGuardsController
+            )
+        }
+
 
     }
 

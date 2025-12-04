@@ -65,6 +65,10 @@ data class Business(val siteName: String)
 @Serializable
 object GuardsScreen
 
+
+@Serializable
+data class GuardsScreenDetail(val guardId: String)
+
 object NavItemList{
     val navItemList = listOf(
 

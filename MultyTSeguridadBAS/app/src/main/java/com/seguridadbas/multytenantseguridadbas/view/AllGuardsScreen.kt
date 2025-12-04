@@ -233,7 +233,9 @@ fun AllGuardsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 items(filteredGuards){ item ->
-                    GuardItem(item, modifier)
+                    GuardItem(item, modifier,
+                        onClick = onGuardClicked
+                        )
                 }
             }
         }else{
