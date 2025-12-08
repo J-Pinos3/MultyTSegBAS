@@ -104,11 +104,7 @@ interface ApiClient {
     suspend fun getAllGuardsShiftsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
-        @QueryMap filter: Map<String, String>,
-        @Query("limit") limit: Int,
-        @Query("offset") offset: Int,
-        @Query("orderBy") orderBy: String? = null
-    ): Response<JsonArray>
+    ): Response<JsonObject>
 
 
     //TURNOS DE UN GUARDIA EN ESPECÍFICO

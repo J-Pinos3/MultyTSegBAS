@@ -133,7 +133,7 @@ fun SecGuardDetail(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = guardData?.fullName.toString().replace("\"","").trim(),
+                text = "Nombre Completo: " + guardData?.fullName.toString().replace("\"","").trim(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -143,7 +143,7 @@ fun SecGuardDetail(
             //cédula
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = guardData?.governmentID.toString().replace("\"","").trim(),
+                text = "C.I.: "+guardData?.governmentID.toString().replace("\"","").trim(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -152,7 +152,7 @@ fun SecGuardDetail(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = guardData?.gender.toString().replace("\"","").trim(),
+                text = "Género: "+guardData?.gender.toString().replace("\"","").trim(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -161,7 +161,7 @@ fun SecGuardDetail(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = guardData?.academicInstruction.toString().replace("\"","").trim(),
+                text = "Instrucción académica: "+guardData?.academicInstruction.toString().replace("\"","").trim(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -170,7 +170,7 @@ fun SecGuardDetail(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = guardData?.maritalStatus.toString().replace("\"","").trim(),
+                text = "Estado civil: "+guardData?.maritalStatus.toString().replace("\"","").trim(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -179,7 +179,7 @@ fun SecGuardDetail(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = guardData?.bloodType.toString().replace("\"","").trim(),
+                text = "Tipo de sangre: "+guardData?.bloodType.toString().replace("\"","").trim(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -206,12 +206,12 @@ fun SecGuardDetail(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
-                    text = guardData?.birthPlace.toString().replace("\"","").trim(),
+                    text = "Lugar de nacimiento: "+guardData?.birthPlace.toString().replace("\"","").trim(),
                     fontSize = 14.sp,
                 )
 
                 Text(
-                    text = guardData?.birthDate.toString().replace("\"","").trim(),
+                    text = "Fecha de nacimiento: "+guardData?.birthDate.toString().replace("\"","").trim(),
                     fontSize = 14.sp,
                 )
 

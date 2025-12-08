@@ -41,14 +41,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
-import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
+import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
-import com.seguridadbas.multytenantseguridadbas.model.station.ShortStation
+import com.seguridadbas.multytenantseguridadbas.model.guard_shifts.ShortGuardShift
 import com.seguridadbas.multytenantseguridadbas.model.stationreports.GuardShiftByStationData
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
@@ -57,70 +57,57 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GuardShiftByStationScreen(
-    siteId: String,//from business screen
+fun AllGuardShiftsScreen(
     modifier: Modifier = Modifier,
-    navigateBackToBusiness: () -> Unit = {},
-    onGuardShiftReportClicked:(String) -> Unit = {},
-    stationsReportsController: StationReportsController
+    navigateBackToMore: () -> Unit,
+    onGuardShiftClicked: (guardShiftId: String) -> Unit = {},
+    guardShiftsController: GuardShiftsController
 ){
 
-    var guardShiftsByStationList by remember { mutableStateOf<List<GuardShiftByStationData>>( emptyList() ) }
+    var token by remember { mutableStateOf("") }
     var tenantId by remember { mutableStateOf("") }
-    var bearerToken by remember { mutableStateOf("") }
+    var allGuardShiftsList by remember { mutableStateOf<List<ShortGuardShift>>( emptyList() ) }
 
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
 
+
     LaunchedEffect(Unit) {
-        CoroutineScope(Dispatchers.IO).launch{
+        CoroutineScope(Dispatchers.IO).launch {
             val storedData = dataStoreController.getDataFromStore().first()
-            bearerToken = storedData.token
-            bearerToken = bearerToken.replace("\"","").trim()
+            token = storedData.token
+            token = token.replace("\"","").trim()
 
             tenantId = dataStoreController.getTenantId().first()
             tenantId = tenantId.replace("\"","").trim()
 
-            if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
-                val result = stationsReportsController.getGuardShiftsByStation(
-                    "Bearer $bearerToken", tenantId, siteId, null  )
 
-                when( result ) {
-                    is Resource.Success  -> {
-                        guardShiftsByStationList = result.data?.toList()!!
-                    }
-
-                    is Resource.Error -> {
-                        Log.e("guardshift by Station screen","No sepudo traer los reportes de de los turnos: ${result.message.toString()}")
-                    }
-
-                    else -> {
-                        Log.e("guardshift by Station screen", "No se pudieron traer los turnos para este sitio")
-                    }
-                }
-            }
+            loadGuardShiftsList(
+                token, tenantId, guardShiftsController,
+                onSuccess = { list -> allGuardShiftsList = list },
+                onError = { error -> Log.e(  "guard shifts screen", error )   },
+            )
         }
     }
 
+
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(scrollBehaviour.nestedScrollConnection),
+        modifier = modifier.fillMaxSize().nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(text = "Turnos Realizados", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(
-                        onClick = { navigateBackToBusiness() }
+                        onClick = { navigateBackToMore() }
                     ){
                         Icon(
-                           painter = painterResource(id = R.drawable.ic_back),
-                            contentDescription = "navigate  back to business"
+                            painter = painterResource(id = R.drawable.ic_back),
+                            contentDescription = "navigate  back to more"
                         )
                     }
                 },
@@ -131,21 +118,21 @@ fun GuardShiftByStationScreen(
                 )
             )
         }
-    ){ paddingValues ->
-        if( !guardShiftsByStationList.isNullOrEmpty() ){
+    ){paddingVals ->
+        if( !allGuardShiftsList.isNullOrEmpty() ){
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = BasBackground)
-                    .padding(paddingValues)
+                    .padding(paddingVals)
                     .statusBarsPadding(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-                items(guardShiftsByStationList){ item ->
-                    GuardShiftByStationItem(
+                items(allGuardShiftsList){ item ->
+                    GuardShiftItem(
                         item,
                         modifier,
-                        onReportClicked = onGuardShiftReportClicked
+                        onGuardShiftClicked = onGuardShiftClicked
                     )
                 }
             }
@@ -169,6 +156,7 @@ fun GuardShiftByStationScreen(
             }
         }
 
+
     }
 
 
@@ -176,11 +164,12 @@ fun GuardShiftByStationScreen(
 }
 
 
+
 @Composable
-private fun GuardShiftByStationItem(
-    report: GuardShiftByStationData,
+private fun GuardShiftItem(
+    report: ShortGuardShift,
     modifier: Modifier,
-    onReportClicked: (reportId: String) -> Unit = {}
+    onGuardShiftClicked: (reportId: String) -> Unit = {}
 ){
 
     Box(
@@ -194,10 +183,10 @@ private fun GuardShiftByStationItem(
             )
             .shadow(2.dp)
             .fillMaxWidth()
-            .height(100.dp)
+            .height(90.dp)
             .background(Color.White)
             .clickable {
-                onReportClicked(report.id)
+                onGuardShiftClicked(report.id)
             }
     ){
         Column(
@@ -208,28 +197,49 @@ private fun GuardShiftByStationItem(
         ){
 
             Text(
-                text = report.stationName.stationName,
+                text = report.guardName,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold
             )
-           Spacer(modifier = Modifier.padding(top = 6.dp))
-
-            Text(
-                text = report.shiftSchedule,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Bold
-            )
-
             Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = report.stationName.stationSchedule  ,
+                text = report.stationName,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold
             )
+
         }
     }
+}
+
+
+private fun loadGuardShiftsList(
+    bearerToken: String, tenantId: String,
+    guardShiftsController: GuardShiftsController,
+    onSuccess: (List<ShortGuardShift>) -> Unit,
+    onError: (String) -> Unit
+){
+
+    CoroutineScope(Dispatchers.IO).launch {
+        if(!bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty()){
+            val result = guardShiftsController.getGuardShifts("Bearer $bearerToken", tenantId)
+
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Resource.Success -> {   onSuccess(result.data!!)      }
+                    is Resource.Error -> {    onError(result.message.toString())      }
+                    else -> {   onError(result.message.toString())    }
+                }
+            }
+        }else{
+            withContext(Dispatchers.Main){
+                onError("token o tenantId inválidos")
+            }
+        }
+
+    }
+
 }

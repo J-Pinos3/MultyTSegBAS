@@ -9,9 +9,11 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
+import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.view.AllGuardShiftsScreen
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardsScreen
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
@@ -35,7 +37,8 @@ fun SplashNavigation(authController: AuthController,
                      stationsController: StationsController,
                      certificationServicesController: CertificationServicesController,
                      stationsReportsController: StationReportsController,
-                     tenantGuardsController: TenantGuardsController
+                     tenantGuardsController: TenantGuardsController,
+                     guardShiftsController: GuardShiftsController
                      ) {
 
     val navController = rememberNavController()
@@ -200,6 +203,15 @@ fun SplashNavigation(authController: AuthController,
         }
 
 
+        composable <GuardsShiftScreen> {
+            AllGuardShiftsScreen(
+                Modifier,
+                navigateBackToMore = { navController.popBackStack() },
+                onGuardShiftClicked = {  },
+                guardShiftsController = guardShiftsController
+            )
+
+        }
     }
 
 }

@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
+import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
     private val certificationServicesController by viewModels<CertificationServicesController>()
     private val stationsReportsController by viewModels<StationReportsController>()
     private val tenantGuardsController by viewModels<TenantGuardsController>()
+    private val guardShiftsController by viewModels<GuardShiftsController>()
 
 
 
@@ -32,7 +34,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MultyTenantSeguridadBASTheme {
-                SplashNavigation(authController, stationsController, certificationServicesController, stationsReportsController, tenantGuardsController)
+                SplashNavigation(
+                    authController,
+                    stationsController,
+                    certificationServicesController,
+                    stationsReportsController,
+                    tenantGuardsController,
+                    guardShiftsController
+                )
                 //SplashScreen()
             }
         }

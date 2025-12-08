@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 //todo replace List<any> for a proper datatype
 data class GuardShiftsDataResponse(
     @SerializedName("completeInventoryCheck")
-    val completeInventoryCheck: Int? = 0,
+    val completeInventoryCheck: Boolean? = null,
     @SerializedName("completeInventoryCheckId")
     val completeInventoryCheckId: String? = "",
     @SerializedName("createdAt")

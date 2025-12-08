@@ -46,7 +46,8 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 
 fun MoreScreen(
     modifier: Modifier = Modifier,
-    onNavigateToGuardsScreen: () -> Unit
+    onNavigateToGuardsScreen: () -> Unit,
+    onNavigateToGuardShiftsScreen: () -> Unit,
 ){
 
     Column(
@@ -73,7 +74,7 @@ fun MoreScreen(
             modifier = modifier,
             R.drawable.ic_tracking,
             "Turnos Realizados",
-            {}
+            onNavigateToGuardShiftsScreen
         )
 
         Spacer(modifier = modifier.padding(vertical = 8.dp))

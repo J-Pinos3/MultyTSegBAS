@@ -11,11 +11,7 @@ class GuardShiftsRepository @Inject constructor(
     suspend fun getAllGuardShiftsRepo(
         token: String,
         tenantID: String,
-        filter: Map<String, String>,
-        limit: Int,
-        offset: Int,
-        orderBy: String? = ""
-    ) = apiClient.getAllGuardsShiftsApi(token, tenantID,filter,limit, offset, orderBy )
+    ) = apiClient.getAllGuardsShiftsApi(token, tenantID )
 
 
     suspend fun getShiftsByGuardRepo(

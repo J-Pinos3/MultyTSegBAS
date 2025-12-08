@@ -25,12 +25,8 @@ class GuardShiftsController @Inject constructor(
     suspend fun getGuardShifts(
         token: String,
         tenantId: String,
-        filter: Map<String, String>,
-        limit: Int,
-        offset: Int,
-        orderBy: String? = ""
     ): Resource<List<ShortGuardShift>>{
-        val response = guardShiftsRepository.getAllGuardShiftsRepo(token, tenantId, filter,limit, offset, orderBy)
+        val response = guardShiftsRepository.getAllGuardShiftsRepo(token, tenantId)
 
         return try{
 
@@ -132,16 +128,16 @@ class GuardShiftsController @Inject constructor(
             val stationObj = row.getAsJsonObject("stationName")
 
             GuardShiftsDataResponse(
-                completeInventoryCheck = row.get("completeInventoryCheck").asInt,
-                completeInventoryCheckId = row.get("completeInventoryCheckId").asString,
+                completeInventoryCheck = row.isNullBooleanField("completeInventoryCheck"),
+                completeInventoryCheckId = row.isNullStringField("completeInventoryCheckId"),
                 createdAt = row.get("createdAt").asString,
-                createdById = row.get("createdById").asString,
+                createdById = row.isNullStringField("createdById"),
                 dailyIncidents = row.getAsJsonArray("dailyIncidents").toList(),
-                deletedAt = row.get("deletedAt").asString,
-                guardName = row.get("guardName").asString,
-                guardNameId = row.get("guardNameId").asString,
-                id = row.get("id").asString,
-                importHash = row.get("importHash").asString,
+                deletedAt = row.isNullStringField("deletedAt"),
+                guardName = row.isNullStringField("guardName"),
+                guardNameId = row.isNullStringField("guardNameId"),
+                id = row.isNullStringField("id"),
+                importHash = row.isNullStringField("importHash"),
                 numberOfIncidentsDurindShift = row.get("numberOfIncidentsDurindShift").asInt,
                 numberOfPatrolsDuringShift = row.get("numberOfPatrolsDuringShift").asInt,
                 observations = row.get("observations").asString,
@@ -151,31 +147,39 @@ class GuardShiftsController @Inject constructor(
                 shiftSchedule = row.get("shiftSchedule").asString,
                 stationName = StationName(
                     createdAt = stationObj.get("createdAt").asString,
-                    createdById = stationObj.get("createdById").asString,
-                    deletedAt = stationObj.get("deletedAt").asString,
+                    createdById = stationObj.isNullStringField("createdById"),
+                    deletedAt = stationObj.isNullStringField("deletedAt"),
                     finishTimeInDay = stationObj.get("finishTimeInDay").asString,
                     id = stationObj.get("id").asString,
-                    importHash = stationObj.get("importHash").asString,
+                    importHash = stationObj.isNullStringField("importHash"),
                     latitud = stationObj.get("latitud").asString,
                     longitud = stationObj.get("longitud").asString,
                     numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
                     startingTimeInDay = stationObj.get("startingTimeInDay").asString,
                     stationName = stationObj.get("stationName").asString,
-                    stationOriginId = stationObj.get("stationOriginId").asString,
+                    stationOriginId = stationObj.isNullStringField("stationOriginId"),
                     stationSchedule = stationObj.get("stationSchedule").asString,
                     tenantId = stationObj.get("tenantId").asString,
                     updatedAt = stationObj.get("updatedAt").asString,
-                    updatedById = stationObj.get("updatedById").asString
+                    updatedById = stationObj.isNullStringField("updatedById")
                 ),
                 stationNameId = row.get("stationNameId").asString,
                 tenantId = row.get("tenantId").asString,
                 updatedAt = row.get("updatedAt").asString,
-                updatedById = row.get("updatedById").asString
+                updatedById = row.isNullStringField("updatedById")
             )
 
         }
         return AllGuardShiftsResponse(count, rows)
 
+    }
+
+    private fun JsonObject?.isNullStringField(field: String): String{
+        return if( this?.get(field)?.isJsonNull == false ) this.get(field).asString else ""
+    }
+
+    private fun JsonObject?.isNullBooleanField(field: String): Boolean{
+        return if( this?.get(field)?.isJsonNull == false ) this.get(field).asBoolean else false
     }
 
 }
