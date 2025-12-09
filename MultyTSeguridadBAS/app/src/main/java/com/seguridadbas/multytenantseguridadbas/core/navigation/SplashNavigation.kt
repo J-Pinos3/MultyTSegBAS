@@ -19,6 +19,7 @@ import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationScreen
+import com.seguridadbas.multytenantseguridadbas.view.GuardShiftsDetailSc
 import com.seguridadbas.multytenantseguridadbas.view.IncidentsByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationScreen
@@ -192,7 +193,6 @@ fun SplashNavigation(authController: AuthController,
             )
         }
 
-
         composable <GuardsScreenDetail>{backStackEntry ->
             val guard = backStackEntry.toRoute<GuardsScreenDetail>()
             SecGuardDetail(
@@ -202,15 +202,24 @@ fun SplashNavigation(authController: AuthController,
             )
         }
 
-
         composable <GuardsShiftScreen> {
             AllGuardShiftsScreen(
                 Modifier,
                 navigateBackToMore = { navController.popBackStack() },
-                onGuardShiftClicked = {  },
+                onGuardShiftClicked = { guardShiftId -> navController.navigate(GuardsShiftDetail(guardShiftId)) },
                 guardShiftsController = guardShiftsController
             )
+        }
 
+        composable <GuardsShiftDetail>{ backStackEntry ->
+            val id = backStackEntry.toRoute<GuardsShiftDetail>()
+            GuardShiftsDetailSc(
+                Modifier,
+                id.guardShiftId,
+                navigateBackToAllGuardsShifts = { navController.popBackStack() },
+                guardShiftsController
+
+            )
         }
     }
 

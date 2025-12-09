@@ -41,7 +41,7 @@ class GuardShiftsController @Inject constructor(
                         ShortGuardShift(
 
                             guardName = it.guardName ?: "",
-                            id = it.id,
+                            id = it.id ,
                             numberOfIncidents = it.numberOfIncidentsDurindShift,
                             numberOfPatrols = it.numberOfPatrolsDuringShift,
                             tenantId = it.tenantId,
@@ -77,11 +77,11 @@ class GuardShiftsController @Inject constructor(
                  Resource.Success(
 
                      GuardShift(
-                         completeInventoryCheck = guardShift?.get("completeInventoryCheck")?.asInt ?: 0,
+                         completeInventoryCheck = guardShift.isNullBooleanField("completeInventoryCheck"),
                          dailyIncidents = guardShift?.getAsJsonArray("dailyIncidents")?.toList() ?: emptyList(),
-                         guardName = guardShift?.get("guardName")?.asString ?: "",
-                         guardNameId = guardShift?.get("guardNameId")?.asString ?: "",
-                         id = guardShift?.get("id")?.asString ?: "",
+                         guardName = guardShift.isNullStringField("guardName"),
+                         guardNameId = guardShift.isNullStringField("guardNameId"),
+                         id = guardShift.isNullStringField("id"),
                          numberOfIncidentsDuringShift = guardShift?.get("numberOfIncidentsDurindShift")?.asInt ?: 0,
                          numberOfPatrolsDuringShift = guardShift?.get("numberOfPatrolsDuringShift")?.asInt ?: 0,
                          observations = guardShift?.get("observations")?.asString ?: "",
@@ -94,6 +94,9 @@ class GuardShiftsController @Inject constructor(
                          longitude = guardShift?.get("stationName")?.asJsonObject?.get("longitud")?.asString ?: "",
                          numberOfGuardsInStation = guardShift?.get("stationName")?.asJsonObject?.get("numberOfGuardsInStation")?.asInt ?: 0,
                          stationName = guardShift?.get("stationName")?.asJsonObject?.get("stationName")?.asString ?: "",
+
+                         startingTimeInDay = guardShift?.get("stationName")?.asJsonObject?.get("startingTimeInDay")?.asString ?: "",
+                         finishTimeInDay = guardShift?.get("stationName")?.asJsonObject?.get("finishTimeInDay")?.asString ?: "",
 
                          )
 

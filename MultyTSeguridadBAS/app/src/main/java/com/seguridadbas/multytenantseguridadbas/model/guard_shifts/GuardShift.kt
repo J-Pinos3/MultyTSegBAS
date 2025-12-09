@@ -1,7 +1,7 @@
 package com.seguridadbas.multytenantseguridadbas.model.guard_shifts
 
 data class GuardShift(
-    val completeInventoryCheck: Int = 0,
+    val completeInventoryCheck: Boolean = false,
     val dailyIncidents: List<Any?> = emptyList<Any>(),
     val guardName: String = "",
     val guardNameId: String = "",
@@ -17,6 +17,8 @@ data class GuardShift(
     val latitude: String = "",
     val longitude: String = "",
     val numberOfGuardsInStation: Int = 0,
-    val stationName: String = ""
+    val stationName: String = "",
 
+    val startingTimeInDay: String = "",
+    val finishTimeInDay: String = "",
 )
