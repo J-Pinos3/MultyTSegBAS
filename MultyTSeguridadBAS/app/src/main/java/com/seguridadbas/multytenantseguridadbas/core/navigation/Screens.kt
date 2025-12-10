@@ -75,6 +75,9 @@ object GuardsShiftScreen
 @Serializable
 data class GuardsShiftDetail(val guardShiftId: String)
 
+@Serializable
+object ShiftsScreen
+
 object NavItemList{
     val navItemList = listOf(
 

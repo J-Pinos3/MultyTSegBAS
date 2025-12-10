@@ -1,7 +1,8 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.seguridadbas.multytenantseguridadbas.view
 
+import android.hardware.Sensor
+import android.hardware.SensorPrivacyManager
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,7 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -30,7 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,7 +48,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -57,12 +55,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
-import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
+import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
-import com.seguridadbas.multytenantseguridadbas.model.stationreports.GuardShiftByStationData
-import com.seguridadbas.multytenantseguridadbas.model.stationreports.IncidentsByStationData
+import com.seguridadbas.multytenantseguridadbas.model.shifts.ShortShiftData
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
@@ -72,78 +70,59 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Date
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IncidentsByStationScreen(
+fun AllShiftScreen(
     modifier: Modifier = Modifier,
-    navigateBackToBusiness: () -> Unit = {},
-    onIncidentClicked: (incidentId: String) -> Unit = {},
-    stationsReportsController: StationReportsController
+    navigateBackToMore: () -> Unit,
+    onShiftClicked: (shiftId: String) -> Unit = {},
+    shiftsController: ShiftsController
 ){
 
-    var allIncidentsByStation by remember { mutableStateOf(emptyList<IncidentsByStationData>()) }
-    var filteredIncidents by remember { mutableStateOf(emptyList<IncidentsByStationData>()) }
+    var allShifts by remember { mutableStateOf( emptyList<ShortShiftData>() ) }
+
     var tenantId by remember { mutableStateOf("") }
     var bearerToken by remember { mutableStateOf("") }
+
 
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
 
     var showDateDialog by remember { mutableStateOf(false) }
-    var searchText by remember { mutableStateOf("") }
     var selectedStartDate by remember { mutableStateOf<String?>(null) }
     var selectedEndDate by remember { mutableStateOf<String?>(null) }
 
 
-    // Efecto para carga inicial
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             val storedData = dataStoreController.getDataFromStore().first()
             bearerToken = storedData.token.replace("\"","").trim()
             tenantId = dataStoreController.getTenantId().first().replace("\"","").trim()
 
-            loadIncidents(null, null, bearerToken, tenantId,
-                stationsReportsController,
-            onSuccess = { incidents -> allIncidentsByStation = incidents},
-                onError = {error -> Log.e("incidents by station screen", error)}
+            loadShifts(
+                null,   bearerToken,    tenantId,     shiftsController,
+                onSuccess = { shifts -> allShifts = shifts  },
+                onError = { error ->  Log.e("shifts screen", error) }
             )
-        }
-    }
-
-    // Efecto para filtrar cuando cambia el texto de búsqueda
-    LaunchedEffect(searchText, allIncidentsByStation) {
-        if (searchText.isBlank()) {
-            filteredIncidents = allIncidentsByStation
-        } else {
-            filteredIncidents = allIncidentsByStation.filter { incident ->
-                incident.title.contains(searchText, ignoreCase = true) ||
-                        incident.description.contains(searchText, ignoreCase = true)
-            }
         }
     }
 
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(scrollBehaviour.nestedScrollConnection),
+
+        modifier= modifier.fillMaxSize().nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
             Column {
                 CenterAlignedTopAppBar(
-                    title = { Text(text="Incidentes", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
+                    title = { Text("Turnos generador", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
                     navigationIcon = {
-                        IconButton(
-                            onClick = { navigateBackToBusiness() }
-                        ){
+                        IconButton(  onClick = { navigateBackToMore() }  ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_back),
-                                contentDescription = "navigate back to business"
+                                contentDescription = "navigate back to more"
                             )
                         }
                     },
@@ -151,100 +130,67 @@ fun IncidentsByStationScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = BasYellow, titleContentColor = Color.Black
                     ),
-                    actions ={
-                        IconButton(
-                            onClick = { showDateDialog = true }
-                        ){
+                    actions = {
+                        IconButton(  onClick = { showDateDialog = true }  ) {
                             Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "fechas"
+                                imageVector = Icons.Default.DateRange, contentDescription = "fechas"
                             )
                         }
                     }
                 )
-
-                // Search Bar
-                OutlinedTextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    placeholder = { Text("Buscar por título o descripción...") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Buscar"
-                        )
-                    },
-                    trailingIcon = {
-                        if (searchText.isNotBlank()) {
-                            IconButton(
-                                onClick = { searchText = "" }
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
-                                    contentDescription = "Limpiar búsqueda"
-                                )
-                            }
-                        }
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp)
-                )
             }
         }
-    ){
-            paddingValues ->
 
-        // Dialog para selección de fechas
-        if (showDateDialog) {
+    ){ paddingVals ->
+
+
+        if(showDateDialog){
             DateRangeDialog(
                 onDismiss = {
                     selectedStartDate = null
                     selectedEndDate = null
-                    searchText = ""
-                    loadIncidents(null, null, bearerToken, tenantId,
-                        stationsReportsController,
-                        onSuccess = { incidents -> allIncidentsByStation = incidents},
-                        onError = {error -> Log.e("incidents by station screen", error)}
+
+                    loadShifts(
+                        null,   bearerToken,    tenantId,     shiftsController,
+                        onSuccess = { shifts -> allShifts = shifts  },
+                        onError = { error ->  Log.e("shifts screen", error) }
                     )
+
                     showDateDialog = false
                 },
                 onConfirm = { startDate, endDate ->
                     selectedStartDate = startDate
-                    selectedEndDate = endDate
-                    // Convertir fechas a string para la API (ajusta el formato según tu API)
+                    selectedEndDate  = endDate
+
                     val startDateStr = startDate.toString()
                     val endDateStr = endDate.toString()
-                    loadIncidents(null, listOf(startDateStr, endDateStr), bearerToken, tenantId,
-                        stationsReportsController,
-                        onSuccess = { incidents -> allIncidentsByStation = incidents  },
-                        onError = {error -> Log.e("incidents by station screen", error)}
+
+                    loadShifts(
+                        listOf(startDateStr, endDateStr),   bearerToken,    tenantId,     shiftsController,
+                        onSuccess = { shifts -> allShifts = shifts  },
+                        onError = { error ->  Log.e("shifts screen", error) }
                     )
                     showDateDialog = false
                 }
             )
         }
 
-        if (filteredIncidents.isNotEmpty()) {
+        if(allShifts.isNotEmpty()){
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = BasBackground)
-                    .padding(paddingValues)
+                modifier = Modifier.fillMaxSize().background(BasBackground)
+                    .padding(paddingVals)
                     .statusBarsPadding(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-                items(filteredIncidents){ item ->
-                    IncidentByStationItem(
-                        item,
-                        modifier,
-                        onReportClicked = onIncidentClicked
+                items( allShifts ){ item ->
+                    ShiftItem(
+                        item, Modifier,
+                        onShiftClicked = onShiftClicked
                     )
+
                 }
             }
-        } else {
+        }else{
             Column(
                 modifier = Modifier.fillMaxSize()
                     .padding(horizontal = 10.dp, vertical = 10.dp),
@@ -252,35 +198,36 @@ fun IncidentsByStationScreen(
                 verticalArrangement = Arrangement.Center
             ){
                 Text(
-                    text = if (searchText.isNotBlank() || selectedStartDate != null || selectedEndDate != null) {
-                        "No se encontraron incidentes con los filtros aplicados"
-                    } else {
-                        "NO hay reportes"
+                    text = if(selectedStartDate != null || selectedEndDate != null){
+                        "No se encontraron turnos con los filtros aplicados"
+                    }else{
+                        "No hay turnos generados"
                     },
                     textAlign = TextAlign.Center,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Red,
-                    textDecoration = TextDecoration.Underline,
+                    color = Color.Black, textDecoration = TextDecoration.Underline,
                     fontFamily = FontFamily.Monospace
                 )
 
-                if (searchText.isNotBlank() || selectedStartDate != null || selectedEndDate != null) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                if(selectedStartDate != null || selectedEndDate != null){
+                    Spacer(Modifier.height(16.dp))
+
                     OutlinedButton(
                         onClick = {
                             selectedStartDate = null
                             selectedEndDate = null
-                            searchText = ""
-                            loadIncidents(null, null, bearerToken, tenantId,
-                                stationsReportsController,
-                                onSuccess = { incidents -> allIncidentsByStation = incidents},
-                                onError = {error -> Log.e("incidents by station screen", error)}
+
+                            loadShifts(
+                                null,   bearerToken,    tenantId,     shiftsController,
+                                onSuccess = { shifts -> allShifts = shifts  },
+                                onError = { error ->  Log.e("shifts screen", error) }
                             )
                         }
                     ) {
                         Text("Limpiar filtros")
                     }
+
                 }
             }
         }
@@ -288,28 +235,24 @@ fun IncidentsByStationScreen(
 }
 
 
-
-
-// Dialog para selección de rango de fechas
 @Composable
 private fun DateRangeDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String?, String?) -> Unit,
-) {
+    onConfirm: (String?,  String?) -> Unit,
+){
     var startDate by remember { mutableStateOf<String?>(null) }
     var endDate by remember { mutableStateOf<String?>(null) }
+
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
-    androidx.compose.ui.window.Dialog(
+    Dialog(
         onDismissRequest = onDismiss
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(16.dp))
-                .padding(10.dp)
-        ) {
+            modifier = Modifier.fillMaxWidth()
+                .background(Color.White, RoundedCornerShape(16.dp)).padding(10.dp)
+        ){
             Text(
                 text = "Seleccionar rango de fechas",
                 fontSize = 18.sp,
@@ -317,39 +260,33 @@ private fun DateRangeDialog(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Selector de fecha inicial
             OutlinedButton(
                 onClick = { showStartDatePicker = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = startDate?.toString() ?: "Fecha inicial",
-                    modifier = Modifier.padding(8.dp)
+                    startDate.toString() ?: "Fecha inicial", Modifier.padding(8.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer( modifier = Modifier.height(8.dp) )
 
-            // Selector de fecha final
             OutlinedButton(
                 onClick = { showEndDatePicker = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = endDate?.toString() ?: "Fecha final",
-                    modifier = Modifier.padding(8.dp)
+                    endDate.toString() ?: "Fecha final", Modifier.padding(8.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer( modifier = Modifier.height(12.dp) )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                OutlinedButton(
-                    onClick = onDismiss
-                ) {
+            ){
+                OutlinedButton( onClick = onDismiss ) {
                     Text("Cancelar")
                 }
 
@@ -357,7 +294,7 @@ private fun DateRangeDialog(
 
                 OutlinedButton(
                     onClick = { onConfirm(startDate, endDate) },
-                    enabled = startDate != null && endDate != null
+                    enabled = startDate!=null && endDate!=null
                 ) {
                     Text("Aplicar")
                 }
@@ -365,39 +302,36 @@ private fun DateRangeDialog(
         }
     }
 
-    val format = SimpleDateFormat("yyyy-MM-dd")
-    // Date Pickers
-    if (showStartDatePicker) {
+    val format  = SimpleDateFormat("yyyy-MM-dd")
+
+    if(showStartDatePicker){
         DatePickerDialogo(
             onDismissRequest = { showStartDatePicker = false },
-            onDateSelected = { date ->
-                startDate = format.format(  Date(date?:0L) )  + "T00:00:00.000Z"
-                showStartDatePicker = false
+            onDateSelected = {  date ->
+                startDate = format.format( Date(date ?: 0L) ) + "T00:00:00.000Z"
+                showStartDatePicker  =false
             }
         )
     }
 
-    if (showEndDatePicker) {
+    if( showEndDatePicker ){
         DatePickerDialogo(
             onDismissRequest = { showEndDatePicker = false },
-            onDateSelected = { date ->
-                //endDate = Date(date?:0).toString() + "T23:59:00.000Z"
-                endDate = format.format(  Date(date?:0L) )  + "T23:59:00.000Z"
-                showEndDatePicker = false
+            onDateSelected = {  date ->
+                endDate = format.format( Date(date ?: 0L) ) + "T23:59:00.000Z"
+                showEndDatePicker  =false
             }
         )
     }
 }
 
-// Date Picker Dialog (necesitarás implementar esto o usar uno existente)
 
 @Composable
 private fun DatePickerDialogo(
     onDismissRequest: () -> Unit,
-    onDateSelected: (Long?) -> Unit
-) {
-
-    androidx.compose.ui.window.Dialog(
+    onDateSelected: (Long?) -> Unit,
+){
+    Dialog(
         onDismissRequest = onDismissRequest
     ) {
         val datePickerState = rememberDatePickerState()
@@ -408,31 +342,28 @@ private fun DatePickerDialogo(
                     onClick = {
                         onDateSelected(datePickerState.selectedDateMillis)
                         onDismissRequest()
-                }) {
+                    }
+                ) {
                     Text("Aceptar")
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = onDismissRequest
-                ) {
+                TextButton( onClick = onDismissRequest ) {
                     Text("Cancelar")
                 }
-
             }
         ) {
             DatePicker(state = datePickerState)
         }
-
     }
 }
 
 
 @Composable
-private fun IncidentByStationItem(
-    report: IncidentsByStationData,
-    modifier: Modifier = Modifier,
-    onReportClicked: (reportId: String) -> Unit = {}
+private fun ShiftItem(
+    shift: ShortShiftData,
+    modifier: Modifier,
+    onShiftClicked: (shiftId: String) -> Unit = {}
 ){
 
     Box(
@@ -449,7 +380,7 @@ private fun IncidentByStationItem(
             .height(100.dp)
             .background(Color.White)
             .clickable {
-                onReportClicked(report.id)
+                onShiftClicked(shift.id)
             }
     ){
         Column(
@@ -460,7 +391,7 @@ private fun IncidentByStationItem(
         ){
 
             Text(
-                text = report.title,
+                text = shift.guardName,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold
@@ -468,7 +399,7 @@ private fun IncidentByStationItem(
             Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = report.date,
+                text = shift.stationName,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold
@@ -477,57 +408,50 @@ private fun IncidentByStationItem(
             Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = report.description,
+                text = shift.stationSchedule,
                 maxLines = 3,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold
             )
-        }
-    }
-}
+            Spacer(modifier = Modifier.padding(top = 6.dp))
 
-
- fun loadIncidents(
-    title: String? = null,
-    rangeDate: List<String>? = null,
-    bearerToken: String,
-    tenantId: String,
-    stationsReportsController: StationReportsController,
-    onSuccess: (List<IncidentsByStationData>) -> Unit,
-    onError: (String) -> Unit
-) {
-    CoroutineScope(Dispatchers.IO).launch {
-        if (!bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty()) {
-            val result = stationsReportsController.getIncidents(
-                "Bearer $bearerToken",
-                tenantId,
-                title,
-                rangeDate
+            Text(
+                text = shift.startDate,
+                maxLines = 3,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.Bold
             )
 
-            withContext(Dispatchers.Main) {
-                when(result) {
-                    is Resource.Success -> {
-                        val incidents = result.data?.toList() ?: emptyList()
-                        onSuccess(incidents)
-                    }
-                    is Resource.Error -> {
-                        val errorMsg = "No se pudieron traer los incidentes ${result.message}"
-                        Log.e("incidents by station screen", errorMsg)
-                        onError(errorMsg)
-                    }
-                    else -> {
-                        val errorMsg = "No se pudieron traer los incidentes"
-                        Log.e("incidents by station screen", errorMsg)
-                        onError(errorMsg)
-                    }
+        }
+    }
+
+}
+
+private fun loadShifts(
+    startTimeRange: List<String>? = null,
+    bearerToken: String, tenantId: String, shiftsController: ShiftsController,
+    onSuccess: (List<ShortShiftData>) -> Unit,
+    onError: (String) -> Unit
+){
+    CoroutineScope(Dispatchers.IO).launch {
+        if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+            val result = shiftsController.getAllShifts("Bearer $bearerToken", tenantId, startTimeRange)
+
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Resource.Success -> {  onSuccess( result.data?.toList() ?: emptyList() )  }
+                    is Resource.Error -> {    onError(result.message.toString())      }
+                    else -> {   onError(result.message.toString())    }
                 }
+
             }
-        } else {
-            withContext(Dispatchers.Main) {
-                onError("Token o tenantId vacíos")
+        }else{
+            withContext(Dispatchers.Main){
+                onError("token o tenantId inválidos")
             }
+
         }
     }
 }

@@ -10,11 +10,8 @@ class ShiftsRepository @Inject constructor(
     suspend fun getAllShiftsRepo(
         token:String,
         tenantId: String,
-        filter: Map<String, String>,
-        limit: Int,
-        offset: Int,
-        orderBy: String? = ""
-    ) = apiClient.getAllShiftsApi(token, tenantId,  filter,limit, offset, orderBy)
+        startTimeRange: List<String>? = null
+    ) = apiClient.getAllShiftsApi(token, tenantId,  startTimeRange)
 
 
     suspend fun shiftDetailRepo(

@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
+import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
     private val stationsReportsController by viewModels<StationReportsController>()
     private val tenantGuardsController by viewModels<TenantGuardsController>()
     private val guardShiftsController by viewModels<GuardShiftsController>()
+    private val shiftsController by viewModels<ShiftsController>()
 
 
 
@@ -40,7 +42,8 @@ class MainActivity : ComponentActivity() {
                     certificationServicesController,
                     stationsReportsController,
                     tenantGuardsController,
-                    guardShiftsController
+                    guardShiftsController,
+                    shiftsController
                 )
                 //SplashScreen()
             }

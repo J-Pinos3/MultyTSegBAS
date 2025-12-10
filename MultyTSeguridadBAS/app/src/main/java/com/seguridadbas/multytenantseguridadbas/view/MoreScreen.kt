@@ -48,6 +48,7 @@ fun MoreScreen(
     modifier: Modifier = Modifier,
     onNavigateToGuardsScreen: () -> Unit,
     onNavigateToGuardShiftsScreen: () -> Unit,
+    onNavigateToShiftScreen: () -> Unit
 ){
 
     Column(
@@ -84,7 +85,7 @@ fun MoreScreen(
             modifier = modifier,
             R.drawable.ic_orders,
             "Turnos Asignados",
-            {}
+            onNavigateToShiftScreen
         )
 
         Spacer(modifier = modifier.padding(vertical = 8.dp))

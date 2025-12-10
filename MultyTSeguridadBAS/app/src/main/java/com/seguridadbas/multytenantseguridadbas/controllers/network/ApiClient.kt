@@ -134,11 +134,8 @@ interface ApiClient {
     suspend fun getAllShiftsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
-        @QueryMap filter: Map<String, String>,
-        @Query("limit") limit: Int,
-        @Query("offset") offset: Int,
-        @Query("orderBy") orderBy: String? = null
-    ): Response<JsonArray>
+        @Query("filter[startTimeRange]") startTimeRange: List<String>? = null
+    ): Response<JsonObject>
 
 
     //BUSCAR TURNOS CREADOS POR ID

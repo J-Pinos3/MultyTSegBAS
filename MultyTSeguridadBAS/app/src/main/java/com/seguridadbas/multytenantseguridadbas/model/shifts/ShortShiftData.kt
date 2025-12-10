@@ -5,5 +5,6 @@ data class ShortShiftData(
     val stationName: String,
     val id: String,
     val tenantId: String,
-    val stationSchedule: String
+    val stationSchedule: String,
+    val startDate: String = ""
 )

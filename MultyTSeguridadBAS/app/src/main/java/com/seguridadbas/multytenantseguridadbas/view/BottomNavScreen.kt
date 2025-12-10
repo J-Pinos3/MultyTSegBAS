@@ -23,6 +23,7 @@ import com.seguridadbas.multytenantseguridadbas.core.navigation.Business
 import com.seguridadbas.multytenantseguridadbas.core.navigation.GuardsScreen
 import com.seguridadbas.multytenantseguridadbas.core.navigation.GuardsShiftScreen
 import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
+import com.seguridadbas.multytenantseguridadbas.core.navigation.ShiftsScreen
 
 @Composable
 fun BottonNavScreen(
@@ -51,6 +52,11 @@ fun BottonNavScreen(
         navController.navigate( GuardsShiftScreen )
     }
 
+    val navigateToShift: () -> Unit = {
+        navController.saveState()
+        navController.navigate(ShiftsScreen)
+    }
+
     Scaffold(
        modifier = Modifier.fillMaxWidth(),
         bottomBar = {
@@ -67,6 +73,7 @@ fun BottonNavScreen(
             navigateToBusiness = navigateToBusiness,
             navigateToGuardsScreen = navigateToGuards,
             navigateToGuardShiftScreen = navigateToGuardShift,
+            navigateToShiftScreen = navigateToShift,
             authController = authController,
             stationsController = stationsController,
             certificationServicesController =certificationServicesController,
@@ -83,6 +90,7 @@ fun ContentScreen(
     navigateToBusiness: (String) -> Unit = {},
     navigateToGuardsScreen: () -> Unit = {},
     navigateToGuardShiftScreen: () -> Unit ,
+    navigateToShiftScreen: () -> Unit,
     authController: AuthController,
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
@@ -95,6 +103,6 @@ fun ContentScreen(
 
         2 -> MyAccountScreen(Modifier, authController)
 
-        3 -> MoreScreen(Modifier, navigateToGuardsScreen, navigateToGuardShiftScreen)
+        3 -> MoreScreen(Modifier, navigateToGuardsScreen, navigateToGuardShiftScreen,navigateToShiftScreen)
     }
 }

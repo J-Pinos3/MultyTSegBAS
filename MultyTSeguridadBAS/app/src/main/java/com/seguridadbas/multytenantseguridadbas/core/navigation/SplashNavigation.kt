@@ -10,11 +10,13 @@ import androidx.navigation.toRoute
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
+import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardShiftsScreen
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardsScreen
+import com.seguridadbas.multytenantseguridadbas.view.AllShiftScreen
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
@@ -39,7 +41,8 @@ fun SplashNavigation(authController: AuthController,
                      certificationServicesController: CertificationServicesController,
                      stationsReportsController: StationReportsController,
                      tenantGuardsController: TenantGuardsController,
-                     guardShiftsController: GuardShiftsController
+                     guardShiftsController: GuardShiftsController,
+                     shiftsController: ShiftsController
                      ) {
 
     val navController = rememberNavController()
@@ -219,6 +222,16 @@ fun SplashNavigation(authController: AuthController,
                 navigateBackToAllGuardsShifts = { navController.popBackStack() },
                 guardShiftsController
 
+            )
+        }
+
+
+        composable<ShiftsScreen>{
+            AllShiftScreen(
+                Modifier,
+                navigateBackToMore = { navController.popBackStack()  },
+                onShiftClicked = {},
+                shiftsController = shiftsController
             )
         }
     }
