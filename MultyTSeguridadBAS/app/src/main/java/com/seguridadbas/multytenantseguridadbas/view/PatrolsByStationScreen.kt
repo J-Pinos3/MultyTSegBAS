@@ -55,6 +55,7 @@ import com.seguridadbas.multytenantseguridadbas.model.stationreports.PatrolBySta
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -151,6 +152,8 @@ fun PatrolsByStationScreen(
                 }
             }
         }else{
+            EmptyReportsState(Modifier, "No hay patrullajes para este sitio", true)
+            /*
             Column(
                 modifier = Modifier.fillMaxSize()
                     .padding(horizontal = 10.dp, vertical = 10.dp),
@@ -167,6 +170,7 @@ fun PatrolsByStationScreen(
                     fontFamily = FontFamily.Monospace
                 )
             }
+            */
         }
 
     }

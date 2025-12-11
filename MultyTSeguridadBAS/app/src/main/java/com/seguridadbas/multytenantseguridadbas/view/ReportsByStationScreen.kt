@@ -51,6 +51,7 @@ import com.seguridadbas.multytenantseguridadbas.model.stationreports.ReportsBySt
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -150,7 +151,8 @@ fun ReportsByStationScreen(
                 }
             }
         }else{
-
+            EmptyReportsState(Modifier, "No hay reportes para este sitio", true)
+            /*
             Column(
                 modifier = Modifier.fillMaxSize()
                     .padding(horizontal = 10.dp, vertical = 10.dp),
@@ -167,6 +169,7 @@ fun ReportsByStationScreen(
                     fontFamily = FontFamily.Monospace
                 )
             }
+            */
         }
 
     }

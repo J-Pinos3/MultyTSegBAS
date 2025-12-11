@@ -53,6 +53,7 @@ import com.seguridadbas.multytenantseguridadbas.model.stationreports.GuardShiftB
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -137,7 +138,8 @@ fun AllGuardShiftsScreen(
                 }
             }
         }else{
-
+            EmptyReportsState(Modifier, "No hay reportes sobre turnos", true)
+            /*
             Column(
                 modifier = Modifier.fillMaxSize()
                     .padding(horizontal = 10.dp, vertical = 10.dp),
@@ -154,6 +156,7 @@ fun AllGuardShiftsScreen(
                     fontFamily = FontFamily.Monospace
                 )
             }
+            */
         }
 
 

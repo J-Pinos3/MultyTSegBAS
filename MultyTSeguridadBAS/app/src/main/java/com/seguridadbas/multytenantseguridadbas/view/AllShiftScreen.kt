@@ -64,6 +64,7 @@ import com.seguridadbas.multytenantseguridadbas.model.shifts.ShortShiftData
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -197,6 +198,16 @@ fun AllShiftScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ){
+                EmptyReportsState(
+                    Modifier,
+                    if(selectedStartDate != null || selectedEndDate != null){
+                        "No se encontraron turnos con los filtros aplicados"
+                    }else{
+                        "No hay turnos generados"
+                    },
+                    true
+                )
+                /*
                 Text(
                     text = if(selectedStartDate != null || selectedEndDate != null){
                         "No se encontraron turnos con los filtros aplicados"
@@ -209,6 +220,7 @@ fun AllShiftScreen(
                     color = Color.Black, textDecoration = TextDecoration.Underline,
                     fontFamily = FontFamily.Monospace
                 )
+                */
 
                 if(selectedStartDate != null || selectedEndDate != null){
                     Spacer(Modifier.height(16.dp))

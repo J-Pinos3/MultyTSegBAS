@@ -56,6 +56,7 @@ import com.seguridadbas.multytenantseguridadbas.model.Guard
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -239,6 +240,8 @@ fun AllGuardsScreen(
                 }
             }
         }else{
+            EmptyReportsState(Modifier, "No hay guardias de seguridad", true)
+            /*
             Column(
                 modifier = Modifier.fillMaxSize()
                     .padding(horizontal = 10.dp, vertical = 10.dp),
@@ -255,6 +258,7 @@ fun AllGuardsScreen(
                     fontFamily = FontFamily.Monospace
                 )
             }
+            */
         }
     }
 

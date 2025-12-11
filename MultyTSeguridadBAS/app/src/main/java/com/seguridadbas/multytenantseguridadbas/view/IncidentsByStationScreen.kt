@@ -66,6 +66,7 @@ import com.seguridadbas.multytenantseguridadbas.model.stationreports.IncidentsBy
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -251,6 +252,16 @@ fun IncidentsByStationScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ){
+                EmptyReportsState(
+                    Modifier,
+                    if(selectedStartDate != null || selectedEndDate != null){
+                        "No se encontraron incidentes con los filtros aplicados"
+                    }else{
+                        "No hay incidentes para este sitio"
+                    },
+                    true
+                )
+                /*
                 Text(
                     text = if (searchText.isNotBlank() || selectedStartDate != null || selectedEndDate != null) {
                         "No se encontraron incidentes con los filtros aplicados"
@@ -264,6 +275,7 @@ fun IncidentsByStationScreen(
                     textDecoration = TextDecoration.Underline,
                     fontFamily = FontFamily.Monospace
                 )
+                */
 
                 if (searchText.isNotBlank() || selectedStartDate != null || selectedEndDate != null) {
                     Spacer(modifier = Modifier.height(16.dp))
