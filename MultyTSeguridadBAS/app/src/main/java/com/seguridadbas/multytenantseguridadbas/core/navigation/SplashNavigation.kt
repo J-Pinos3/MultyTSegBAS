@@ -33,6 +33,7 @@ import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.ResetPasswordScreen
 import com.seguridadbas.multytenantseguridadbas.view.SecGuardDetail
+import com.seguridadbas.multytenantseguridadbas.view.ShiftDetailScreen
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
 
 @Composable
@@ -230,10 +231,21 @@ fun SplashNavigation(authController: AuthController,
             AllShiftScreen(
                 Modifier,
                 navigateBackToMore = { navController.popBackStack()  },
-                onShiftClicked = {},
+                onShiftClicked = { shiftId -> navController.navigate(ShiftDetailsSc(shiftId)) },
                 shiftsController = shiftsController
             )
         }
+
+        composable <ShiftDetailsSc>{ backStackEntry ->
+            val id = backStackEntry.toRoute<ShiftDetailsSc>().shiftId
+            ShiftDetailScreen(
+                Modifier,
+                id,
+                navigateBackToShifts = { navController.popBackStack() },
+                shiftsController
+            )
+        }
+
     }
 
 }

@@ -84,7 +84,7 @@ fun MoreScreen(
         FeatureItems(
             modifier = modifier,
             R.drawable.ic_orders,
-            "Turnos Asignados",
+            "Turnos Generados",
             onNavigateToShiftScreen
         )
 

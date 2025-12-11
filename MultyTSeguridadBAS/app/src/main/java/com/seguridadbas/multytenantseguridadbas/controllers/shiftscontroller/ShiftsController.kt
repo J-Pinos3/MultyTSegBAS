@@ -77,24 +77,27 @@ class ShiftsController @Inject constructor(
             if(response.isSuccessful && response.body() != null){
 
                 val jsonBody = response.body()!!
+                val guardObj = jsonBody.getAsJsonObject("guard")
+                val stationObj = jsonBody.getAsJsonObject("station")
+
 
                 Resource.Success(
                     ShiftsData(
                         endTime = jsonBody.get("endTime").asString,
-                                startTime = jsonBody.get("startTime").asString,
-                                guardEmail = jsonBody.get("guardEmail").asString,
-                                guardFirstName = jsonBody.get("guardFirstName").asString,
-                                guardId = jsonBody.get("guardId").asString,
-                                guardLastName = jsonBody.get("guardLastName").asString,
-                                shiftId = jsonBody.get("shiftId").asString,
-                                finishTimeInDay = jsonBody.get("finishTimeInDay").asString,
-                                latitude = jsonBody.get("latitude").asString,
-                                longitude = jsonBody.get("longitude").asString,
-                                numberOfGuardsInStation = jsonBody.get("numberOfGuardsInStation").asString,
-                                startingTimeInDay = jsonBody.get("startingTimeInDay").asString,
-                                stationName = jsonBody.get("stationName").asString,
-                                stationSchedule = jsonBody.get("stationSchedule").asString,
-                                tenantId = jsonBody.get("tenantId").asString
+                        startTime = jsonBody.get("startTime").asString,
+                        guardEmail = guardObj.get("email").asString,
+                        guardFirstName = guardObj.isNullStringField("firstName"),
+                        guardId = guardObj.get("id").asString,
+                        guardLastName = guardObj.isNullStringField("lastName"),
+                        shiftId = jsonBody.get("id").asString,
+                        finishTimeInDay = stationObj.get("finishTimeInDay").asString,
+                        latitude = stationObj.get("latitud").asString,
+                        longitude = stationObj.get("longitud").asString,
+                        numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
+                        startingTimeInDay = stationObj.get("startingTimeInDay").asString,
+                        stationName = stationObj.get("stationName").asString,
+                        stationSchedule = stationObj.get("stationSchedule").asString,
+                        tenantId = jsonBody.get("tenantId").asString
                     )
                 )
 

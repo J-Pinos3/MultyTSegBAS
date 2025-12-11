@@ -117,7 +117,7 @@ fun AllShiftScreen(
         topBar = {
             Column {
                 CenterAlignedTopAppBar(
-                    title = { Text("Turnos generador", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
+                    title = { Text("Turnos generados", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(  onClick = { navigateBackToMore() }  ) {
                             Icon(
@@ -377,7 +377,7 @@ private fun ShiftItem(
             )
             .shadow(2.dp)
             .fillMaxWidth()
-            .height(100.dp)
+            .height(150.dp)
             .background(Color.White)
             .clickable {
                 onShiftClicked(shift.id)
@@ -386,7 +386,7 @@ private fun ShiftItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(8.dp),
             horizontalAlignment = Alignment.Start
         ){
 
