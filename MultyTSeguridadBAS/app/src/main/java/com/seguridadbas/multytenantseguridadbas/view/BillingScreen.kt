@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -35,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 
@@ -52,7 +55,7 @@ fun BillingScreen(
         modifier = modifier.fillMaxSize().nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
             CenterAlignedTopAppBar(
-                title={ Text(text = "") },
+                title={ Text(text = "Nómina") },
                 navigationIcon = {
                     IconButton(
                         onClick = { navigateBackToHome()  }
@@ -66,7 +69,17 @@ fun BillingScreen(
                 scrollBehavior = scrollBehaviour,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = BasYellow, titleContentColor = Color.Black
-                )
+                ),
+                actions = {
+                    IconButton(
+                        onClick = { /** navegar a servicios */  }
+                    ){
+                        Icon(
+                            painter =painterResource( R.drawable.ic_orders ),
+                            contentDescription = "pagos de servicios"
+                        )
+                    }
+                }
             )
         }
     ){paddingVals ->
@@ -74,10 +87,13 @@ fun BillingScreen(
 
 
         LazyColumn(
-
+            modifier = modifier.fillMaxSize().background(BasBackground)
+                .padding(paddingVals).statusBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
 
         }
+
     }
 }
 
