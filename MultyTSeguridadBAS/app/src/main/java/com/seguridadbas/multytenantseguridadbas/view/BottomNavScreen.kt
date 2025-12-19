@@ -18,6 +18,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthC
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.core.navigation.BillingListScreen
 import com.seguridadbas.multytenantseguridadbas.core.navigation.BottomNavBar
 import com.seguridadbas.multytenantseguridadbas.core.navigation.Business
 import com.seguridadbas.multytenantseguridadbas.core.navigation.GuardsScreen
@@ -57,6 +58,11 @@ fun BottonNavScreen(
         navController.navigate(ShiftsScreen)
     }
 
+    val navigateToBilling: () -> Unit = {
+        navController.saveState()
+        navController.navigate(BillingListScreen )
+    }
+
     Scaffold(
        modifier = Modifier.fillMaxWidth(),
         bottomBar = {
@@ -74,6 +80,7 @@ fun BottonNavScreen(
             navigateToGuardsScreen = navigateToGuards,
             navigateToGuardShiftScreen = navigateToGuardShift,
             navigateToShiftScreen = navigateToShift,
+            navigateToBilling = navigateToBilling,
             authController = authController,
             stationsController = stationsController,
             certificationServicesController =certificationServicesController,
@@ -91,13 +98,14 @@ fun ContentScreen(
     navigateToGuardsScreen: () -> Unit = {},
     navigateToGuardShiftScreen: () -> Unit ,
     navigateToShiftScreen: () -> Unit,
+    navigateToBilling: () -> Unit,
     authController: AuthController,
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
     tenantId: String
 ){
     when(selectedIndex){
-        0-> HomeScreen(Modifier, certificationServicesController, tenantId)
+        0-> HomeScreen(Modifier, certificationServicesController, tenantId, navigateToBilling)
 
         1 -> PostSitesScreen(Modifier, navigateToBusiness, stationsController)
 

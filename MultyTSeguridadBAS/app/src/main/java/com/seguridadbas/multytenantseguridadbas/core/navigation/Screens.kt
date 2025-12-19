@@ -81,6 +81,10 @@ object ShiftsScreen
 @Serializable
 data class ShiftDetailsSc(val shiftId: String)
 
+
+@Serializable
+object BillingListScreen
+
 object NavItemList{
     val navItemList = listOf(
 

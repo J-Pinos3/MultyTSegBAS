@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontroller.BillingAccountController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
@@ -27,6 +28,8 @@ class MainActivity : ComponentActivity() {
     private val tenantGuardsController by viewModels<TenantGuardsController>()
     private val guardShiftsController by viewModels<GuardShiftsController>()
     private val shiftsController by viewModels<ShiftsController>()
+    private val billingAccountController by viewModels<BillingAccountController>()
+
 
 
 
@@ -43,7 +46,8 @@ class MainActivity : ComponentActivity() {
                     stationsReportsController,
                     tenantGuardsController,
                     guardShiftsController,
-                    shiftsController
+                    shiftsController,
+                    billingAccountController
                 )
                 //SplashScreen()
             }

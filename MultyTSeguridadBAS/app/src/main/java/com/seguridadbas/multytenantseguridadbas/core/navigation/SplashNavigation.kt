@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontroller.BillingAccountController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
@@ -17,6 +18,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.Ten
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardShiftsScreen
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardsScreen
 import com.seguridadbas.multytenantseguridadbas.view.AllShiftScreen
+import com.seguridadbas.multytenantseguridadbas.view.BillingScreen
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
@@ -43,7 +45,8 @@ fun SplashNavigation(authController: AuthController,
                      stationsReportsController: StationReportsController,
                      tenantGuardsController: TenantGuardsController,
                      guardShiftsController: GuardShiftsController,
-                     shiftsController: ShiftsController
+                     shiftsController: ShiftsController,
+                     billingAccountController: BillingAccountController
                      ) {
 
     val navController = rememberNavController()
@@ -243,6 +246,15 @@ fun SplashNavigation(authController: AuthController,
                 id,
                 navigateBackToShifts = { navController.popBackStack() },
                 shiftsController
+            )
+        }
+
+
+        composable <BillingListScreen>{
+            BillingScreen(
+                Modifier,
+                navigateBackToHome = { navController.popBackStack() },
+                billingAccountController = billingAccountController
             )
         }
 

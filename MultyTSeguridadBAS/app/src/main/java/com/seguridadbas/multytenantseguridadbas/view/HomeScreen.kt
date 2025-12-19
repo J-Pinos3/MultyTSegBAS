@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,7 +68,8 @@ import java.time.format.DateTimeFormatter
 fun HomeScreen(
     modifier: Modifier = Modifier,
     certificationServicesController: CertificationServicesController,
-    tenantId: String
+    tenantId: String,
+    onBillingClicked: () -> Unit = {}
 ){
 
     var bearerToken by remember { mutableStateOf("") }
@@ -178,7 +180,8 @@ fun HomeScreen(
         BillingComposable(
             modifier.padding(horizontal = 2.dp),
             "$ 12312.00",
-            "20/01/23"
+            "20/01/23",
+            onBillingClicked = { onBillingClicked() }
         )
 
         Spacer(modifier = Modifier.padding(top = 30.dp))
@@ -205,14 +208,21 @@ fun HomeScreen(
 
 
 @Composable
-fun BillingComposable(modifier: Modifier, amount: String, lastPayment: String){
+fun BillingComposable(
+    modifier: Modifier,
+    amount: String,
+    lastPayment: String,
+    onBillingClicked: () -> Unit = {}
+){
 
     val apiFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd" )
     val date = LocalDate.parse(LocalDate.now().toString(), apiFormat)
 
 
     Surface(
-        modifier = modifier,
+        modifier = modifier.clickable(
+            onClick = onBillingClicked
+        ),
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, BasGray),
         color = Color.Transparent
