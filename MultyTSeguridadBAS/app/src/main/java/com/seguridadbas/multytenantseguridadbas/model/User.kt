@@ -10,5 +10,11 @@ data class User(
     @SerializedName("fullName")
     val fullName: String = "",
     @SerializedName("tenantId")
-    val tenantID: String = ""
+    val tenantID: String = "",
+    @SerializedName("firstName")
+    val firstName : String = "",
+    @SerializedName("lastName")
+    val lastName : String = "",
+    @SerializedName("name")
+    val name: String = ""
 )

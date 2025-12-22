@@ -31,8 +31,8 @@ class AuthController @Inject constructor(
     private val TAG = "AUTH_CONTROLLER"
 
 
-    suspend fun signUp(email: String, password: String, fullName: String): Resource<String>{
-        val user = User(email, password, fullName)
+    suspend fun signUp(email: String, password: String, fullName: String, firstName: String, lastName: String, name: String): Resource<String>{
+        val user = User(email, password, fullName, firstName = firstName, lastName = lastName, name = name)
 
         val response = authenticationRepository.signUpRepo(user)
         return try{

@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -43,6 +45,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
+import com.seguridadbas.multytenantseguridadbas.controllers.network.ApiClient
+import com.seguridadbas.multytenantseguridadbas.controllers.repository.AuthenticationRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
@@ -62,7 +66,9 @@ fun RegisterScreen(
 
     /** AÑADIR VOLVER AL  LOGIN
     */
-    var fullName by remember { mutableStateOf("") }
+
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordText by remember { mutableStateOf("") }
@@ -88,7 +94,8 @@ fun RegisterScreen(
     Column(
         modifier = Modifier.fillMaxSize()
             .background(color = BasBackground)
-            .statusBarsPadding(),
+            .statusBarsPadding()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 
@@ -110,7 +117,7 @@ fun RegisterScreen(
             modifier = Modifier
                 .padding(start = 20.dp)
                 .align(Alignment.Start),
-            text = "Ingrese su nombre completo",
+            text = "Ingrese su nombre",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp
         )
@@ -119,10 +126,33 @@ fun RegisterScreen(
 
         FullNameRegisterField(
             modifier = Modifier,
-            fullName = fullName,
+            fullName = firstName,
             onFullNameChange = {
-                currentText -> fullName = currentText
-            }
+                currentText -> firstName = currentText
+            },
+            placeholder = "Nombre:"
+        )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        Text(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .align(Alignment.Start),
+            text = "Ingrese su apellido",
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        FullNameRegisterField(
+            modifier = Modifier,
+            fullName = lastName,
+            onFullNameChange = {
+                    currentText -> lastName = currentText
+            },
+            placeholder = "Apellido:"
         )
 
 
@@ -235,7 +265,7 @@ fun RegisterScreen(
                 fontSize = 16.sp
             )
 
-            Spacer(modifier = Modifier.padding(top = 24.dp))
+            Spacer(modifier = Modifier.padding(top = 10.dp))
         }
 
         if(showPasswordError){
@@ -259,7 +289,9 @@ fun RegisterScreen(
 
                     CoroutineScope(Dispatchers.IO).launch {
                         loading = true
-                        val result = authController.signUp(emailText, passwordText, fullName)
+                        val result = authController.signUp(emailText, passwordText,
+                            "$firstName $lastName", firstName, lastName, "$firstName $lastName"
+                        )
                         withContext(Dispatchers.Main){
                             loading  =false
                             when(result){
@@ -292,7 +324,7 @@ fun RegisterScreen(
         )
 
         if(loading){
-            Spacer(modifier = Modifier.padding(top = 24.dp))
+            Spacer(modifier = Modifier.padding(top = 14.dp))
             Text("Cargandoo")
         }
 
@@ -314,6 +346,7 @@ fun RegisterScreen(
         }
 
 
+        Spacer(Modifier.height(40.dp))
     }
 
 
@@ -321,14 +354,14 @@ fun RegisterScreen(
 
 
 @Composable
-fun FullNameRegisterField(modifier: Modifier, fullName: String, onFullNameChange: (String) -> Unit){
+fun FullNameRegisterField(modifier: Modifier, fullName: String, onFullNameChange: (String) -> Unit, placeholder: String){
     TextField(
         value = fullName,
         onValueChange = onFullNameChange,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 15.dp),
-        placeholder = { Text(text="Nombre Completo:") },
+        placeholder = { Text(text=placeholder) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         singleLine = true, maxLines = 1,
         colors = TextFieldDefaults.colors(
