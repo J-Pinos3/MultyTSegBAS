@@ -22,7 +22,7 @@ class BillingAccountController @Inject constructor(
     suspend fun getAllClientAccounts(
         token: String, tenantId: String
     ): Resource<List<ClientAccountDataResponse>>{
-        val response = billingAccountRepository.getClientAccountApi(token, tenantId)
+        val response = billingAccountRepository.getClientAccountRepo(token, tenantId)
 
         return try{
 
@@ -49,9 +49,9 @@ class BillingAccountController @Inject constructor(
 
 
     suspend fun getAllBilling(
-        token: String, tenantId: String
+        token: String, tenantId: String, clientId:String
     ): Resource<List<BillingDataResponse>>{
-        val response = billingAccountRepository.getBillingRepo(token, tenantId)
+        val response = billingAccountRepository.getBillingRepo(token, tenantId, clientId)
 
 
         return try {

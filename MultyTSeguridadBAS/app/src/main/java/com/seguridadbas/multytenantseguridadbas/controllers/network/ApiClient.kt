@@ -257,7 +257,8 @@ interface ApiClient {
     @GET("tenant/{tenantId}/billing")
     suspend fun getBillingApi(
         @Header("Authorization") auth_token: String,
-        @Path("tenantId") tenantId: String
+        @Path("tenantId") tenantId: String,
+        @Query("filter[clientsInvoiceId]") clientId: String
     ): Response<JsonObject>
 
 
@@ -265,6 +266,14 @@ interface ApiClient {
     suspend fun getClientAccountApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String
+    ): Response<JsonObject>
+
+
+    @POST("tenant/{tenantId}/plan/stripe/checkout")
+    suspend fun processPaymentApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Body plan: String
     ): Response<JsonObject>
 }
 
