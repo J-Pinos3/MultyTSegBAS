@@ -86,7 +86,7 @@ fun PostSitesScreen(
                     is Resource.Success -> {
 
                         sitesList = result.data?.toList()!!
-                        Log.i("Sites","objetos: ${sitesList[0].stationName} ---")
+                        //Log.i("Sites","objetos: ${sitesList[0].stationName} ---")
                     }
                     is Resource.Error -> {
                         sitesList = emptyList()

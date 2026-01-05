@@ -258,7 +258,7 @@ interface ApiClient {
     suspend fun getBillingApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
-        @Query("filter[clientsInvoiceId]") clientId: String
+        @Query("filter[clientsInvoiced]") clientId: String? = null
     ): Response<JsonObject>
 
 

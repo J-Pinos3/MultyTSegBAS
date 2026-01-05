@@ -49,7 +49,7 @@ class BillingAccountController @Inject constructor(
 
 
     suspend fun getAllBilling(
-        token: String, tenantId: String, clientId:String
+        token: String, tenantId: String, clientId:String? = null
     ): Resource<List<BillingDataResponse>>{
         val response = billingAccountRepository.getBillingRepo(token, tenantId, clientId)
 
@@ -75,6 +75,35 @@ class BillingAccountController @Inject constructor(
             }
         }
 
+    }
+
+
+
+    suspend fun processPayment(
+        token: String, tenantId: String, plan: String
+    ): Resource<String>{
+        val response  = billingAccountRepository.processPaymentRepo(token, tenantId, plan)
+
+
+        return try{
+
+            if(response.isSuccessful && response.body() != null){
+                val field = response.body()!!.getAsJsonObject("id")
+                Resource.Success(
+                    response.body().isNullStringField(field.isNullStringField("description") )
+                )
+            }else{
+                Resource.Error(response.message().toString() + "--" + response.raw().message )
+            }
+
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión ha tardado mucho tiempo")
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                is IOException -> { Resource.Error(ex.message.toString()) }
+            }
+        }
     }
 
 

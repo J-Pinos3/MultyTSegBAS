@@ -11,7 +11,7 @@ class BillingAccountRepository @Inject constructor(
     suspend fun getBillingRepo(
         token:String,
         tenantId: String,
-        clientId: String
+        clientId: String? = null
     ) = apiClient.getBillingApi(token, tenantId, clientId)
 
 
