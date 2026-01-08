@@ -56,6 +56,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation("com.facebook.android:facebook-android-sdk:18.1.3")
+
     implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 
