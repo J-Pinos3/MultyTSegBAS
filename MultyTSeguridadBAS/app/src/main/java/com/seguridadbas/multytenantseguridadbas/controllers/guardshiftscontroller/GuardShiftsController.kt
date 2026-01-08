@@ -73,30 +73,30 @@ class GuardShiftsController @Inject constructor(
          return try {
 
              if(response.isSuccessful){
-                 val guardShift = response.body()
+                 val guardShift = response.body()!!
+                 val guardObj = guardShift.getAsJsonObject("guardName")
                  Resource.Success(
 
                      GuardShift(
                          completeInventoryCheck = guardShift.isNullBooleanField("completeInventoryCheck"),
-                         dailyIncidents = guardShift?.getAsJsonArray("dailyIncidents")?.toList() ?: emptyList(),
-                         guardName = guardShift.isNullStringField("guardName"),
+                         dailyIncidents = guardShift.getAsJsonArray("dailyIncidents").toList() ,
+                         guardName = guardObj.get("fullName").asString,
                          guardNameId = guardShift.isNullStringField("guardNameId"),
                          id = guardShift.isNullStringField("id"),
-                         numberOfIncidentsDuringShift = guardShift?.get("numberOfIncidentsDurindShift")?.asInt ?: 0,
-                         numberOfPatrolsDuringShift = guardShift?.get("numberOfPatrolsDuringShift")?.asInt ?: 0,
-                         observations = guardShift?.get("observations")?.asString ?: "",
-                         patrolsDone = guardShift?.getAsJsonArray("patrolsDone")?.toList() ?: emptyList(),
-                         punchInTime = guardShift?.get("punchInTime")?.asString ?: "",
-                         punchOutTime = guardShift?.get("punchOutTime")?.asString ?: "",
-                         shiftSchedule = guardShift?.get("shiftSchedule")?.asString ?: "",
-                         tenantId = guardShift?.get("tenantId")?.asString ?: "",
-                         latitude = guardShift?.get("stationName")?.asJsonObject?.get("latitud")?.asString ?: "",
-                         longitude = guardShift?.get("stationName")?.asJsonObject?.get("longitud")?.asString ?: "",
-                         numberOfGuardsInStation = guardShift?.get("stationName")?.asJsonObject?.get("numberOfGuardsInStation")?.asInt ?: 0,
-                         stationName = guardShift?.get("stationName")?.asJsonObject?.get("stationName")?.asString ?: "",
-
-                         startingTimeInDay = guardShift?.get("stationName")?.asJsonObject?.get("startingTimeInDay")?.asString ?: "",
-                         finishTimeInDay = guardShift?.get("stationName")?.asJsonObject?.get("finishTimeInDay")?.asString ?: "",
+                         numberOfIncidentsDuringShift = guardShift.isNullIntField("numberOfIncidentsDurindShift"),
+                         numberOfPatrolsDuringShift = guardShift.isNullIntField("numberOfPatrolsDuringShift"),
+                         observations = guardShift.get("observations")?.asString ?: "",
+                         patrolsDone = guardShift.getAsJsonArray("patrolsDone").toList() ,
+                         punchInTime = guardShift.isNullStringField("punchInTime"),
+                         punchOutTime = guardShift.isNullStringField("punchOutTime"),
+                         shiftSchedule = guardShift.get("shiftSchedule").asString,
+                         tenantId = guardShift.get("tenantId").asString ,
+                         latitude = guardShift.get("stationName").asJsonObject.get("latitud").asString ,
+                         longitude = guardShift.get("stationName").asJsonObject.get("longitud").asString ,
+                         numberOfGuardsInStation = guardShift.get("stationName").asJsonObject.isNullIntField ("numberOfGuardsInStation"),
+                         stationName = guardShift.get("stationName").asJsonObject.get("stationName").asString,
+                         startingTimeInDay = guardShift.get("stationName").asJsonObject.isNullStringField("startingTimeInDay"),
+                         finishTimeInDay = guardShift.get("stationName").asJsonObject.isNullStringField("finishTimeInDay"),
 
                          )
 
@@ -129,6 +129,7 @@ class GuardShiftsController @Inject constructor(
         val rows = rowsArray.map{ rowElement ->
             val row = rowElement.asJsonObject
             val stationObj = row.getAsJsonObject("stationName")
+            val guardObj = row.getAsJsonObject("guardName")
 
             GuardShiftsDataResponse(
                 completeInventoryCheck = row.isNullBooleanField("completeInventoryCheck"),
@@ -137,28 +138,28 @@ class GuardShiftsController @Inject constructor(
                 createdById = row.isNullStringField("createdById"),
                 dailyIncidents = row.getAsJsonArray("dailyIncidents").toList(),
                 deletedAt = row.isNullStringField("deletedAt"),
-                guardName = row.isNullStringField("guardName"),
+                guardName = guardObj.get("fullName").asString,
                 guardNameId = row.isNullStringField("guardNameId"),
                 id = row.isNullStringField("id"),
                 importHash = row.isNullStringField("importHash"),
                 numberOfIncidentsDurindShift = row.get("numberOfIncidentsDurindShift").asInt,
-                numberOfPatrolsDuringShift = row.get("numberOfPatrolsDuringShift").asInt,
+                numberOfPatrolsDuringShift = row.isNullIntField("numberOfPatrolsDuringShift"),
                 observations = row.get("observations").asString,
                 patrolsDone = row.getAsJsonArray("patrolsDone").toList(),
-                punchInTime = row.get("punchInTime").asString,
-                punchOutTime = row.get("punchOutTime").asString,
+                punchInTime = row.isNullStringField("punchInTime"),
+                punchOutTime = row.isNullStringField("punchOutTime"),
                 shiftSchedule = row.get("shiftSchedule").asString,
                 stationName = StationName(
                     createdAt = stationObj.get("createdAt").asString,
                     createdById = stationObj.isNullStringField("createdById"),
                     deletedAt = stationObj.isNullStringField("deletedAt"),
-                    finishTimeInDay = stationObj.get("finishTimeInDay").asString,
+                    finishTimeInDay = stationObj.isNullStringField("finishTimeInDay"),
                     id = stationObj.get("id").asString,
                     importHash = stationObj.isNullStringField("importHash"),
                     latitud = stationObj.get("latitud").asString,
                     longitud = stationObj.get("longitud").asString,
-                    numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
-                    startingTimeInDay = stationObj.get("startingTimeInDay").asString,
+                    numberOfGuardsInStation = stationObj.isNullStringField("numberOfGuardsInStation"),
+                    startingTimeInDay = stationObj.isNullStringField("startingTimeInDay"),
                     stationName = stationObj.get("stationName").asString,
                     stationOriginId = stationObj.isNullStringField("stationOriginId"),
                     stationSchedule = stationObj.get("stationSchedule").asString,
@@ -179,6 +180,10 @@ class GuardShiftsController @Inject constructor(
 
     private fun JsonObject?.isNullStringField(field: String): String{
         return if( this?.get(field)?.isJsonNull == false ) this.get(field).asString else ""
+    }
+
+    private fun JsonObject?.isNullIntField(field: String): Int{
+        return if( this?.get(field)?.isJsonNull == false ) this.get(field).asInt else 0
     }
 
     private fun JsonObject?.isNullBooleanField(field: String): Boolean{

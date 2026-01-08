@@ -175,7 +175,7 @@ class CertificationServicesController @Inject constructor(
                 price = row.get("price").asString,
                 serviceImages = row.getAsJsonArray("serviceImages").toList(),
                 specifications = row.get("specifications").asString ,
-                subtitle = row.get("subtitle").asString,
+                subtitle = row.isNullField("subtitle"),
                 tenantId = row.get("tenantId").asString,
                 title = row.get("title").asString,
                 updatedAt = row.get("updatedAt").asString,

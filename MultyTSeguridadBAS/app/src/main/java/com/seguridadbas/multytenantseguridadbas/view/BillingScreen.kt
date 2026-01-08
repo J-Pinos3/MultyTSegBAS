@@ -49,6 +49,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontro
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.billingaccount.BillingDataResponse
+import com.seguridadbas.multytenantseguridadbas.model.billingaccount.UpdatedBillingDataResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
@@ -68,7 +69,7 @@ fun BillingScreen(
     billingAccountController: BillingAccountController
 ){
 
-    var allBillings by remember { mutableStateOf( emptyList<BillingDataResponse>() ) }
+    var allBillings by remember { mutableStateOf( emptyList<UpdatedBillingDataResponse>() ) }
 
     var tenantId by remember { mutableStateOf("") }
     var bearerToken by remember { mutableStateOf("") }
@@ -154,7 +155,7 @@ fun BillingScreen(
 
 private fun loadBillings(
     bearerToken: String, tenantId: String, billingAccountController: BillingAccountController,
-    onSuccess: (List<BillingDataResponse>) -> Unit,
+    onSuccess: (List<UpdatedBillingDataResponse>) -> Unit,
     onError: (String) -> Unit
 ){
     CoroutineScope(Dispatchers.IO).launch {
@@ -181,7 +182,7 @@ private fun loadBillings(
 
 @Composable
 private fun BillingStateItem(
-    billingObj: BillingDataResponse,
+    billingObj: UpdatedBillingDataResponse,
     modifier: Modifier = Modifier,
     onClick: (billingId: String) -> Unit = {}
 ){
@@ -195,7 +196,7 @@ private fun BillingStateItem(
             )
             .shadow(2.dp)
             .fillMaxWidth()
-            .height(70.dp)
+            //.height(170.dp)
             .background(Color.White)
             .clickable(  onClick = {  onClick( billingObj.id )  }   )
     ){
@@ -227,7 +228,7 @@ private fun BillingStateItem(
                 )
 
                 Text(
-                    text = billingObj.montoPorPagar, fontSize = 14.sp
+                    text = billingObj.montoPorPagar?:"00.00", fontSize = 14.sp
                 )
             }
 
@@ -260,7 +261,7 @@ private fun BillingStateItem(
                 )
 
                 Text(
-                    text = billingObj.lastPaymentDate, fontSize = 14.sp
+                    text = billingObj.lastPaymentDate?:"0000/00/00", fontSize = 14.sp
                 )
             }
 
@@ -276,7 +277,7 @@ private fun BillingStateItem(
                 )
 
                 Text(
-                    text = billingObj.nextPaymentDate, fontSize = 14.sp
+                    text = billingObj.nextPaymentDate?:"0000/00/00", fontSize = 14.sp
                 )
             }
 

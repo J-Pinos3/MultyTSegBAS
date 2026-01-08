@@ -72,7 +72,7 @@ class StationsController @Inject constructor(
 
                     StationData(
                 assignedGuards = jsonBody.getAsJsonArray("assignedGuards").toList(),
-                        finishTimeInDay = jsonBody.get("finishTimeInDay").asString ?: "",
+                        finishTimeInDay = jsonBody.isNullField("finishTimeInDay"),
                         id = jsonBody.get("id").asString ?: "",
                         incidents = jsonBody.getAsJsonArray("incidents").toList(),
                         latitude = jsonBody.get("latitud").asString,
@@ -80,7 +80,7 @@ class StationsController @Inject constructor(
                         stationName = jsonBody.get("stationName").asString,
                         stationSchedule = jsonBody.get("stationSchedule").asString,
                         tasks = jsonBody.getAsJsonArray("tasks").toList(),
-                        numberOfGuardsInStation = jsonBody.get("numberOfGuardsInStation").asInt
+                        numberOfGuardsInStation = if( !jsonBody.get("deletedAt").isJsonNull  ) jsonBody.get("deletedAt").asString.toInt() else 0
                     )
 
                 )
@@ -117,17 +117,17 @@ class StationsController @Inject constructor(
                 createdAt = row.get("createdAt").asString,
                 createdById = row.get("createdById").asString,
                 deletedAt =  if( !row.get("deletedAt").isJsonNull  ) row.get("deletedAt").asString else "" ,
-                finishTimeInDay = row.get("finishTimeInDay").asString,
+                finishTimeInDay = row.isNullField("finishTimeInDay"),
                 id = row.get("id").asString,
                 importHash = if( !row.get("importHash").isJsonNull  ) row.get("importHash").asString else "",
                 incidents = row.getAsJsonArray("incidents").toList(),
                 latitud = row.get("latitud").asString,
                 longitud = row.get("longitud").asString,
-                numberOfGuardsInStation = row.get("numberOfGuardsInStation").asString,
+                numberOfGuardsInStation = row.isNullField("numberOfGuardsInStation"),
                 patrol = row.getAsJsonArray("patrol").toList(),
                 reports = row.getAsJsonArray("reports").toList(),
                 shift = row.getAsJsonArray("shift").toList(),
-                startingTimeInDay = row.get("startingTimeInDay").asString,
+                startingTimeInDay = row.isNullField("startingTimeInDay"),
                 stationName = row.get("stationName").asString,
                 stationOrigin = row.isNullField("stationOrigin"),
                 stationOriginId = row.isNullField("stationOriginId"),

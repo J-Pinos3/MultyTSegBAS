@@ -37,7 +37,7 @@ class TenantGuardsController @Inject constructor(
                 academicInstruction = row.get("academicInstruction").asString,
                 address = row.isNullStringField("address"),
                 birthDate = row.get("birthDate").asString,
-                birthPlace = row.get("birthPlace").asString,
+                birthPlace = row.isNullStringField("birthPlace"),
                 bloodType = row.get("bloodType").asString,
                 createdAt = row.get("createdAt").asString,
                 createdById = row.isNullStringField("createdAt"),
