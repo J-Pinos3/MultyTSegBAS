@@ -68,6 +68,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     implementation("com.google.dagger:hilt-android:2.52")
+    implementation(libs.androidx.browser)
     kapt("com.google.dagger:hilt-android-compiler:2.52")
 
     implementation(libs.coil.compose)

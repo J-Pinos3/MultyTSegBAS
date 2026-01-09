@@ -2,21 +2,28 @@ package com.seguridadbas.multytenantseguridadbas.view
 
 import android.content.Context
 import android.graphics.drawable.shapes.Shape
+import android.net.Uri
 import android.text.Layout
 import android.util.Log
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -25,6 +32,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -37,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -163,7 +172,7 @@ fun LoginScreen(
         )
 
 
-        Spacer(modifier = Modifier.padding(top = 16.dp))
+        Spacer(modifier = Modifier.padding(top = 8.dp))
 
         if(showPasswordError){
             Text(
@@ -176,7 +185,7 @@ fun LoginScreen(
 
             )
 
-            Spacer(modifier = Modifier.padding(top = 16.dp))
+            Spacer(modifier = Modifier.padding(top = 8.dp))
         }
 
         if(!showMailError){
@@ -189,7 +198,7 @@ fun LoginScreen(
                 fontSize = 16.sp
             )
 
-            Spacer(modifier = Modifier.padding(top = 24.dp))
+            Spacer(modifier = Modifier.padding(top = 8.dp))
         }
 
         LoginButton(modifier = Modifier,
@@ -279,6 +288,30 @@ fun LoginScreen(
 
             _onCreateAccountClicked = onCreateAccount
         )
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        SocialMediaButton(
+            Modifier,
+            "Iniciar Sesión con Google",
+            painterResource(R.drawable.google),
+            {
+                openCustomTab(context,"http://10.0.2.2:8080/api/auth/social/google/")
+            }
+
+        )
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
+        SocialMediaButton(
+            Modifier,
+            "Iniciar Sesión con Facebook",
+            painterResource(R.drawable.facebook),
+            {
+                openCustomTab(context,"http://10.0.2.2:8080/api/auth/social/facebook/")
+
+            }
+        )
+
     }
 
 
@@ -378,6 +411,53 @@ fun CreateAccount(modifier: Modifier, _onCreateAccountClicked: () -> Unit){
 }
 
 
+
+@Composable
+fun SocialMediaButton(
+    modifier: Modifier,
+    text: String,
+    icon: Painter,
+    onClick: () -> Unit = {}
+){
+
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.3f)),
+        //colors = ButtonDefaults.outlinedButtonColors(   containerColor = Color.White     )
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Espacio antes del icono
+            Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                painter = icon,
+                contentDescription = "social media provider",
+                modifier = Modifier.size(35.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp)) // Espacio entre icono y texto
+            Text(
+                text = text,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp,
+                color = Color.Black
+            )
+        }
+    }
+
+
+}
+
+
+
+
 @Composable
 fun LoginButton(
     modifier: Modifier,
@@ -407,6 +487,11 @@ fun LoginButton(
             fontSize = 30.sp
         )
     }
+}
+
+private fun openCustomTab(context: Context, url: String){
+    val customTabsIntent = CustomTabsIntent.Builder().build()
+    customTabsIntent.launchUrl(context, Uri.parse(url))
 }
 
 

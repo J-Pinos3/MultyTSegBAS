@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MultyTenantSeguridadBAS</string>
+
+    <string name="facebook_app_id">2841036402895109</string>
+    <string name="fb_login_protocol_scheme">fb2841036402895109</string>
+    <string name="facebook_client_token">8e3cef96c847b14c41685a607edb0afa</string>
+
+
 </resources>
