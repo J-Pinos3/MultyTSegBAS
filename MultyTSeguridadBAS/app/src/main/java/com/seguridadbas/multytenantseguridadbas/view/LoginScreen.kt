@@ -1,11 +1,13 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
 import android.content.Context
-import android.graphics.drawable.shapes.Shape
 import android.net.Uri
-import android.text.Layout
 import android.util.Log
+import androidx.activity.ComponentActivity
+import android.content.Intent
 import android.widget.Toast
+import kotlinx.coroutines.flow.*
+
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -20,48 +22,40 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStore
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
@@ -69,16 +63,11 @@ import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.model.UserDataStore
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
-import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.JsonObject
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
-
 
 
 //@Preview(showSystemUi = true)
@@ -106,6 +95,68 @@ fun LoginScreen(
 
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
+
+    var isProcessingDeepLink by remember { mutableStateOf(false) }
+
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { (context as ComponentActivity).intent }
+            .filter { intent->
+                intent.action == Intent.ACTION_VIEW && intent.data != null
+            }
+            .collect{  intent ->
+                val uri = intent.data!!
+                Log.d("DeepLink", "url : $uri")
+
+                val token = uri.getQueryParameter("authToken")
+                val errorCode = uri.getQueryParameter("socialErrorCode")
+
+                if( token != null ){
+                    Log.i("DeepLink","Token jwt recibido: ${token.take(4)}...")
+                    isProcessingDeepLink = true
+
+                    val userDataStore = UserDataStore(
+                        token = token,
+                        id = "",
+                        email = "",
+                        firstName = "",
+                        lastName = ""
+                    )
+                    dataStoreController.saveToDataStore(userDataStore)
+
+                    CoroutineScope(Dispatchers.IO).launch{
+                        val resultTenant = authController.authenticateProfileME("Bearer $token")
+
+                        when(resultTenant){
+                            is Resource.Success -> {
+                                val tenantIdSocial  = resultTenant.data?.tenantId.toString().replace("\"","").trim()
+
+                                dataStoreController.saveTenantId(tenantIdSocial)
+                                Log.i("Deep_Link","tenantId GUARDADO $tenantIdSocial")
+
+                                withContext(Dispatchers.Main){
+                                    onLoginClicked(tenantIdSocial)
+                                }
+                            }
+
+                            is Resource.Error -> {
+                                Log.e("Deep_Link","Error al obtener tenant: ${resultTenant.message}")
+                            }
+
+                            else -> {
+                                Log.e("Deep_Link","No se pudo obtener el tenant")
+                            }
+                        }
+                        isProcessingDeepLink = false
+                    }
+                }else if( errorCode != null ){
+                    Log.e("DeepLink","Error al iniciar sesion con redes sociales")
+                    Toast.makeText(context, "Error con redes sociales", Toast.LENGTH_SHORT).show()
+                }
+
+                (context as ComponentActivity).intent = Intent()
+            }
+    }
 
 
     Column(
@@ -296,7 +347,7 @@ fun LoginScreen(
             "Iniciar Sesión con Google",
             painterResource(R.drawable.google),
             {
-                openCustomTab(context,"http://10.0.2.2:8080/api/auth/social/google/")
+                openCustomTab(context,"https://unabetted-edison-unparallel.ngrok-free.dev/api/auth/social/google/")
             }
 
         )
@@ -307,11 +358,24 @@ fun LoginScreen(
             "Iniciar Sesión con Facebook",
             painterResource(R.drawable.facebook),
             {
-                openCustomTab(context,"http://10.0.2.2:8080/api/auth/social/facebook/")
+                openCustomTab(context,"https://unabetted-edison-unparallel.ngrok-free.dev/api/auth/social/facebook/")
 
             }
         )
 
+    }
+
+    if(isProcessingDeepLink){
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ){
+            CircularProgressIndicator(
+                modifier = Modifier.width(20.dp),
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        }
     }
 
 

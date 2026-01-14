@@ -150,7 +150,7 @@ class AuthController @Inject constructor(
         return if( response.isSuccessful ){
             Resource.Success( userProfile )
         }else{
-            Resource.Error( "No se pudo autenticar el usuario: ${response.message()} + ${response.errorBody().toString()}" )
+            Resource.Error( "No se pudo autenticar el usuario:${response.raw().message} ${response.message()} + ${response.errorBody().toString()}" )
         }
     }
 
