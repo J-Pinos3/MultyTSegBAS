@@ -76,6 +76,7 @@ fun LoginScreen(
     onLoginClicked:(String) -> Unit = {},
     onForgotPasswordClicked: () -> Unit = {},
     onCreateAccount: () -> Unit = {},
+    deepLinkIntentFlow: SharedFlow<Intent>,
     authController: AuthController
 ){
 
@@ -99,7 +100,58 @@ fun LoginScreen(
     var isProcessingDeepLink by remember { mutableStateOf(false) }
 
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(deepLinkIntentFlow) {
+        deepLinkIntentFlow.collect { intent ->
+            val uri = intent.data
+            if (uri == null) return@collect
+
+            Log.d("Deep Link", "url : $uri")
+            val uriToken = uri.getQueryParameter("authToken")
+            val errorCode = uri.getQueryParameter("socialErrorCode")
+
+            if(uriToken != null){
+                Log.i("DeepLink","Token jwt recibido: ${uriToken.take(4)}...")
+                isProcessingDeepLink = true
+
+                val userDataStore = UserDataStore(
+                    token = uriToken,
+                    id = "",
+                    email = "",
+                    firstName = "",
+                    lastName = ""
+                )
+                dataStoreController.saveToDataStore(userDataStore)
+
+                CoroutineScope(Dispatchers.IO).launch{
+                    val resultTenant = authController.authenticateProfileME("Bearer $uriToken")
+
+                    when(resultTenant){
+                        is Resource.Success -> {
+                            val tenantIdSocial  = resultTenant.data?.tenantId.toString().replace("\"","").trim()
+
+                            dataStoreController.saveTenantId(tenantIdSocial)
+                            Log.i("Deep_Link","tenantId GUARDADO $tenantIdSocial")
+
+                            withContext(Dispatchers.Main){
+                                onLoginClicked(tenantIdSocial)
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            Log.e("Deep_Link","Error al obtener tenant: ${resultTenant.message}")
+                        }
+
+                        else -> {
+                            Log.e("Deep_Link","No se pudo obtener el tenant")
+                        }
+                    }
+                    isProcessingDeepLink = false
+                }
+            }else if (errorCode != null){
+                Log.e("DeepLink","Error al iniciar sesion con redes sociales")
+            }
+        }
+        /*
         snapshotFlow { (context as ComponentActivity).intent }
             .filter { intent->
                 intent.action == Intent.ACTION_VIEW && intent.data != null
@@ -112,50 +164,16 @@ fun LoginScreen(
                 val errorCode = uri.getQueryParameter("socialErrorCode")
 
                 if( token != null ){
-                    Log.i("DeepLink","Token jwt recibido: ${token.take(4)}...")
-                    isProcessingDeepLink = true
 
-                    val userDataStore = UserDataStore(
-                        token = token,
-                        id = "",
-                        email = "",
-                        firstName = "",
-                        lastName = ""
-                    )
-                    dataStoreController.saveToDataStore(userDataStore)
-
-                    CoroutineScope(Dispatchers.IO).launch{
-                        val resultTenant = authController.authenticateProfileME("Bearer $token")
-
-                        when(resultTenant){
-                            is Resource.Success -> {
-                                val tenantIdSocial  = resultTenant.data?.tenantId.toString().replace("\"","").trim()
-
-                                dataStoreController.saveTenantId(tenantIdSocial)
-                                Log.i("Deep_Link","tenantId GUARDADO $tenantIdSocial")
-
-                                withContext(Dispatchers.Main){
-                                    onLoginClicked(tenantIdSocial)
-                                }
-                            }
-
-                            is Resource.Error -> {
-                                Log.e("Deep_Link","Error al obtener tenant: ${resultTenant.message}")
-                            }
-
-                            else -> {
-                                Log.e("Deep_Link","No se pudo obtener el tenant")
-                            }
-                        }
-                        isProcessingDeepLink = false
-                    }
                 }else if( errorCode != null ){
-                    Log.e("DeepLink","Error al iniciar sesion con redes sociales")
+
                     Toast.makeText(context, "Error con redes sociales", Toast.LENGTH_SHORT).show()
                 }
 
                 (context as ComponentActivity).intent = Intent()
             }
+        */
+
     }
 
 

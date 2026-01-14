@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.core.navigation
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -37,6 +38,7 @@ import com.seguridadbas.multytenantseguridadbas.view.ResetPasswordScreen
 import com.seguridadbas.multytenantseguridadbas.view.SecGuardDetail
 import com.seguridadbas.multytenantseguridadbas.view.ShiftDetailScreen
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun SplashNavigation(authController: AuthController,
@@ -46,7 +48,8 @@ fun SplashNavigation(authController: AuthController,
                      tenantGuardsController: TenantGuardsController,
                      guardShiftsController: GuardShiftsController,
                      shiftsController: ShiftsController,
-                     billingAccountController: BillingAccountController
+                     billingAccountController: BillingAccountController,
+                     deepLinkIntentFlowSocial: SharedFlow<Intent>
                      ) {
 
     val navController = rememberNavController()
@@ -63,6 +66,7 @@ fun SplashNavigation(authController: AuthController,
                 {it-> navController.navigate(Home(tenantId = it)) },
                 { navController.navigate(ResetPasswordSc) },
                 { navController.navigate(Register) },
+                deepLinkIntentFlow = deepLinkIntentFlowSocial,
                 authController = authController
             )
         }

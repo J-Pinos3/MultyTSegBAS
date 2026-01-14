@@ -144,7 +144,11 @@ class AuthController @Inject constructor(
             provider = response.body()?.get("provider").toString(),
             phoneNumber = response.body()?.get("phoneNumber").toString(),
 
-            tenantId = response.body()?.getAsJsonArray("tenants")?.first()?.asJsonObject?.get("tenantId").toString()
+            tenantId = if(response.body()?.getAsJsonArray("tenants")?.toList().isNullOrEmpty() ){
+                ""
+            }else{
+                response.body()?.getAsJsonArray("tenants")?.first()?.asJsonObject?.get("tenantId").toString()
+            }
         )
 
         return if( response.isSuccessful ){
@@ -184,6 +188,13 @@ class AuthController @Inject constructor(
     */
 
 }
+
+
+/*
+fun <T> JsonObject?.isNullCollectionField(field: String): List<T>{
+    return if( this?.get(field)?.isJsonNull == false) this.getAsJsonArray(field).toList() else listOf<T>()
+}
+*/
 
 
 /*
