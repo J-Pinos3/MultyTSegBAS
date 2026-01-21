@@ -147,6 +147,7 @@ class AuthController @Inject constructor(
             tenantId = if(response.body()?.getAsJsonArray("tenants")?.toList().isNullOrEmpty() ){
                 ""
             }else{
+                                                                                                        //.asString ?: "", asString does not ad \"
                 response.body()?.getAsJsonArray("tenants")?.first()?.asJsonObject?.get("tenantId").toString()
             }
         )

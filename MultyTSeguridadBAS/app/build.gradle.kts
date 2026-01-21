@@ -41,6 +41,11 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packagingOptions {
+        excludes += "META-INF/LICENSE.md"
+        excludes += "META-INF/LICENSE-notice.md"
+    }
 }
 
 dependencies {
@@ -69,6 +74,7 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:2.52")
     implementation(libs.androidx.browser)
+    testImplementation(libs.junit.junit)
     kapt("com.google.dagger:hilt-android-compiler:2.52")
 
     implementation(libs.coil.compose)
@@ -82,6 +88,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    implementation("io.mockk:mockk:1.13.5")
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
