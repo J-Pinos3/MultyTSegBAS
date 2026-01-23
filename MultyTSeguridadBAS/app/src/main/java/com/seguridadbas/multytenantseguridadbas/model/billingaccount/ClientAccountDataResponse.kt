@@ -5,48 +5,52 @@ import com.google.gson.annotations.SerializedName
 data class ClientAccountDataResponse(
     @SerializedName("address")
     val address: String,
-    @SerializedName("billingInvoices")
-    val billingInvoices: List<Any?> = emptyList<Any>(),
-    @SerializedName("commercialName")
-    val commercialName: String,
-    @SerializedName("contractDate")
-    val contractDate: String,
-    @SerializedName("createdAt")
+    @SerializedName("addressComplement")
+    val addressComplement: String? = "",
+    @SerializedName("zipCode")
+    val zipCode: String? = "",
+    @SerializedName("city")
+    val city: String,
+    @SerializedName("country")
+    val country: String,
+    @SerializedName("useSameAddressForBilling")
+    val useSameAddressForBilling: Boolean,
+    @SerializedName("website")
+    val website: String? = "",
+    @SerializedName("latitude")
+    val latitude: String? = "",
+    @SerializedName("longitude")
+    val longitude: String? = "",
+    @SerializedName("categoryIds")
+    val categoryIds: String? = "",
+    @SerializedName("active")
+    val active: Boolean,
+    @SerializedName("categories")
+    val categories: List<Any?> = emptyList<Any>(),
+    @SerializedName("createdAt")//∯∯∯
     val createdAt: String,
-    @SerializedName("createdById")
+    @SerializedName("createdById")//∯∯∯
     val createdById: String,
-    @SerializedName("deletedAt")
+    @SerializedName("deletedAt")//∯∯∯
     val deletedAt: String? = "",
-    @SerializedName("email")
+    @SerializedName("email")//∯∯∯
     val email: String,
     @SerializedName("faxNumber")
-    val faxNumber: String,
-    @SerializedName("id")
+    val faxNumber: String? = "",
+    @SerializedName("id")//∯∯∯
     val id: String,
-    @SerializedName("importHash")
+    @SerializedName("importHash")//∯∯∯
     val importHash: String? ="",
-    @SerializedName("logoUrl")
-    val logoUrl: List<Any>,
-    @SerializedName("phoneNumber")
+    @SerializedName("phoneNumber")//∯∯∯
     val phoneNumber: String,
-    @SerializedName("placePictureUrl")
-    val placePictureUrl: List<Any?> = emptyList<Any>(),
-    @SerializedName("purchasedServices")
-    val purchasedServices: List<Any?> = emptyList<Any>(),
-    @SerializedName("pushNotifications")
-    val pushNotifications: List<Any?> = emptyList<Any>(),
-    @SerializedName("representante")
-    val representante: String? = "",
-    @SerializedName("representanteId")
-    val representanteId: String? = "",
-    @SerializedName("rucNumber")
-    val rucNumber: String,
-    @SerializedName("stations")
-    val stations: List<Any?> = emptyList<Any>(),
-    @SerializedName("tenantId")
+    @SerializedName("name")//∯∯∯
+    val name: String,
+    @SerializedName("lastName")//∯∯∯
+    val lastName: String? = "",
+    @SerializedName("tenantId")//∯∯∯
     val tenantId: String,
-    @SerializedName("updatedAt")
+    @SerializedName("updatedAt")//∯∯∯
     val updatedAt: String,
-    @SerializedName("updatedById")
+    @SerializedName("updatedById")//∯∯∯
     val updatedById: String? = ""
 )
