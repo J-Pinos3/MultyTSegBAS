@@ -87,6 +87,7 @@ fun ServiceBadgeItems(
                 )
             }
 
+            /*
             //descripcion
             Text(
                 modifier = Modifier.weight(0.3f).padding(top = 5.dp),
@@ -97,6 +98,7 @@ fun ServiceBadgeItems(
                 fontWeight = FontWeight.SemiBold,
                 overflow = TextOverflow.Clip
             )
+            */
 
             Box(
                 modifier = Modifier

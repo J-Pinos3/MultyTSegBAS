@@ -21,10 +21,12 @@ data class ServiceDataResponse(
     val price: String,
     @SerializedName("serviceImages")
     val serviceImages: List<Any?> = emptyList<Any>(),
-    @SerializedName("specifications")
-    val specifications: String,
-    @SerializedName("subtitle")
-    val subtitle: String,
+    @SerializedName("taxId")
+    val taxId: String? = "",
+    @SerializedName("taxName")
+    val taxName: String? = "",
+    @SerializedName("taxRate")
+    val taxRate: String? = "",
     @SerializedName("tenantId")
     val tenantId: String,
     @SerializedName("title")
