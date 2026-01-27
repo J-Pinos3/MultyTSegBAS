@@ -75,6 +75,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.52")
     implementation(libs.androidx.browser)
     testImplementation(libs.junit.junit)
+    testImplementation(libs.junit.junit)
     kapt("com.google.dagger:hilt-android-compiler:2.52")
 
     implementation(libs.coil.compose)
