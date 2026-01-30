@@ -1,6 +1,7 @@
 package com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller
 
 import androidx.lifecycle.ViewModel
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.StationReportsRepository
@@ -74,42 +75,44 @@ class StationReportsController  @Inject constructor(
                     GuardShiftByStationData(
                         completeInventoryCheck = jsonBody.isNullBooleanField("completeInventoryCheck"),
                         completeInventoryCheckId = jsonBody.isNullStringField("completeInventoryCheckId"),
-                        createdAt = jsonBody.get("createdAt").asString,
+                        createdAt = jsonBody.isNullStringField("createdAt"),
                         createdById = jsonBody.isNullStringField("createdById"),
-                        dailyIncidents = jsonBody.getAsJsonArray("dailyIncidents").toList(),
+
+                        dailyIncidents = jsonBody.isNullArrayField("dailyIncidents"),
                         deletedAt = jsonBody.isNullStringField("deletedAt"),
                         guardName = jsonBody.isNullStringField("guardName"),
                         guardNameId = jsonBody.isNullStringField("guardNameId"),
                         id = jsonBody.isNullStringField("id"),
                         importHash = jsonBody.isNullStringField("importHash"),
-                        numberOfIncidentsDurindShift = jsonBody.get("numberOfIncidentsDurindShift").asInt,
-                        numberOfPatrolsDuringShift = jsonBody.get("numberOfPatrolsDuringShift").asInt,
-                        observations = jsonBody.get("observations").asString,
-                        patrolsDone = jsonBody.getAsJsonArray("patrolsDone").toList(),
-                        punchInTime = jsonBody.get("punchInTime").asString,
-                        punchOutTime = jsonBody.get("punchOutTime").asString,
-                        shiftSchedule = jsonBody.get("shiftSchedule").asString,
+                        numberOfIncidentsDurindShift = jsonBody.isNullIntField("numberOfIncidentsDurindShift"),
+                        numberOfPatrolsDuringShift = jsonBody.isNullIntField("numberOfPatrolsDuringShift"),
+                        observations = jsonBody.isNullStringField("observations"),
+
+                        patrolsDone = jsonBody.isNullArrayField("patrolsDone"),
+                        punchInTime = jsonBody.isNullStringField("punchInTime"),
+                        punchOutTime = jsonBody.isNullStringField("punchOutTime"),
+                        shiftSchedule = jsonBody.isNullStringField("shiftSchedule"),
                         stationName = StationObj(
-                            createdAt = stationObj.get("createdAt").asString,
-                            createdById = stationObj.get("createdById").asString,
+                            createdAt = stationObj.isNullStringField("createdAt"),
+                            createdById = stationObj.isNullStringField("createdById"),
                             deletedAt = stationObj.isNullStringField("deletedAt"),
-                            finishTimeInDay = stationObj.get("finishTimeInDay").asString,
-                            id = stationObj.get("id").asString,
+                            finishTimeInDay = stationObj.isNullStringField("finishTimeInDay"),
+                            id = stationObj.isNullStringField("id"),
                             importHash = stationObj.isNullStringField("importHash"),
-                            latitud = stationObj.get("latitud").asString,
-                            longitud = stationObj.get("longitud").asString,
-                            numberOfGuardsInStation = stationObj.get("numberOfGuardsInStation").asString,
-                            startingTimeInDay = stationObj.get("startingTimeInDay").asString,
-                            stationName = stationObj.get("stationName").asString,
+                            latitud = stationObj.isNullStringField("latitud"),
+                            longitud = stationObj.isNullStringField("longitud"),
+                            numberOfGuardsInStation = stationObj.isNullStringField("numberOfGuardsInStation"),
+                            startingTimeInDay = stationObj.isNullStringField("startingTimeInDay"),
+                            stationName = stationObj.isNullStringField("stationName"),
                             stationOriginId = stationObj.isNullStringField("stationOriginId"),
-                            stationSchedule = stationObj.get("stationSchedule").asString,
-                            tenantId = stationObj.get("tenantId").asString,
-                            updatedAt = stationObj.get("updatedAt").asString,
+                            stationSchedule = stationObj.isNullStringField("stationSchedule"),
+                            tenantId = stationObj.isNullStringField("tenantId"),
+                            updatedAt = stationObj.isNullStringField("updatedAt"),
                             updatedById = stationObj.isNullStringField("updatedById")
                         ),
-                        stationNameId  = jsonBody.get("stationNameId").asString,
-                        tenantId  = jsonBody.get("tenantId").asString,
-                        updatedAt  = jsonBody.get("updatedAt").asString,
+                        stationNameId  = jsonBody.isNullStringField("stationNameId"),
+                        tenantId  = jsonBody.isNullStringField("tenantId"),
+                        updatedAt  = jsonBody.isNullStringField("updatedAt"),
                         updatedById  = jsonBody.isNullStringField("updatedById"),
                     )
                 )
@@ -633,5 +636,14 @@ class StationReportsController  @Inject constructor(
 
     private fun JsonObject?.isNullBooleanField(field: String): Boolean{
         return if(this?.get(field)?.isJsonNull == false) this.get(field).asBoolean else false
+    }
+
+
+    private fun JsonObject?.isNullArrayField(field: String): List<Any>{
+        return if(this?.get(field)?.isJsonNull == false) this.asJsonArray.toList() else emptyList()
+    }
+
+    private fun JsonObject?.isNullIntField(field: String): Int{
+        return if( this?.get(field)?.isJsonNull == false ) this.get(field).asInt else 0
     }
 }
