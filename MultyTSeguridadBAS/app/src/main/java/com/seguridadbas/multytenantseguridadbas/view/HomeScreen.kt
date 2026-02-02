@@ -23,11 +23,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,9 +59,11 @@ import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.certifications.CertificationDataResponse
 import com.seguridadbas.multytenantseguridadbas.model.services.ServiceDataResponse
+import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptTokenResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
@@ -68,9 +82,15 @@ import java.time.format.DateTimeFormatter
 fun HomeScreen(
     modifier: Modifier = Modifier,
     certificationServicesController: CertificationServicesController,
+    tenantInvitationController: TenantInvitationController,
     tenantId: String,
     onBillingClicked: () -> Unit = {}
 ){
+    var currentTenantId by remember { mutableStateOf(tenantId) }
+    //token typed by the user
+    var verificationCode by remember { mutableStateOf("") }
+    var userId by remember { mutableStateOf("") }//todo gotta get it from datastore
+    var acceptTokenResponse by remember { mutableStateOf(AcceptTokenResponse()) }
 
     var bearerToken by remember { mutableStateOf("") }
 
@@ -121,87 +141,107 @@ fun HomeScreen(
 
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(color = BasBackground)
-            .statusBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
-
-    ){
-        Text(
+    if( !tenantId.isNullOrEmpty()){
+        Column(
             modifier = Modifier
-                .padding(vertical = 16.dp, horizontal = 6.dp)
-                .align(Alignment.Start),
-            text = "Bienvenido Cliente, ",
-            fontSize = 40.sp,
-            fontWeight = FontWeight.ExtraBold,
-        )
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .background(color = BasBackground)
+                .statusBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
 
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(BasYellow)
-                .padding(top = 30.dp, bottom = 30.dp)
         ){
-            Image(
-                painter = painterResource(R.drawable.baslogo),
-                contentDescription = "Logo de bas"
+            Text(
+                modifier = Modifier
+                    .padding(vertical = 16.dp, horizontal = 6.dp)
+                    .align(Alignment.Start),
+                text = "Bienvenido Cliente, ",
+                fontSize = 40.sp,
+                fontWeight = FontWeight.ExtraBold,
             )
-        }
 
-        Spacer(modifier = Modifier.padding(top = 10.dp))
 
-        titleTexts(  modifier = Modifier.align(Alignment.Start), "Nuestros Servicios:"  )
-
-        Spacer(modifier = Modifier.padding(top = 10.dp))
-
-        LazyRow(
-            modifier = Modifier.fillMaxWidth().height(200.dp),
-            //verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            items(servicesList){ service ->
-                ServiceBadgeItems(
-                    Modifier.fillMaxWidth().width(160.dp).height(200.dp),
-                    service
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(BasYellow)
+                    .padding(top = 30.dp, bottom = 30.dp)
+            ){
+                Image(
+                    painter = painterResource(R.drawable.baslogo),
+                    contentDescription = "Logo de bas"
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.padding(top = 30.dp))
+            Spacer(modifier = Modifier.padding(top = 10.dp))
 
-        titleTexts(  modifier = Modifier.align(Alignment.Start), "Facturación:"  )
+            titleTexts(  modifier = Modifier.align(Alignment.Start), "Nuestros Servicios:"  )
 
-        Spacer(modifier = Modifier.padding(top = 10.dp))
+            Spacer(modifier = Modifier.padding(top = 10.dp))
 
-        BillingComposable(
-            modifier.padding(horizontal = 2.dp),
-            "$ 12312.00",
-            "20/01/23",
-            onBillingClicked = { onBillingClicked() }
-        )
-
-        Spacer(modifier = Modifier.padding(top = 30.dp))
-
-        titleTexts(  modifier = Modifier.align(Alignment.Start), "Certificaciones y Permisos:"  )
-
-        LazyRow(
-            modifier = Modifier.fillMaxWidth().height(220.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            items(certificationsList){ certification ->
-                CertificationBadgeItems(
-                    Modifier.width(160.dp).height(200.dp),
-                    certification)
+            LazyRow(
+                modifier = Modifier.fillMaxWidth().height(200.dp),
+                //verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                items(servicesList){ service ->
+                    ServiceBadgeItems(
+                        Modifier.fillMaxWidth().width(160.dp).height(200.dp),
+                        service
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.padding(top = 30.dp))
+
+            titleTexts(  modifier = Modifier.align(Alignment.Start), "Facturación:"  )
+
+            Spacer(modifier = Modifier.padding(top = 10.dp))
+
+            BillingComposable(
+                modifier.padding(horizontal = 2.dp),
+                "$ 12312.00",
+                "20/01/23",
+                onBillingClicked = { onBillingClicked() }
+            )
+
+            Spacer(modifier = Modifier.padding(top = 30.dp))
+
+            titleTexts(  modifier = Modifier.align(Alignment.Start), "Certificaciones y Permisos:"  )
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth().height(220.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                items(certificationsList){ certification ->
+                    CertificationBadgeItems(
+                        Modifier.width(160.dp).height(200.dp),
+                        certification)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(90.dp) )
+
         }
+    }else{
+        TenantInvitationBadge(
+            modifier = Modifier.fillMaxSize(),
+            onCodeChanged = {
+                currentTypedToken -> verificationCode = currentTypedToken   },
+            isButtonEnabled = true,
+            codeTyped = verificationCode,
+            onAcceptInvitation = {
 
-        Spacer(modifier = Modifier.height(90.dp) )
+                processInvitationAccepted(
+                    "Bearer ${bearerToken}", verificationCode, userId,
+                    tenantInvitationController, acceptTokenResponse, {
+                        currentTenantId = it
+                    }
+                )
 
+            }
+        )
     }
 
 }
@@ -209,10 +249,8 @@ fun HomeScreen(
 
 @Composable
 fun BillingComposable(
-    modifier: Modifier,
-    amount: String,
-    lastPayment: String,
-    onBillingClicked: () -> Unit = {}
+    modifier: Modifier,  amount: String,
+    lastPayment: String, onBillingClicked: () -> Unit = {}
 ){
 
     val apiFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd" )
@@ -298,4 +336,165 @@ fun titleTexts(modifier: Modifier, text: String){
         fontSize = 24.sp,
         textAlign = TextAlign.Start
     )
+}
+
+
+//functions to accept tenant invitation
+@Composable
+fun TenantInvitationBadge(
+    modifier: Modifier = Modifier,
+    onCodeChanged: (String) -> Unit = {},
+    isButtonEnabled: Boolean = true,
+    codeTyped: String,
+    onAcceptInvitation: () -> Unit = {},
+){
+
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ){
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            elevation = CardDefaults.cardElevation(4.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
+        ){
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ){
+                // Franja superior amarilla
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .background(
+                            color = BasYellow,
+                            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                        )
+                )
+
+
+                // Contenido principal centrado
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .background(
+                                color = BasBackground,
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.AccountCircle,
+                            contentDescription = null,
+                            modifier = Modifier.size(36.dp),
+                            tint = BasGray
+                        )
+                    }
+
+
+                    Text(
+                        text = "Ingresa el código de la organización",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    TextField(
+                        value = codeTyped,
+                        onValueChange = onCodeChanged,
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 15.dp),
+                        placeholder = { Text(text="Código:") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true, maxLines = 1,
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
+                        )
+                    )
+
+                //button send code - accept invitation
+                    Button(
+                        onClick = onAcceptInvitation,
+                        modifier
+                            .padding(horizontal = 20.dp)
+                            .fillMaxWidth()
+                            .height(50.dp) ,
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(isButtonEnabled) Color.Black else Color.Gray ,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.White.copy(alpha = 0.6f)
+                        ),
+                        enabled = isButtonEnabled
+
+                    )
+                    {
+                        Text(
+                            text = "Continuar",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 30.sp
+                        )
+                    }
+                }
+
+
+                // Franja inferior amarilla
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .background(
+                            color = BasYellow,
+                            shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                        )
+                )
+            }
+        }
+    }
+}
+
+
+private fun processInvitationAccepted(bearerToken: String, verificationCode: String,
+    userId: String, controller: TenantInvitationController, acceptTokenResponse: AcceptTokenResponse,
+    onUpdateTenantId: (String) -> Unit = {} ){
+    CoroutineScope(Dispatchers.IO).launch {
+        val result = controller.acceptTenantInvitation(bearerToken, verificationCode, userId)
+        withContext(Dispatchers.Main){
+            when(result){
+
+                is Resource.Success -> {
+                    Log.i("TenantInvitation","Success: ${  !acceptTokenResponse.id.isNullOrEmpty()  }")
+                    onUpdateTenantId( result.data!!.id  )
+                }
+                is Resource.Error -> {
+                    Log.e("TenantInvitation","Error: ${  !acceptTokenResponse.id.isNullOrEmpty()  }")
+                }
+                else -> {
+                    Log.e("TenantInvitation","No se pudo procesar la invitación")
+                }
+
+            }
+        }
+    }
 }

@@ -15,6 +15,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.Shi
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.SplashNavigation
 import com.seguridadbas.multytenantseguridadbas.ui.theme.MultyTenantSeguridadBASTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +33,8 @@ class MainActivity : ComponentActivity() {
     private val guardShiftsController by viewModels<GuardShiftsController>()
     private val shiftsController by viewModels<ShiftsController>()
     private val billingAccountController by viewModels<BillingAccountController>()
+    private val tenantInvitationController by viewModels<TenantInvitationController>()
+
 
     val deepLinkIntentFlowSocial = MutableSharedFlow<Intent>(replay = 1)
 
@@ -56,6 +59,7 @@ class MainActivity : ComponentActivity() {
                     guardShiftsController,
                     shiftsController,
                     billingAccountController,
+                    tenantInvitationController,
                     deepLinkIntentFlowSocial
                 )
                 //SplashScreen()

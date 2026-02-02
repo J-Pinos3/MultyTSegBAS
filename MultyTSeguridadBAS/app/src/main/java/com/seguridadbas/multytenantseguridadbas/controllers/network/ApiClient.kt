@@ -275,6 +275,16 @@ interface ApiClient {
         @Path("tenantId") tenantId: String,
         @Body plan: String
     ): Response<JsonObject>
+
+
+    /** 🏠 ENDPOINTS FOR TENANT INVITATION  */
+
+    @POST("tenant/invitation/{token}/accept")
+    suspend fun acceptTenantInvitationApi(
+        @Header("Authorization") auth_token: String,
+        @Path("token") token: String, //token de 6 dígitos
+        @Body userId: String
+    ): Response<JsonObject>
 }
 
 

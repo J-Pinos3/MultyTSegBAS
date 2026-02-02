@@ -18,6 +18,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthC
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.BillingListScreen
 import com.seguridadbas.multytenantseguridadbas.core.navigation.BottomNavBar
 import com.seguridadbas.multytenantseguridadbas.core.navigation.Business
@@ -32,6 +33,7 @@ fun BottonNavScreen(
     authController: AuthController,
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
+    tenantInvitationController: TenantInvitationController,
     tenantId: String
 ){
     var selectedIndex by remember{ mutableStateOf(0) }
@@ -84,6 +86,7 @@ fun BottonNavScreen(
             authController = authController,
             stationsController = stationsController,
             certificationServicesController =certificationServicesController,
+            tenantInvitationController = tenantInvitationController,
             tenantId = tenantId
         )
     }
@@ -102,10 +105,11 @@ fun ContentScreen(
     authController: AuthController,
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
+    tenantInvitationController: TenantInvitationController,
     tenantId: String
 ){
     when(selectedIndex){
-        0-> HomeScreen(Modifier, certificationServicesController, tenantId, navigateToBilling)
+        0-> HomeScreen(Modifier, certificationServicesController, tenantInvitationController,tenantId, navigateToBilling)
 
         1 -> PostSitesScreen(Modifier, navigateToBusiness, stationsController)
 
