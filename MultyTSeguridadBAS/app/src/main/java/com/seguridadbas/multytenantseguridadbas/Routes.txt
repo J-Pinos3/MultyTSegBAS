@@ -1,0 +1,6 @@
+{
+    "email":"txz89902@laoia.com",
+    "password":"Txz8@laoia"
+}
+
+funciona aceptar el token de invitación al tenant-organización?

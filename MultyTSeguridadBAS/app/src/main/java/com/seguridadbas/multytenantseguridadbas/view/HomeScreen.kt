@@ -89,7 +89,7 @@ fun HomeScreen(
     var currentTenantId by remember { mutableStateOf(tenantId) }
     //token typed by the user
     var verificationCode by remember { mutableStateOf("") }
-    var userId by remember { mutableStateOf("") }//todo gotta get it from datastore
+    var userId by remember { mutableStateOf("") }
     var acceptTokenResponse by remember { mutableStateOf(AcceptTokenResponse()) }
 
     var bearerToken by remember { mutableStateOf("") }
@@ -103,6 +103,10 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             val storedData = dataStoreController.getDataFromStore().first()
+            userId = dataStoreController.getDataFromStore().first().id
+            userId = userId.replace("\"","").trim()
+            userId = userId.replace("\"","").trim()
+
             bearerToken = storedData.token
             bearerToken = bearerToken.replace("\"","").trim()
 
@@ -226,7 +230,7 @@ fun HomeScreen(
         }
     }else{
         TenantInvitationBadge(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             onCodeChanged = {
                 currentTypedToken -> verificationCode = currentTypedToken   },
             isButtonEnabled = true,
@@ -234,7 +238,9 @@ fun HomeScreen(
             onAcceptInvitation = {
 
                 processInvitationAccepted(
-                    "Bearer ${bearerToken}", verificationCode, userId,
+                    "Bearer ${bearerToken}",
+                    verificationCode,
+                    userId,
                     tenantInvitationController, acceptTokenResponse, {
                         currentTenantId = it
                     }
@@ -488,7 +494,7 @@ private fun processInvitationAccepted(bearerToken: String, verificationCode: Str
                     onUpdateTenantId( result.data!!.id  )
                 }
                 is Resource.Error -> {
-                    Log.e("TenantInvitation","Error: ${  !acceptTokenResponse.id.isNullOrEmpty()  }")
+                    Log.e("TenantInvitation","Error: ${  result.message  }")
                 }
                 else -> {
                     Log.e("TenantInvitation","No se pudo procesar la invitación")
