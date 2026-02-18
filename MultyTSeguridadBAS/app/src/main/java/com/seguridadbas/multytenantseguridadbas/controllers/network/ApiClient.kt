@@ -11,6 +11,7 @@ import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import com.seguridadbas.multytenantseguridadbas.model.autocompletGuardsResponse
 import com.seguridadbas.multytenantseguridadbas.model.autocompletGuardsResponseItem
 import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
+import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptInvitationBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -283,7 +284,7 @@ interface ApiClient {
     suspend fun acceptTenantInvitationApi(
         @Header("Authorization") auth_token: String,
         @Path("token") token: String, //token de 6 dígitos
-        @Body userId: String
+        @Body body: AcceptInvitationBody
     ): Response<JsonObject>
 }
 

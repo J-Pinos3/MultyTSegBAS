@@ -6,6 +6,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkExc
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.TenantInvitationRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.station.ShortStation
+import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptInvitationBody
 import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptTokenResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okio.IOException
@@ -21,7 +22,8 @@ class TenantInvitationController @Inject constructor(
     suspend fun acceptTenantInvitation(
         token: String, invitationToken: String, userId: String
     ): Resource<AcceptTokenResponse> {
-        val response = tenantInvitationRepository.acceptTenantInvitationRepo(token, invitationToken, userId)
+        val acceptInvitationBody = AcceptInvitationBody(userId)
+        val response = tenantInvitationRepository.acceptTenantInvitationRepo(token, invitationToken, acceptInvitationBody)
 
         return try{
 

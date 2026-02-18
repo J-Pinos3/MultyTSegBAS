@@ -100,20 +100,20 @@ fun HomeScreen(
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(currentTenantId) {
         CoroutineScope(Dispatchers.IO).launch {
             val storedData = dataStoreController.getDataFromStore().first()
             userId = dataStoreController.getDataFromStore().first().id
             userId = userId.replace("\"","").trim()
-            userId = userId.replace("\"","").trim()
+
 
             bearerToken = storedData.token
             bearerToken = bearerToken.replace("\"","").trim()
 
-            Log.i("Home","token: ${bearerToken.substring(0,6)} and tenantId: $tenantId")
+            Log.i("Home","token: ${bearerToken.substring(0,6)} and tenantId: $currentTenantId")
 
             if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
-                val certificationsResult = certificationServicesController.getAllCertifications("Bearer $bearerToken", tenantId)
+                val certificationsResult = certificationServicesController.getAllCertifications("Bearer $bearerToken", currentTenantId)
 
                 when(certificationsResult){
                     is Resource.Success -> {
@@ -126,7 +126,7 @@ fun HomeScreen(
                     else -> {Log.e("Sites","No se pudo traer los certificados")}
                 }
 
-                val servicesResult = certificationServicesController.getAllServices("Bearer $bearerToken", tenantId)
+                val servicesResult = certificationServicesController.getAllServices("Bearer $bearerToken", currentTenantId)
 
                 when(servicesResult){
                     is Resource.Success -> {
@@ -145,7 +145,7 @@ fun HomeScreen(
 
     }
 
-    if( !tenantId.isNullOrEmpty()){
+    if( !currentTenantId.isNullOrEmpty()){
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -241,8 +241,8 @@ fun HomeScreen(
                     "Bearer ${bearerToken}",
                     verificationCode,
                     userId,
-                    tenantInvitationController, acceptTokenResponse, {
-                        currentTenantId = it
+                    tenantInvitationController, acceptTokenResponse, { newTenantId->
+                        currentTenantId = newTenantId
                     }
                 )
 
@@ -485,6 +485,7 @@ private fun processInvitationAccepted(bearerToken: String, verificationCode: Str
     userId: String, controller: TenantInvitationController, acceptTokenResponse: AcceptTokenResponse,
     onUpdateTenantId: (String) -> Unit = {} ){
     CoroutineScope(Dispatchers.IO).launch {
+        Log.i("ACCEPT","${bearerToken}\n ${verificationCode}\n, $userId")
         val result = controller.acceptTenantInvitation(bearerToken, verificationCode, userId)
         withContext(Dispatchers.Main){
             when(result){
