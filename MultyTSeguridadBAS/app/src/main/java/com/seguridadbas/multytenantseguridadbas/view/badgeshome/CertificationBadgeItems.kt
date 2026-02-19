@@ -110,7 +110,7 @@ fun CertificationBadgeItems(
                         .fillMaxSize()
                         .clip(RoundedCornerShape(8.dp)),
                     model = if (certification.icon.isNullOrEmpty())
-                        "https://picsum.photos/300/200"
+                        "https://picsum.photos/100"
                     else
                         certification.icon,
                     contentDescription = "certification image",

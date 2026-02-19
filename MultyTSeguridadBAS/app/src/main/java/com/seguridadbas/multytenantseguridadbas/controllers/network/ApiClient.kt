@@ -2,16 +2,11 @@ package com.seguridadbas.multytenantseguridadbas.controllers.network
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.seguridadbas.multytenantseguridadbas.model.AllGuardsResponse
-import com.seguridadbas.multytenantseguridadbas.model.AuthMeResponse
-import com.seguridadbas.multytenantseguridadbas.model.GuardDataResponse
-import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
-import com.seguridadbas.multytenantseguridadbas.model.autocompletGuardsResponse
-import com.seguridadbas.multytenantseguridadbas.model.autocompletGuardsResponseItem
 import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
 import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptInvitationBody
+import com.seguridadbas.multytenantseguridadbas.model.visitorlogs.VisitorLogRequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -21,7 +16,6 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.QueryMap
 
 interface ApiClient {
 
@@ -286,6 +280,17 @@ interface ApiClient {
         @Path("token") token: String, //token de 6 dígitos
         @Body body: AcceptInvitationBody
     ): Response<JsonObject>
+
+
+    /** LOGS - BITACORAS */
+    @POST("tenant/{tenantId}/visitor-log")
+    suspend fun sendVisitLogApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Body requestData: VisitorLogRequestBody
+    ): Response<JsonObject>
+
+
 }
 
 

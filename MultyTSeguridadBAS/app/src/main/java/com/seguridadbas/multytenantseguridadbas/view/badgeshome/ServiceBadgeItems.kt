@@ -111,7 +111,7 @@ fun ServiceBadgeItems(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(8.dp)),
-                    model = if( service.iconImage.isNullOrEmpty() ) "https://picsum.photos/300/200" else service.iconImage[0],
+                    model = if( service.iconImage.isNullOrEmpty() ) "https://picsum.photos/100" else service.iconImage[0],
                     contentDescription = "service image",
                     contentScale = ContentScale.Crop
                 )
