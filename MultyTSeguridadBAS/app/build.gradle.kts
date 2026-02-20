@@ -82,6 +82,8 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
+    implementation("com.chargemap.compose:numberpicker:1.0.3")
+
 
 
     testImplementation(libs.junit)
