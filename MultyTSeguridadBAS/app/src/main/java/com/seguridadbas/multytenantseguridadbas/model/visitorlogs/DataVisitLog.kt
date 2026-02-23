@@ -2,7 +2,7 @@ package com.seguridadbas.multytenantseguridadbas.model.visitorlogs
 
 import com.google.gson.annotations.SerializedName
 
-data class dataVisitLog(
+data class DataVisitLog(
     @SerializedName("firstName")
     val firstName: String? = "",
     @SerializedName("idNumber")
@@ -16,5 +16,7 @@ data class dataVisitLog(
     @SerializedName("reason")
     val reason: String,
     @SerializedName("visitDate")
-    val visitDate: String
+    val visitDate: String,
+    @SerializedName("exitTime")
+    val exitTime: String? = null
 )

@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.icu.util.TimeZone
+import android.net.Uri
 import android.os.Build
 import android.widget.NumberPicker
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -20,19 +22,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,16 +54,35 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.chargemap.compose.numberpicker.NumberPicker
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
+import com.seguridadbas.multytenantseguridadbas.controllers.repository.FileRepository
 import com.seguridadbas.multytenantseguridadbas.controllers.visitlogscontroller.VisitLogController
 import com.seguridadbas.multytenantseguridadbas.model.visitorlogs.IdPhoto
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @Preview(showSystemUi = true)
 @Composable
 fun VisitLogScreen(
     //visitLogController: VisitLogController
 ){
+
+    var token by remember { mutableStateOf("") }
+    var tenantId by remember { mutableStateOf("") }
+
+
+
+    val context = LocalContext.current
+    val dataStoreController = DataStoreController(context)
+    val scope = rememberCoroutineScope()
+
 
     var visitDate by remember { mutableStateOf("") }
     var exitTime by remember { mutableStateOf("") }
@@ -67,8 +93,76 @@ fun VisitLogScreen(
 
     var numPeople by remember { mutableStateOf(1) }
 
-    //file data
-    val photoList: ArrayList<IdPhoto> = arrayListOf()
+
+    var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
+    var selectedPhotoFile by remember { mutableStateOf<File?>(null) }
+    var isLoadingPhoto by remember { mutableStateOf(false) }
+
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var successMessage by remember { mutableStateOf("") }
+
+    val fileRepository = remember { FileRepository(context = context) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success->
+        if(success){
+            isLoadingPhoto  = false
+        }
+    }
+
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if(uri != null){
+            isLoadingPhoto = true
+            selectedPhotoUri = uri
+
+            selectedPhotoFile = fileRepository.uriToFile(uri)
+            isLoadingPhoto = false
+        }
+    }
+
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val cameraGranted = permissions[Manifest.permission.CAMERA] == true
+        val storageGRanted = permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
+
+        if(cameraGranted){
+            //abre la camara
+            val (uri, file) = fileRepository.createCameraFileUri()
+            selectedPhotoUri = uri
+            selectedPhotoFile = file
+            cameraLauncher.launch(uri)
+        }else if(storageGRanted){
+            galleryLauncher.launch("image/*")
+        }
+    }
+
+    fun requestPermissionsAndTakePicture(fromCamera: Boolean){
+        val permissions = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            arrayOf(    Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES    )
+        }else{
+            arrayOf( Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE )
+        }
+        permissionLauncher.launch(permissions)
+    }
+
+    LaunchedEffect(Unit) {
+        CoroutineScope(Dispatchers.IO).launch{
+            val storedData = dataStoreController.getDataFromStore().first()
+            token = storedData.token
+            token = token.replace("\"","").trim()
+
+            tenantId = dataStoreController.getTenantId().first()
+            tenantId = tenantId.replace("\"","").trim()
+        }
+    }
+
 
 
     Column(
@@ -229,55 +323,40 @@ private fun VisitLogTextField(
 }
 
 @Composable
-private fun TakePhotoButton(
+private fun PhotoButton(
     modifier: Modifier,
-    onButtonClicked: () -> Unit
+    onButtonClicked: () -> Unit,
+    text: String,
+    isLoading: Boolean = false
 ){
     Button(
         onClick = onButtonClicked,
-        modifier = modifier.padding(horizontal = 20.dp)
-            .fillMaxWidth()
-            .height(50.dp),
-        shape = RoundedCornerShape(50),
+        modifier = modifier.height(50.dp),//.padding(horizontal = 20.dp).fillMaxWidth()
+        shape = RoundedCornerShape(8),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
-            contentColor = Color.White
-        )
+            containerColor = BasYellow,
+            contentColor = Color.Black
+        ),
+        enabled = isLoading
     ) {
-        Text(
-            text = "Tomar foto",
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
-        )
+        if(isLoading){
+            CircularProgressIndicator(
+                modifier = Modifier.size(16.dp),
+                color = Color.Black,
+                strokeWidth = 1.dp
+            )
+        }else{
+            Text(
+                text = text,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+        }
     }
 }
 
-
-
-private fun hasCameraPermission(context: Context) = ContextCompat.checkSelfPermission(
-    context, Manifest.permission.CAMERA
-) == PackageManager.PERMISSION_GRANTED
-
-
-
-private fun requestCameraPermissions(context: Context){
-    var permissionsArray: Array<String>
-    if( !hasCameraPermission( context ) ){
-
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            permissionsArray = arrayOf(
-                Manifest.permission.CAMERA, Manifest.permission.READ_MEDIA_IMAGES
-            )
-        }else{
-            permissionsArray = arrayOf(
-                Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        }
-
-        ActivityCompat.requestPermissions(
-            context as Activity, permissionsArray, 0
-        )
-    }
+private fun getCurrentDateTimeISO(): String{
+    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+    sdf.timeZone = TimeZone.getTimeZone("UTC") as java.util.TimeZone
+    return sdf.format( Date() )
 }
