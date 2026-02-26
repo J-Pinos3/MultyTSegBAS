@@ -17,6 +17,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontro
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
+import com.seguridadbas.multytenantseguridadbas.controllers.visitlogscontroller.VisitLogController
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardShiftsScreen
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardsScreen
 import com.seguridadbas.multytenantseguridadbas.view.AllShiftScreen
@@ -39,6 +40,7 @@ import com.seguridadbas.multytenantseguridadbas.view.ResetPasswordScreen
 import com.seguridadbas.multytenantseguridadbas.view.SecGuardDetail
 import com.seguridadbas.multytenantseguridadbas.view.ShiftDetailScreen
 import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
+import com.seguridadbas.multytenantseguridadbas.view.VisitLogScreen
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
@@ -51,6 +53,7 @@ fun SplashNavigation(authController: AuthController,
                      shiftsController: ShiftsController,
                      billingAccountController: BillingAccountController,
                      tenantInvitationController: TenantInvitationController,
+                     visitLogController: VisitLogController,
                      deepLinkIntentFlowSocial: SharedFlow<Intent>
                      ) {
 
@@ -262,6 +265,15 @@ fun SplashNavigation(authController: AuthController,
                 navigateBackToHome = { navController.popBackStack() },
                 billingAccountController = billingAccountController
             )
+        }
+
+        composable<VisitorLogsScreen>{
+            VisitLogScreen(
+                Modifier,
+                navigateBackToMore = { navController.popBackStack() },
+                visitLogController = visitLogController
+            )
+
         }
 
     }

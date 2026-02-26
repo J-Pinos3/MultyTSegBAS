@@ -48,7 +48,8 @@ fun MoreScreen(
     modifier: Modifier = Modifier,
     onNavigateToGuardsScreen: () -> Unit,
     onNavigateToGuardShiftsScreen: () -> Unit,
-    onNavigateToShiftScreen: () -> Unit
+    onNavigateToShiftScreen: () -> Unit,
+    onNavigateToVisitorLogScreen: () -> Unit
 ){
 
     Column(
@@ -90,6 +91,12 @@ fun MoreScreen(
 
         Spacer(modifier = modifier.padding(vertical = 8.dp))
 
+        FeatureItems(
+            modifier = modifier,
+            R.drawable.ic_visitlogs,
+            "Crear Bitácora",
+            onNavigateToVisitorLogScreen
+        )
     }
 
 

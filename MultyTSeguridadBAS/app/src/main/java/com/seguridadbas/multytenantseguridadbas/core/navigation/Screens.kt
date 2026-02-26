@@ -83,6 +83,9 @@ data class ShiftDetailsSc(val shiftId: String)
 
 
 @Serializable
+object VisitorLogsScreen
+
+@Serializable
 object BillingListScreen
 
 object NavItemList{

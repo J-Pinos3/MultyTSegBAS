@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.seguridadbas.multytenantseguridadbas"
-        minSdk = 28
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -74,6 +74,7 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:2.52")
     implementation(libs.androidx.browser)
+    implementation(libs.androidx.material3)
     testImplementation(libs.junit.junit)
     testImplementation(libs.junit.junit)
     kapt("com.google.dagger:hilt-android-compiler:2.52")

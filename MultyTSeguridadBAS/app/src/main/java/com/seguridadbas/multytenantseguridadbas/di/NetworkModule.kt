@@ -42,7 +42,7 @@ object NetworkModule {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/api/")
+            .baseUrl("http://192.168.1.8:8080/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(monitorClient)
             .build()

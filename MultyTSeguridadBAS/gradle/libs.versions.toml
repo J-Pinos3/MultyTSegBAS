@@ -13,6 +13,7 @@ kotlinxSerialization = "1.6.3"
 coilCompose = "2.6.0"
 browser = "1.9.0"
 junitJunit = "4.12"
+material3 = "1.4.0"
 
 
 [libraries]
@@ -36,6 +37,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 
 [plugins]

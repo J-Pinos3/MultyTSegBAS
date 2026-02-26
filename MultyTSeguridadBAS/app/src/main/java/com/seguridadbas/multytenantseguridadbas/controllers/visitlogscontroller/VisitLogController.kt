@@ -36,7 +36,8 @@ class VisitLogController @Inject constructor(
                     )
                 )
             }else{
-                Resource.Error(response.message().toString() + "--" + response.raw().message )
+                Resource.Error(response.message().toString() + "--" + response.raw().message +
+                        "///" + response.errorBody().toString() )
             }
 
 
