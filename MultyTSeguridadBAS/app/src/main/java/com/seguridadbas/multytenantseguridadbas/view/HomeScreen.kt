@@ -160,7 +160,7 @@ fun HomeScreen(
                     .padding(vertical = 16.dp, horizontal = 6.dp)
                     .align(Alignment.Start),
                 text = "Bienvenido Cliente, ",
-                fontSize = 40.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.ExtraBold,
             )
 

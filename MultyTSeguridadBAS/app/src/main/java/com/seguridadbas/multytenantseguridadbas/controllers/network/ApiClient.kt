@@ -2,6 +2,7 @@ package com.seguridadbas.multytenantseguridadbas.controllers.network
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.seguridadbas.multytenantseguridadbas.model.SendEmailVerificationRequest
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
@@ -32,7 +33,7 @@ interface ApiClient {
     @POST("auth/send-email-address-verification-email")
     suspend fun sendEmailVerificationApi(
         @Header("Authorization") auth_token: String,
-        @Body email: String
+        @Body emailRequest: SendEmailVerificationRequest
     ): Response<ResponseBody>
 
     @POST("auth/send-password-reset-email")

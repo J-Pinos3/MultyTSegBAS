@@ -49,6 +49,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.network.ApiClient
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.AuthenticationRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
+import com.seguridadbas.multytenantseguridadbas.model.SendEmailVerificationRequest
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import com.seguridadbas.multytenantseguridadbas.view.dialog.EmailVerificationDialog
@@ -335,7 +336,6 @@ fun RegisterScreen(
 
                     verifyEmailWithToken(user_token, authController, emailText)
 
-                    /** logica para enviar correos*/
 
                     showVerificationDialog = false
                     emailText = ""
@@ -481,7 +481,7 @@ fun RegisterButton(
 
 fun verifyEmailWithToken(token: String, controller: AuthController, email:String){
     CoroutineScope(Dispatchers.IO).launch {
-        val result = controller.sendVerificationEmail(token, email)
+        val result = controller.sendVerificationEmail(token, SendEmailVerificationRequest(email))
         withContext(Dispatchers.Main){
             when(result){
                 is Resource.Success -> {

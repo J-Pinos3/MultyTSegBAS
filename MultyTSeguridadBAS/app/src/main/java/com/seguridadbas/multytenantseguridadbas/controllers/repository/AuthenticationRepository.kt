@@ -1,6 +1,7 @@
 package com.seguridadbas.multytenantseguridadbas.controllers.repository
 
 import com.seguridadbas.multytenantseguridadbas.controllers.network.ApiClient
+import com.seguridadbas.multytenantseguridadbas.model.SendEmailVerificationRequest
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
 import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
@@ -16,8 +17,8 @@ class AuthenticationRepository @Inject constructor(
 
     suspend fun signInRepo(user: User)= apiClient.signInApi(user = user)
 
-    suspend fun sendEmailVerificationRepo(email: String, auth_token: String)
-            = apiClient.sendEmailVerificationApi(auth_token = auth_token,email = email)
+    suspend fun sendEmailVerificationRepo(emailRequest: SendEmailVerificationRequest, auth_token: String)
+            = apiClient.sendEmailVerificationApi(auth_token = auth_token, emailRequest = emailRequest)
 
 
     suspend fun sendResetPasswordRepo(email: String)

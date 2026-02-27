@@ -9,6 +9,7 @@ import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.AuthenticationRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
+import com.seguridadbas.multytenantseguridadbas.model.SendEmailVerificationRequest
 import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfile
@@ -95,8 +96,8 @@ class AuthController @Inject constructor(
     }
 
 
-    suspend fun sendVerificationEmail(token: String, email: String): Resource<String>{
-        val response = authenticationRepository.sendEmailVerificationRepo(auth_token = token, email = email)
+    suspend fun sendVerificationEmail(token: String, emailRequest: SendEmailVerificationRequest): Resource<String>{
+        val response = authenticationRepository.sendEmailVerificationRepo(auth_token = token, emailRequest = emailRequest)
 
         return if( response.isSuccessful ){
             Resource.Success(response.body().toString())

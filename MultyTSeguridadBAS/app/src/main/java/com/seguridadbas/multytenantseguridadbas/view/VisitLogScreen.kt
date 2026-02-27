@@ -95,9 +95,14 @@ fun VisitLogScreen(
         Log.d("VisitLogScreen", "Camera result: $success")
         if (success) {
             Log.d("VisitLogScreen", "Photo taken successfully. File: ${selectedPhotoFile?.absolutePath}")
+            if(selectedPhotoFile != null){
+                selectedPhotoUri = Uri.fromFile(selectedPhotoFile!!)
+            }
             isLoadingPhoto = false
         } else {
             Log.e("VisitLogScreen", "Camera was cancelled or failed")
+            selectedPhotoUri = null
+            selectedPhotoUri = null
             isLoadingPhoto = false
         }
     }
