@@ -292,6 +292,13 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
+    /** ENDPOINT PARA FACTURAS */
+    @GET("tenant/{tenantId}/invoice")
+    suspend fun getAllInvoicesApi(
+        @Header("Auhorization") auth_token: String,
+        @Path("tenantId") tenantId: String
+    ): Response<JsonObject>
+
 }
 
 
