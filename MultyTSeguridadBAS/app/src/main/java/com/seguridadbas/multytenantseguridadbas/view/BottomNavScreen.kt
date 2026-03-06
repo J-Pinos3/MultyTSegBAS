@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
+import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
@@ -35,6 +36,7 @@ fun BottonNavScreen(
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
     tenantInvitationController: TenantInvitationController,
+    invoiceController: InvoiceController,
     tenantId: String
 ){
     var selectedIndex by remember{ mutableStateOf(0) }
@@ -95,6 +97,7 @@ fun BottonNavScreen(
             stationsController = stationsController,
             certificationServicesController =certificationServicesController,
             tenantInvitationController = tenantInvitationController,
+            invoiceController = invoiceController,
             tenantId = tenantId
         )
     }
@@ -115,10 +118,11 @@ fun ContentScreen(
     stationsController: StationsController,
     certificationServicesController: CertificationServicesController,
     tenantInvitationController: TenantInvitationController,
+    invoiceController: InvoiceController,
     tenantId: String
 ){
     when(selectedIndex){
-        0-> HomeScreen(Modifier, certificationServicesController, tenantInvitationController,tenantId, navigateToBilling)
+        0-> HomeScreen(Modifier, certificationServicesController, tenantInvitationController, invoiceController,tenantId, navigateToBilling)
 
         1 -> PostSitesScreen(Modifier, navigateToBusiness, stationsController)
 

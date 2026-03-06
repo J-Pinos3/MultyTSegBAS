@@ -11,6 +11,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthC
 import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontroller.BillingAccountController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
+import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
 import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
     private val billingAccountController by viewModels<BillingAccountController>()
     private val tenantInvitationController by viewModels<TenantInvitationController>()
     private val visitLogController by viewModels<VisitLogController>()
+    private val invoiceController by viewModels<InvoiceController>()
 
 
 
@@ -64,6 +66,7 @@ class MainActivity : ComponentActivity() {
                     billingAccountController,
                     tenantInvitationController,
                     visitLogController,
+                    invoiceController,
                     deepLinkIntentFlowSocial,
                 )
                 //SplashScreen()

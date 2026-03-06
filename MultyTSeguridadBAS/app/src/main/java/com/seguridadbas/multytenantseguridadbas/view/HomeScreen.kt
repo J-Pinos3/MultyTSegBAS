@@ -59,9 +59,11 @@ import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
+import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.certifications.CertificationDataResponse
+import com.seguridadbas.multytenantseguridadbas.model.invoices.AllInvoicesRespData
 import com.seguridadbas.multytenantseguridadbas.model.services.ServiceDataResponse
 import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptTokenResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
@@ -83,6 +85,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     certificationServicesController: CertificationServicesController,
     tenantInvitationController: TenantInvitationController,
+    invoiceController: InvoiceController,
     tenantId: String,
     onBillingClicked: () -> Unit = {}
 ){
@@ -96,6 +99,9 @@ fun HomeScreen(
 
     var certificationsList by remember{ mutableStateOf<List<CertificationDataResponse>>( emptyList() ) }
     var servicesList by remember { mutableStateOf<List<ServiceDataResponse>>( emptyList() ) }
+
+    var invoiceAmount by remember { mutableStateOf("$0.00") }
+    var dueDateInvoice by remember { mutableStateOf("1999/01/01") }
 
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
@@ -139,6 +145,15 @@ fun HomeScreen(
 
                     else ->{ Log.e("Sites","No se pudo traer los servicios") }
                 }
+
+                loadUpcomingInvoice(
+                    bearerToken, currentTenantId,invoiceController,
+                    onSuccess = {
+                        invoiceAmount = it.total
+                        dueDateInvoice = it.dueDate
+                    },
+                    onError = { errorMsg -> Log.e("home screen invoice", errorMsg)  }
+                )
             }
         }
 
@@ -204,8 +219,8 @@ fun HomeScreen(
 
             BillingComposable(
                 modifier.padding(horizontal = 2.dp),
-                "$ 12312.00",
-                "20/01/23",
+                invoiceAmount,
+                dueDateInvoice,
                 onBillingClicked = { onBillingClicked() }
             )
 
@@ -504,4 +519,33 @@ private fun processInvitationAccepted(bearerToken: String, verificationCode: Str
             }
         }
     }
+}
+
+
+private fun loadUpcomingInvoice(
+    bearerToken: String, tenantId: String,
+    invoiceController: InvoiceController,
+    onSuccess: (AllInvoicesRespData) -> Unit,
+    onError: (String) -> Unit
+){
+
+    CoroutineScope(Dispatchers.IO).launch{
+        if(!bearerToken.isNullOrEmpty() || !tenantId.isNullOrEmpty()){
+            val result = invoiceController.getAllInvoices("Bearer $bearerToken", tenantId)
+
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Resource.Success -> { onSuccess(result.data!!.sortedBy { it.dueDate }[0]) }
+                    is Resource.Error -> { onError(result.message.toString()) }
+                    else -> { onError(result.message.toString()) }
+                }
+            }
+        }else{
+            withContext(Dispatchers.Main){
+                onError("token o tenantId inválidos")
+            }
+        }
+    }
+
+
 }

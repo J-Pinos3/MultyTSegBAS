@@ -12,6 +12,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthC
 import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontroller.BillingAccountController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
+import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
 import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
@@ -54,6 +55,7 @@ fun SplashNavigation(authController: AuthController,
                      billingAccountController: BillingAccountController,
                      tenantInvitationController: TenantInvitationController,
                      visitLogController: VisitLogController,
+                     invoiceController: InvoiceController,
                      deepLinkIntentFlowSocial: SharedFlow<Intent>
                      ) {
 
@@ -78,7 +80,7 @@ fun SplashNavigation(authController: AuthController,
 
         composable <Home>{ backstackEntry ->
             val home =backstackEntry.toRoute<Home>()
-            BottonNavScreen(navController, authController, stationsController, certificationServicesController,tenantInvitationController,home.tenantId)
+            BottonNavScreen(navController, authController, stationsController, certificationServicesController,tenantInvitationController, invoiceController,home.tenantId)
         }
 
         composable <Register>{
