@@ -469,7 +469,7 @@ fun UpdateProfileButton(
         Text(
             text = "Actualizar Perfil",
             fontWeight = FontWeight.ExtraBold,
-            fontSize = 30.sp
+            fontSize = 25.sp
         )
     }
 
@@ -502,7 +502,7 @@ fun UpdatePasswordButton(
         Text(
             text = "Actualizar Contraseña",
             fontWeight = FontWeight.ExtraBold,
-            fontSize = 30.sp
+            fontSize = 20.sp
         )
     }
 

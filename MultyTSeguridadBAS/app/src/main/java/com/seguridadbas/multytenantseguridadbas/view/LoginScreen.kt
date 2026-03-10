@@ -36,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -178,121 +179,123 @@ fun LoginScreen(
 
     }
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = BasBackground)
-            .statusBarsPadding()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-
-        Box(
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ){ paddingVals ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(BasYellow)
-                .padding(top = 50.dp, bottom = 30.dp)
+                .fillMaxSize()
+                .padding(paddingVals)
+                .background(color = BasBackground)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Image(
-                painter = painterResource(R.drawable.baslogo),
-                contentDescription = "Logo de bas"
-            )
-        }
 
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        Text(
-            text = "Bienvenido",
-            fontWeight = FontWeight.W900,
-            fontSize = 40.sp
-        )
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        EmailField(
-            modifier = Modifier,
-            emailText,
-            onEmailChange = {
-                currentText -> emailText = currentText
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(BasYellow)
+                    .padding(top = 50.dp, bottom = 30.dp)
+            ){
+                Image(
+                    painter = painterResource(R.drawable.baslogo),
+                    contentDescription = "Logo de bas"
+                )
             }
-        )
 
-        Spacer(modifier = Modifier.padding(top = 16.dp))
+            Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        PasswordField(
-            modifier = Modifier,
-            password = passwordText,
-            isPasswordVisible = passwordVisible,
-            onPasswordCHange = {
-                newPassword ->
-                passwordText = newPassword
+            Text(
+                text = "Bienvenido",
+                fontWeight = FontWeight.W900,
+                fontSize = 40.sp
+            )
 
-                passwordErrorMessage = validators.validatePassword(passwordText)
-                //println("Error: $passwordErrorMessage")
-                if( passwordErrorMessage.isNullOrEmpty() ){
-                    showPasswordError = false
-                }else{
-                    //println("Error: $passwordErrorMessage")
-                    showPasswordError = true
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            EmailField(
+                modifier = Modifier,
+                emailText,
+                onEmailChange = {
+                        currentText -> emailText = currentText
                 }
-            },
-            onPasswordVisibilityChange = {
-                newVisibility ->
-                passwordVisible = newVisibility
+            )
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            PasswordField(
+                modifier = Modifier,
+                password = passwordText,
+                isPasswordVisible = passwordVisible,
+                onPasswordCHange = {
+                        newPassword ->
+                    passwordText = newPassword
+
+                    passwordErrorMessage = validators.validatePassword(passwordText)
+                    //println("Error: $passwordErrorMessage")
+                    if( passwordErrorMessage.isNullOrEmpty() ){
+                        showPasswordError = false
+                    }else{
+                        //println("Error: $passwordErrorMessage")
+                        showPasswordError = true
+                    }
+                },
+                onPasswordVisibilityChange = {
+                        newVisibility ->
+                    passwordVisible = newVisibility
+                }
+            )
+
+
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+
+            if(showPasswordError){
+                Text(
+                    text = passwordErrorMessage,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .padding(top = 8.dp, start = 20.dp)
+                        .align(Alignment.Start),
+                    fontSize = 16.sp
+
+                )
+
+                Spacer(modifier = Modifier.padding(top = 8.dp))
             }
-        )
+
+            if(!showMailError){
+                Text(
+                    text = "El formato de correo no es válido",
+                    color = Color.Red,
+                    modifier = Modifier
+                        .padding(top = 8.dp, start = 20.dp)
+                        .align(Alignment.Start),
+                    fontSize = 16.sp
+                )
+
+                Spacer(modifier = Modifier.padding(top = 8.dp))
+            }
+
+            LoginButton(modifier = Modifier,
+                enabled = !showPasswordError && showMailError,
+                onLoginButtonClicked = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        loading = true
+                        val result = authController.signIn(emailText, passwordText)
 
 
-        Spacer(modifier = Modifier.padding(top = 8.dp))
-
-        if(showPasswordError){
-            Text(
-                text = passwordErrorMessage,
-                color = Color.Red,
-                modifier = Modifier
-                    .padding(top = 8.dp, start = 20.dp)
-                    .align(Alignment.Start),
-                fontSize = 16.sp
-
-            )
-
-            Spacer(modifier = Modifier.padding(top = 8.dp))
-        }
-
-        if(!showMailError){
-            Text(
-                text = "El formato de correo no es válido",
-                color = Color.Red,
-                modifier = Modifier
-                    .padding(top = 8.dp, start = 20.dp)
-                    .align(Alignment.Start),
-                fontSize = 16.sp
-            )
-
-            Spacer(modifier = Modifier.padding(top = 8.dp))
-        }
-
-        LoginButton(modifier = Modifier,
-            enabled = !showPasswordError && showMailError,
-            onLoginButtonClicked = {
-                CoroutineScope(Dispatchers.IO).launch {
-                    loading = true
-                    val result = authController.signIn(emailText, passwordText)
-
-
-                    when(result){
-                        is Resource.Success -> {
-                            loading = false
-                            val userDataStore = UserDataStore(
-                                token = result.data?.token.toString(),
-                                id = result.data?.user?.id.toString(),
-                                email = result.data?.user?.email.toString(),
-                                firstName = result.data?.user?.firstName.toString(),
-                                lastName = result.data?.user?.lastName.toString() ?: ""
-                            )
-                            val token = result.data?.token.toString().replace("\"","").trim()
-                            val resultTenant = authController.authenticateProfileME("Bearer $token")
+                        when(result){
+                            is Resource.Success -> {
+                                loading = false
+                                val userDataStore = UserDataStore(
+                                    token = result.data?.token.toString(),
+                                    id = result.data?.user?.id.toString(),
+                                    email = result.data?.user?.email.toString(),
+                                    firstName = result.data?.user?.firstName.toString(),
+                                    lastName = result.data?.user?.lastName.toString() ?: ""
+                                )
+                                val token = result.data?.token.toString().replace("\"","").trim()
+                                val resultTenant = authController.authenticateProfileME("Bearer $token")
                                 when(resultTenant){
                                     is Resource.Success -> {
 
@@ -311,79 +314,80 @@ fun LoginScreen(
                                     }
                                 }
 
-                            withContext(Dispatchers.Main){
-                                dataStoreController.saveToDataStore(userDataStore)
-                                onLoginClicked(tenantid)
+                                withContext(Dispatchers.Main){
+                                    dataStoreController.saveToDataStore(userDataStore)
+                                    onLoginClicked(tenantid)
+                                }
+
+                                Log.i("LOGIN SCREEN", "login exitoso, ${result.data?.token } ${result.data?.user?.firstName}")
                             }
 
-                            Log.i("LOGIN SCREEN", "login exitoso, ${result.data?.token } ${result.data?.user?.firstName}")
-                        }
+                            is Resource.Error->{
+                                loading = false
+                                Log.e("LOGIN SCREEN", "error login: ${result.message.toString()}")
+                            }
 
-                        is Resource.Error->{
-                            loading = false
-                            Log.e("LOGIN SCREEN", "error login: ${result.message.toString()}")
-                        }
+                            else ->{
+                                loading = false
+                                Log.e("LOGIN SCREEN", "error al iniciar sesion")
+                            }
 
-                        else ->{
-                            loading = false
-                            Log.e("LOGIN SCREEN", "error al iniciar sesion")
                         }
-
                     }
+
+                    //onLoginClicked()
+                }
+            )
+
+            if(loading){
+                Spacer(modifier = Modifier.padding(top = 24.dp))
+                Text("Cargandoo")
+            }
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            ForgotPassword(
+                Modifier
+                    .padding(end = 20.dp)
+                    .align(Alignment.End),
+
+                _onForgotPasswordClicked = onForgotPasswordClicked
+            )
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            CreateAccount(
+                Modifier
+                    .padding(end = 20.dp)
+                    .align(Alignment.End),
+
+                _onCreateAccountClicked = onCreateAccount
+            )
+
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+
+            SocialMediaButton(
+                Modifier,
+                "Iniciar Sesión con Google",
+                painterResource(R.drawable.google),
+                {
+                    openCustomTab(context,"https://unabetted-edison-unparallel.ngrok-free.dev/api/auth/social/google/")
                 }
 
-                //onLoginClicked()
-            }
-        )
+            )
+            Spacer(modifier = Modifier.padding(top = 16.dp))
 
-        if(loading){
-            Spacer(modifier = Modifier.padding(top = 24.dp))
-            Text("Cargandoo")
+            SocialMediaButton(
+                Modifier,
+                "Iniciar Sesión con Facebook",
+                painterResource(R.drawable.facebook),
+                {
+                    openCustomTab(context,"https://unabetted-edison-unparallel.ngrok-free.dev/api/auth/social/facebook/")
+
+                }
+            )
+
         }
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        ForgotPassword(
-            Modifier
-                .padding(end = 20.dp)
-                .align(Alignment.End),
-            
-            _onForgotPasswordClicked = onForgotPasswordClicked
-        )
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        CreateAccount(
-            Modifier
-                .padding(end = 20.dp)
-                .align(Alignment.End),
-
-            _onCreateAccountClicked = onCreateAccount
-        )
-
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        SocialMediaButton(
-            Modifier,
-            "Iniciar Sesión con Google",
-            painterResource(R.drawable.google),
-            {
-                openCustomTab(context,"https://unabetted-edison-unparallel.ngrok-free.dev/api/auth/social/google/")
-            }
-
-        )
-        Spacer(modifier = Modifier.padding(top = 16.dp))
-
-        SocialMediaButton(
-            Modifier,
-            "Iniciar Sesión con Facebook",
-            painterResource(R.drawable.facebook),
-            {
-                openCustomTab(context,"https://unabetted-edison-unparallel.ngrok-free.dev/api/auth/social/facebook/")
-
-            }
-        )
-
     }
 
     if(isProcessingDeepLink){

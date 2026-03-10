@@ -32,10 +32,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
+import com.chargemap.compose.numberpicker.ListItemPicker
 import com.chargemap.compose.numberpicker.NumberPicker
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontroller.BillingAccountController
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.FileRepository
+import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.controllers.visitlogscontroller.VisitLogController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.visitorlogs.DataVisitLog
@@ -47,6 +51,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -56,6 +61,9 @@ import java.util.Date
 fun VisitLogScreen(
     modifier: Modifier = Modifier,
     visitLogController: VisitLogController,
+    billingAccountController: BillingAccountController,//to get clients
+    stationsController: StationsController, //to get stations
+    tenantGuardsController: TenantGuardsController, //to get security guards
     navigateBackToMore: () -> Unit = {}
 ) {
 
@@ -67,13 +75,23 @@ fun VisitLogScreen(
     val scope = rememberCoroutineScope()
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+    var sitesList by remember{mutableStateOf<List<String>>( emptyList() ) }
+    var guardsList by remember{mutableStateOf<List<String>>( emptyList() ) }
+    var clientsList by remember{mutableStateOf<List<String>>( emptyList() ) }
+
     var visitDate by remember { mutableStateOf("") }
     var exitTime by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var idNumber by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
     var reason by remember { mutableStateOf("") }
     var numPeople by remember { mutableStateOf(1) }
+
+    val placesList = listOf<String>("🏠","🏢","💼")
+    var chosenPlace by remember { mutableStateOf(placesList[0] ) }
+    var placeName by remember{ mutableStateOf("") }
+    var homeNumber by remember { mutableStateOf("") }
 
     var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
     var selectedPhotoFile by remember { mutableStateOf<File?>(null) }
@@ -262,7 +280,21 @@ fun VisitLogScreen(
 
                 tenantId = dataStoreController.getTenantId().first()
                 tenantId = tenantId.replace("\"", "").trim()
-                Log.d("VisitLogScreen", "Data loaded. Token: ${token.take(10)}..., TenantId: $tenantId")
+
+                loadSitesNames(
+                    "Bearer $token", tenantId, stationsController,
+                    onSuccess = { sitesList = it },  onError = { errorMessage = it } )
+
+                loadGuardsNames(
+                    "Bearer $token", tenantId, tenantGuardsController,
+                    onSuccess = { guardsList = it },  onError = { errorMessage = it } )
+
+                loadClientsNames(
+                    "Bearer $token", tenantId, billingAccountController,
+                    onSuccess = { clientsList = it },  onError = { errorMessage = it } )
+
+
+            //Log.d("VisitLogScreen", "Data loaded. Token: ${token.take(10)}..., TenantId: $tenantId")
             } catch (e: Exception) {
                 Log.e("VisitLogScreen", "Error loading data from DataStore", e)
                 errorMessage = "Error al cargar datos"
@@ -390,6 +422,24 @@ fun VisitLogScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Campo Teléfono
+                Text(
+                    text = "Ingrese el teléfono:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                VisitLogTextField(
+                    modifier = Modifier,
+                    typedText = phoneNumber,
+                    onTextChange = { phoneNumber = it },
+                    placeholder = "+12339450:",
+                    isSingleLine = true,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
                 // Fila: Cédula + Número de personas
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -421,17 +471,70 @@ fun VisitLogScreen(
                             fontSize = 14.sp,
                             modifier = Modifier.padding(start = 10.dp)
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(5.dp))
                         NumberPicker(
                             modifier = Modifier.padding(end = 15.dp),
                             value = numPeople,
-                            range = 1..20,
+                            range = 1..80,
                             onValueChange = { numPeople = it }
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                //Fila: lugar  + número
+                Text(
+                    text = "Lugar y Número:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    ListItemPicker(
+                        label = { it },
+                        value = chosenPlace,
+                        onValueChange = {
+                            chosenPlace = it
+
+                            placeName = when (chosenPlace) {
+                                placesList[0] -> "Casa"
+                                placesList[1] -> "Apartamento"
+                                placesList[2] -> "Oficina"
+                                else -> ""
+                            }
+
+                        },
+                        list = placesList
+                    )
+
+                    VisitLogTextField(
+                        modifier = Modifier.weight(.3f),
+                        typedText = homeNumber,
+                        onTextChange = { homeNumber = it },
+                        placeholder = "N28-123  --  12:",
+                        isSingleLine = false,
+                        maxLines = 1
+                    )
+
+                }
+
+
+                Spacer(modifier = Modifier.height(16.dp))
+                //campo cliente
+                Text(
+                    text = "Cliente:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+
+                //todo combo-box de clientes y guardias y sitios
 
                 // Campo Razón
                 Text(
@@ -650,3 +753,97 @@ private fun launchCamera(
         Log.e("launchCamera", "Error launching camera", e)
     }
 }
+
+
+
+private fun loadSitesNames(
+    bearerToken: String, tenantId: String,
+    stationsController: StationsController,
+    onSuccess: (List<String>) -> Unit,
+    onError: (String) -> Unit
+){
+
+    CoroutineScope(Dispatchers.IO).launch {
+        if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+            val result = stationsController.getAllStations(bearerToken, tenantId)
+
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Resource.Success -> {
+                        onSuccess(  result.data?.map { it.stationName }!! )
+                    }
+
+                    is Resource.Error -> { onError(result.message.toString()) }
+
+                    else -> { onError(result.message.toString()) }
+                }
+            }
+        }else{
+            withContext(Dispatchers.Main){  onError("token o tenantId inválidos")     }
+        }
+    }
+}
+
+
+
+private fun loadGuardsNames(
+    bearerToken: String, tenantId: String,
+    tenantGuardsController: TenantGuardsController,
+    onSuccess: (List<String>) -> Unit,
+    onError: (String) -> Unit
+){
+
+    CoroutineScope(Dispatchers.IO).launch {
+        if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+            val result = tenantGuardsController.getSecGuards(bearerToken, tenantId)
+
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Resource.Success -> {
+                        onSuccess(  result.data?.map { it.firstName + " " + it.lastName }!! )
+                    }
+
+                    is Resource.Error -> { onError(result.message.toString()) }
+
+                    else -> { onError(result.message.toString()) }
+                }
+            }
+        }else{
+            withContext(Dispatchers.Main){  onError("token o tenantId inválidos")     }
+        }
+    }
+}
+
+
+
+private fun loadClientsNames(
+    bearerToken: String, tenantId: String,
+    billingAccountController: BillingAccountController,
+    onSuccess: (List<String>) -> Unit,
+    onError: (String) -> Unit
+){
+
+    CoroutineScope(Dispatchers.IO).launch {
+        if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+            val result = billingAccountController.getAllClientAccounts(bearerToken, tenantId)
+
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Resource.Success -> {
+                        onSuccess(  result.data?.map { it.name + " " + it.lastName }!! )
+                    }
+
+                    is Resource.Error -> { onError(result.message.toString()) }
+
+                    else -> { onError(result.message.toString()) }
+                }
+            }
+        }else{
+            withContext(Dispatchers.Main){  onError("token o tenantId inválidos")     }
+        }
+    }
+}
+
+
+
+

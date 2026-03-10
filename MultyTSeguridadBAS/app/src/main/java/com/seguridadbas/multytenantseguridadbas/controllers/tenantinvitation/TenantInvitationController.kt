@@ -35,28 +35,28 @@ class TenantInvitationController @Inject constructor(
 
                 Resource.Success(
                     AcceptTokenResponse(
-                        address = jsonBody.get("address").asString,
-                        businessTitle = jsonBody.get("businessTitle").asString,
-                        createdAt = jsonBody.get("createdAt").asString,
+                        address = jsonBody.isNullStringField("address"),
+                        businessTitle = jsonBody.isNullStringField("businessTitle"),
+                        createdAt = jsonBody.isNullStringField("createdAt"),
                         createdById = jsonBody.isNullStringField("createdById"),
                         deletedAt = jsonBody.isNullStringField("deletedAt"),
-                        email = jsonBody.get("email").asString,
-                        extraLines = jsonBody.get("extraLines").asString,
-                        id = jsonBody.get("id").asString,
-                        licenseNumber = jsonBody.get("licenseNumber").asString,
+                        email = jsonBody.isNullStringField("email"),
+                        extraLines = jsonBody.isNullStringField("extraLines"),
+                        id = jsonBody.isNullStringField("id"),
+                        licenseNumber = jsonBody.isNullStringField("licenseNumber"),
                         logoId = jsonBody.isNullStringField("logoId"),
-                        name = jsonBody.get("name").asString,
-                        phone = jsonBody.get("phone").asString,
-                        plan = jsonBody.get("plan").asString,
-                        planStatus = jsonBody.get("planStatus").asString,
+                        name = jsonBody.isNullStringField("name"),
+                        phone = jsonBody.isNullStringField("phone"),
+                        plan = jsonBody.isNullStringField("plan"),
+                        planStatus = jsonBody.isNullStringField("planStatus"),
                         planStripeCustomerId = jsonBody.isNullStringField("planStripeCustomerId"),
                         planUserId = jsonBody.isNullStringField("planUserId"),
-                        taxNumber = jsonBody.get("taxNumber").asString,
-                        timezone = jsonBody.get("timezone").asString,
-                        updatedAt = jsonBody.get("updatedAt").asString,
+                        taxNumber = jsonBody.isNullStringField("taxNumber"),
+                        timezone = jsonBody.isNullStringField("timezone"),
+                        updatedAt = jsonBody.isNullStringField("updatedAt"),
                         updatedById = jsonBody.isNullStringField("updatedById"),
-                        url = jsonBody.get("url").asString,
-                        website = jsonBody.get("website").asString
+                        url = jsonBody.isNullStringField("url"),
+                        website = jsonBody.isNullStringField("website")
                     )
                 )
 
