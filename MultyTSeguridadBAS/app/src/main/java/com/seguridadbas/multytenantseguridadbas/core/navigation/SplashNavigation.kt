@@ -273,7 +273,10 @@ fun SplashNavigation(authController: AuthController,
             VisitLogScreen(
                 Modifier,
                 navigateBackToMore = { navController.popBackStack() },
-                visitLogController = visitLogController
+                visitLogController = visitLogController,
+                billingAccountController = billingAccountController,
+                stationsController = stationsController,
+                tenantGuardsController = tenantGuardsController
             )
 
         }

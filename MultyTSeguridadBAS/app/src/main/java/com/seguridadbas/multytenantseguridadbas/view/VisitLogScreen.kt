@@ -1,6 +1,7 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
 import android.Manifest
+import android.R.attr.onClick
 import android.content.Context
 import android.content.pm.PackageManager
 import android.icu.util.TimeZone
@@ -11,25 +12,32 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import com.chargemap.compose.numberpicker.ListItemPicker
@@ -75,9 +83,13 @@ fun VisitLogScreen(
     val scope = rememberCoroutineScope()
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+    var selectedSite by remember { mutableStateOf("") }
+    var selectedGuard by remember { mutableStateOf("") }
+    var selectedCustomer by remember { mutableStateOf("") }
     var sitesList by remember{mutableStateOf<List<String>>( emptyList() ) }
     var guardsList by remember{mutableStateOf<List<String>>( emptyList() ) }
     var clientsList by remember{mutableStateOf<List<String>>( emptyList() ) }
+    //TODO create additional ui fields and fill them with the lists above
 
     var visitDate by remember { mutableStateOf("") }
     var exitTime by remember { mutableStateOf("") }
@@ -533,9 +545,45 @@ fun VisitLogScreen(
                     fontSize = 16.sp,
                     modifier = Modifier.padding(start = 10.dp)
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                DropdownCustom(
+                    contentList = clientsList,
+                    onSelectedOption = { selectedCustomer = it }
+                )
 
-                //todo combo-box de clientes y guardias y sitios
 
+
+                //campo guardia
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Guardia:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                DropdownCustom(
+                    contentList = guardsList,
+                    onSelectedOption = { selectedGuard = it }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                //campo sitios
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Sitio:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                DropdownCustom(
+                    contentList = sitesList,
+                    onSelectedOption = { selectedSite = it }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
                 // Campo Razón
                 Text(
                     text = "Razón de ingreso:",
@@ -754,6 +802,88 @@ private fun launchCamera(
     }
 }
 
+
+@Composable
+fun DropdownCustom(
+    contentList: List<String>,
+    onSelectedOption: (String) -> Unit,
+    label: String = "select an option"
+) {
+
+    // Declaring a boolean value to store
+    // the expanded state of the Text Field
+    var mExpanded by remember { mutableStateOf(false) }
+
+    // Create a string value to store the selected city
+    var mSelectedText by remember { mutableStateOf("") }
+
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+
+    // Up Icon when expanded and down icon when collapsed
+    val icon = if (mExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+
+    Column(Modifier.padding(20.dp)) {
+
+        // Create an Outlined Text Field
+        // with icon and not expanded
+        OutlinedTextField(
+
+            value = mSelectedText,
+            onValueChange = { mSelectedText = it
+            onSelectedOption(it)
+                            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    // This value is used to assign to
+                    // the DropDown the same width
+                    mTextFieldSize = coordinates.size.toSize()
+                },
+            label = {Text(label)},
+            trailingIcon = {
+                Icon(icon,"contentDescription",
+                    Modifier.clickable { mExpanded = !mExpanded },
+                    tint = Color.Black
+                )
+            },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedIndicatorColor = BasYellow,
+                unfocusedIndicatorColor = BasYellow,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedLabelColor = Color.Black,
+                unfocusedLabelColor = Color.Gray,
+                cursorColor = Color.Black
+            )
+        )
+
+        // Create a drop-down menu with list of cities,
+        // when clicked, set the Text Field text as the city selected
+        DropdownMenu(
+            expanded = mExpanded,
+            onDismissRequest = { mExpanded = false },
+            modifier = Modifier
+                .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
+                .background(Color.White)
+        ) {
+            contentList.forEach { label ->
+                DropdownMenuItem(
+                    text = { Text(text = label, color = Color.Black) },
+                    onClick = {
+                        mSelectedText = label
+                        onSelectedOption(label)
+                        mExpanded = false
+                    }
+                )
+            }
+        }
+    }
+}
 
 
 private fun loadSitesNames(
