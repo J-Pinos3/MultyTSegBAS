@@ -86,9 +86,9 @@ fun VisitLogScreen(
     var selectedSite by remember { mutableStateOf("") }
     var selectedGuard by remember { mutableStateOf("") }
     var selectedCustomer by remember { mutableStateOf("") }
-    var sitesList by remember{mutableStateOf<List<String>>( emptyList() ) }
-    var guardsList by remember{mutableStateOf<List<String>>( emptyList() ) }
-    var clientsList by remember{mutableStateOf<List<String>>( emptyList() ) }
+    var sitesList by remember{mutableStateOf<List<Pair<String, String>>>( emptyList() ) }
+    var guardsList by remember{mutableStateOf<List<Pair<String, String>>>( emptyList() ) }
+    var clientsList by remember{mutableStateOf<List<Pair<String, String>>>( emptyList() ) }
     //TODO create additional ui fields and fill them with the lists above
 
     var visitDate by remember { mutableStateOf("") }
@@ -241,7 +241,11 @@ fun VisitLogScreen(
                     reason = reason,
                     numPeople = numPeople,
                     exitTime = exitTime.ifBlank { null },
-                    idPhoto = listOf(idPhotoObj)
+                    idPhoto = listOf(idPhotoObj),
+                    clientId = selectedCustomer,
+                    guardId = selectedGuard,
+                    postSiteId = selectedSite,
+                    placeType = placeName + " " + homeNumber
                 )
 
                 val requestBody = VisitorLogRequestBody(data = visitorLogData)
@@ -547,8 +551,8 @@ fun VisitLogScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 DropdownCustom(
-                    contentList = clientsList,
-                    onSelectedOption = { selectedCustomer = it }
+                    contentList = clientsList.map { it.first },
+                    onSelectedOption = { customer -> selectedCustomer = clientsList.first{ it.second == customer }.second }
                 )
 
 
@@ -563,8 +567,8 @@ fun VisitLogScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 DropdownCustom(
-                    contentList = guardsList,
-                    onSelectedOption = { selectedGuard = it }
+                    contentList = guardsList.map { it.first },
+                    onSelectedOption = { guard -> selectedGuard = guardsList.first{ it.second == guard }.second }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -579,8 +583,8 @@ fun VisitLogScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 DropdownCustom(
-                    contentList = sitesList,
-                    onSelectedOption = { selectedSite = it }
+                    contentList = sitesList.map{ it.first },
+                    onSelectedOption = { site -> selectedSite = sitesList.first{ it.second == site }.second }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -889,7 +893,7 @@ fun DropdownCustom(
 private fun loadSitesNames(
     bearerToken: String, tenantId: String,
     stationsController: StationsController,
-    onSuccess: (List<String>) -> Unit,
+    onSuccess: (List<Pair<String, String>>) -> Unit,
     onError: (String) -> Unit
 ){
 
@@ -900,7 +904,7 @@ private fun loadSitesNames(
             withContext(Dispatchers.Main){
                 when(result){
                     is Resource.Success -> {
-                        onSuccess(  result.data?.map { it.stationName }!! )
+                        onSuccess(  result.data?.map { Pair(it.stationName, it.stationId) }!! )
                     }
 
                     is Resource.Error -> { onError(result.message.toString()) }
@@ -919,7 +923,7 @@ private fun loadSitesNames(
 private fun loadGuardsNames(
     bearerToken: String, tenantId: String,
     tenantGuardsController: TenantGuardsController,
-    onSuccess: (List<String>) -> Unit,
+    onSuccess: (List<Pair<String, String>>) -> Unit,
     onError: (String) -> Unit
 ){
 
@@ -930,7 +934,7 @@ private fun loadGuardsNames(
             withContext(Dispatchers.Main){
                 when(result){
                     is Resource.Success -> {
-                        onSuccess(  result.data?.map { it.firstName + " " + it.lastName }!! )
+                        onSuccess(  result.data?.map { Pair(it.firstName + " " + it.lastName,it.id) }!! )
                     }
 
                     is Resource.Error -> { onError(result.message.toString()) }
@@ -949,7 +953,7 @@ private fun loadGuardsNames(
 private fun loadClientsNames(
     bearerToken: String, tenantId: String,
     billingAccountController: BillingAccountController,
-    onSuccess: (List<String>) -> Unit,
+    onSuccess: (List<Pair<String, String>>) -> Unit,
     onError: (String) -> Unit
 ){
 
@@ -960,7 +964,7 @@ private fun loadClientsNames(
             withContext(Dispatchers.Main){
                 when(result){
                     is Resource.Success -> {
-                        onSuccess(  result.data?.map { it.name + " " + it.lastName }!! )
+                        onSuccess(  result.data?.map { Pair(it.name + " " + it.lastName, it.id) }!! )
                     }
 
                     is Resource.Error -> { onError(result.message.toString()) }

@@ -15,6 +15,14 @@ data class DataVisitLog(
     val numPeople: Int,
     @SerializedName("reason")
     val reason: String,
+    @SerializedName("clientId")
+    val clientId: String = "",
+    @SerializedName("guardId")
+    val guardId: String= "",
+    @SerializedName("postSiteId")
+    val postSiteId: String= "",
+    @SerializedName("placeType")
+    val placeType: String= "",
     @SerializedName("visitDate")
     val visitDate: String,
     @SerializedName("exitTime")

@@ -22,7 +22,7 @@ data class ClientAccountDataResponse(
     @SerializedName("longitude")
     val longitude: String? = "",
     @SerializedName("categoryIds")
-    val categoryIds: String? = "",
+    val categoryIds: List<Any?> = emptyList<Any>(),
     @SerializedName("active")
     val active: Boolean,
     @SerializedName("categories")

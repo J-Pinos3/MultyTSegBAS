@@ -126,7 +126,7 @@ class BillingAccountController @Inject constructor(
                         website = row.get("website").asString,
                         latitude = row.get("latitude").asString,
                         longitude = row.get("longitude").asString,
-                        categoryIds = row.isNullStringField("categoryIds"),
+                        categoryIds = row.getArrayFieldAsList("categoryIds"),
                         active=row.get("active").asBoolean,
                         categories = row.getAsJsonArray("categories").toList(),
                         createdAt = row.get("createdAt").asString,
@@ -214,6 +214,14 @@ class BillingAccountController @Inject constructor(
 
     private fun JsonObject?.isNullStringField(field: String):  String{
         return if(this?.get(field)?.isJsonNull == false) this.get(field).asString else ""
+    }
+
+    private fun JsonObject?.getArrayFieldAsList(field: String): List<Any> {
+        return if (this != null && this.has(field) && this.get(field).isJsonArray) {
+            this.getAsJsonArray(field).map { it.asJsonObject }
+        } else {
+            emptyList()
+        }
     }
 
 }

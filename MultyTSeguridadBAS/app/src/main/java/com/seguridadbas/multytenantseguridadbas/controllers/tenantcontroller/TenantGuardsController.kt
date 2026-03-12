@@ -47,9 +47,9 @@ class TenantGuardsController @Inject constructor(
                 gender = row.get("gender").asString,
                 governmentId = row.get("governmentId").asString,
                 guard = Guard(
-                    email = guardObj.get("email").asString,
-                    firstName = guardObj.get("firstName").asString,
-                    id = guardObj.get("id").asString,
+                    email = guardObj.isNullStringField("email"),
+                    firstName = guardObj.isNullStringField("firstName"),
+                    id = guardObj.isNullStringField("id"),
                     lastName = guardObj.isNullStringField("lastName")
                 ),
                 guardCredentials = row.isNullStringField("guardCredentials"),
