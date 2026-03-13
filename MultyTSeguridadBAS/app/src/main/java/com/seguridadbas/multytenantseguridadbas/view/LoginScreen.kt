@@ -3,9 +3,7 @@ package com.seguridadbas.multytenantseguridadbas.view
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.activity.ComponentActivity
 import android.content.Intent
-import android.widget.Toast
 import kotlinx.coroutines.flow.*
 
 import androidx.browser.customtabs.CustomTabsIntent
@@ -23,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,11 +43,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -66,7 +63,7 @@ import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.core.util.validators
 import com.seguridadbas.multytenantseguridadbas.model.UserDataStore
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
-import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBlue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -194,11 +191,11 @@ fun LoginScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BasYellow)
-                    .padding(top = 50.dp, bottom = 30.dp)
+                    .background(BasBlue)
+                    .padding(top = 30.dp, bottom = 30.dp)
             ){
                 Image(
-                    painter = painterResource(R.drawable.baslogo),
+                    painter = painterResource(R.drawable.cguardimage),
                     contentDescription = "Logo de bas"
                 )
             }
@@ -247,20 +244,20 @@ fun LoginScreen(
             )
 
 
-            Spacer(modifier = Modifier.padding(top = 8.dp))
+            Spacer(modifier = Modifier.padding(top = 6.dp))
 
             if(showPasswordError){
                 Text(
                     text = passwordErrorMessage,
                     color = Color.Red,
                     modifier = Modifier
-                        .padding(top = 8.dp, start = 20.dp)
+                        .padding(top = 6.dp, start = 20.dp)
                         .align(Alignment.Start),
-                    fontSize = 16.sp
+                    fontSize = 14.sp
 
                 )
 
-                Spacer(modifier = Modifier.padding(top = 8.dp))
+                Spacer(modifier = Modifier.padding(top = 6.dp))
             }
 
             if(!showMailError){
@@ -268,12 +265,12 @@ fun LoginScreen(
                     text = "El formato de correo no es válido",
                     color = Color.Red,
                     modifier = Modifier
-                        .padding(top = 8.dp, start = 20.dp)
+                        .padding(top = 6.dp, start = 20.dp)
                         .align(Alignment.Start),
-                    fontSize = 16.sp
+                    fontSize = 14.sp
                 )
 
-                Spacer(modifier = Modifier.padding(top = 8.dp))
+                Spacer(modifier = Modifier.padding(top = 6.dp))
             }
 
             LoginButton(modifier = Modifier,
@@ -340,8 +337,8 @@ fun LoginScreen(
             )
 
             if(loading){
-                Spacer(modifier = Modifier.padding(top = 24.dp))
-                Text("Cargandoo")
+                Spacer(modifier = Modifier.padding(top = 12.dp))
+                Text("Cargando...")
             }
 
             Spacer(modifier = Modifier.padding(top = 16.dp))

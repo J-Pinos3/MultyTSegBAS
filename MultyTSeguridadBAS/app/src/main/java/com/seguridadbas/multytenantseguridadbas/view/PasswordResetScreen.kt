@@ -30,13 +30,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
+import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBlue
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import com.seguridadbas.multytenantseguridadbas.view.dialog.EmailResetPasswordDialog
 import kotlinx.coroutines.CoroutineScope
@@ -67,11 +67,11 @@ fun ResetPasswordScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BasYellow)
-                .padding(top =  50.dp, bottom = 30.dp)
+                .background(BasBlue)
+                .padding(top =  30.dp, bottom = 30.dp)
         ){
             Image(
-                painter = painterResource(R.drawable.baslogo),
+                painter = painterResource(R.drawable.cguardimage),
                 contentDescription = "Logo de bas"
             )
         }

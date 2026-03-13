@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 
+val BasBlue = Color(1,2,69)
 
 val BasYellow = Color(255,204,0)
 

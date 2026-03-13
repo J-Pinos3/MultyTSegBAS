@@ -1,10 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
 import android.Manifest
-import android.R.attr.onClick
-import android.content.Context
-import android.content.pm.PackageManager
-import android.icu.util.TimeZone
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -38,7 +34,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import com.chargemap.compose.numberpicker.ListItemPicker
 import com.chargemap.compose.numberpicker.NumberPicker
@@ -54,6 +49,7 @@ import com.seguridadbas.multytenantseguridadbas.model.visitorlogs.DataVisitLog
 import com.seguridadbas.multytenantseguridadbas.model.visitorlogs.IdPhoto
 import com.seguridadbas.multytenantseguridadbas.model.visitorlogs.VisitorLogRequestBody
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
+import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBlue
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -361,12 +357,12 @@ fun VisitLogScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BasYellow)
-                    .padding(top = 50.dp, bottom = 50.dp),
+                    .background(BasBlue)
+                    .padding(top = 30.dp, bottom = 30.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(R.drawable.baslogo),
+                    painter = painterResource(R.drawable.cguardimage),
                     contentDescription = "Logo de bas"
                 )
             }

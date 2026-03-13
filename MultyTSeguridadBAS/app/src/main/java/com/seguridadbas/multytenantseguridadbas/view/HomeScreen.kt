@@ -1,7 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +32,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,7 +54,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
-import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
@@ -67,6 +64,7 @@ import com.seguridadbas.multytenantseguridadbas.model.invoices.AllInvoicesRespDa
 import com.seguridadbas.multytenantseguridadbas.model.services.ServiceDataResponse
 import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptTokenResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
+import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBlue
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import com.seguridadbas.multytenantseguridadbas.view.badgeshome.CertificationBadgeItems
@@ -183,11 +181,11 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BasYellow)
+                    .background(BasBlue)
                     .padding(top = 30.dp, bottom = 30.dp)
             ){
                 Image(
-                    painter = painterResource(R.drawable.baslogo),
+                    painter = painterResource(R.drawable.cguardimage),
                     contentDescription = "Logo de bas"
                 )
             }
