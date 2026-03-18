@@ -31,14 +31,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
-import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantguardscontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
-import com.seguridadbas.multytenantseguridadbas.model.GuardDataResponse
 import com.seguridadbas.multytenantseguridadbas.model.SecurityGuardProfile
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow

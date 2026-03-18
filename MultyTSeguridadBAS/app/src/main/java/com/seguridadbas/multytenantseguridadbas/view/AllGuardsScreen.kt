@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -42,15 +41,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
-import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantguardscontroller.TenantGuardsController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.Guard
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground

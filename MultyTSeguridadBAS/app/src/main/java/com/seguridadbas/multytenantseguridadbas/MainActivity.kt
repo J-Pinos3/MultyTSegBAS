@@ -15,7 +15,8 @@ import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.I
 import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
-import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantguardscontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantinfocontroller.TenantInfoController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
 import com.seguridadbas.multytenantseguridadbas.controllers.visitlogscontroller.VisitLogController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.SplashNavigation
@@ -38,6 +39,7 @@ class MainActivity : ComponentActivity() {
     private val tenantInvitationController by viewModels<TenantInvitationController>()
     private val visitLogController by viewModels<VisitLogController>()
     private val invoiceController by viewModels<InvoiceController>()
+    private val tenantInfoController by viewModels<TenantInfoController>()
 
 
 
@@ -67,6 +69,7 @@ class MainActivity : ComponentActivity() {
                     tenantInvitationController,
                     visitLogController,
                     invoiceController,
+                    tenantInfoController,
                     deepLinkIntentFlowSocial,
                 )
                 //SplashScreen()

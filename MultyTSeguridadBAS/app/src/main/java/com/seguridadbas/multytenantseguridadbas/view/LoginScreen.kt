@@ -86,6 +86,8 @@ fun LoginScreen(
     var showPasswordError by remember { mutableStateOf(true) }
     var passwordErrorMessage by remember { mutableStateOf("") }
 
+    var showLoginErrorMessage by remember { mutableStateOf(false) }
+
     var emailText by remember { mutableStateOf("") }
 
     var loading by remember { mutableStateOf(false) }
@@ -299,14 +301,19 @@ fun LoginScreen(
                                         tenantid = resultTenant.data?.tenantId.toString().replace("\"","").trim() ?: ""
                                         dataStoreController.saveTenantId( tenantid   )
 
+                                        showLoginErrorMessage = false
                                         Log.i("Login","tenantId GUARDADO $tenantid")
                                     }
 
                                     is Resource.Error -> {
+
+                                        showLoginErrorMessage = true
                                         Log.e("Login",result.message.toString())
                                     }
 
                                     else -> {
+
+                                        showLoginErrorMessage = true
                                         Log.e("Login","No se pudo traer el perfil del usuario")
                                     }
                                 }
@@ -321,11 +328,13 @@ fun LoginScreen(
 
                             is Resource.Error->{
                                 loading = false
+                                showLoginErrorMessage = true
                                 Log.e("LOGIN SCREEN", "error login: ${result.message.toString()}")
                             }
 
                             else ->{
                                 loading = false
+                                showLoginErrorMessage = false
                                 Log.e("LOGIN SCREEN", "error al iniciar sesion")
                             }
 
@@ -339,6 +348,19 @@ fun LoginScreen(
             if(loading){
                 Spacer(modifier = Modifier.padding(top = 12.dp))
                 Text("Cargando...")
+            }
+
+            if(!showLoginErrorMessage){
+                Text(
+                    text = "Correo o contraseña incorrectos",
+                    color = Color.Red,
+                    modifier = Modifier
+                        .padding(top = 6.dp, start = 10.dp)
+                        .align(Alignment.Start),
+                    fontSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.padding(top = 1.dp))
             }
 
             Spacer(modifier = Modifier.padding(top = 16.dp))

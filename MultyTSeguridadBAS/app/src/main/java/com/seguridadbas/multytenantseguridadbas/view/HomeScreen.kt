@@ -534,13 +534,19 @@ private fun loadUpcomingInvoice(
             withContext(Dispatchers.Main){
                 when(result){
                     is Resource.Success -> { onSuccess(result.data!!.sortedBy { it.dueDate }[0]) }
-                    is Resource.Error -> { onError(result.message.toString()) }
-                    else -> { onError(result.message.toString()) }
+                    is Resource.Error -> {
+                        onError(result.message.toString())
+                        Log.e("home screen invoice", result.message.toString())
+                    }
+                    else -> { onError(result.message.toString())
+                        Log.e("home screen invoice", result.message.toString())
+                    }
                 }
             }
         }else{
             withContext(Dispatchers.Main){
                 onError("token o tenantId inválidos")
+                Log.e("home screen invoice", "errror")
             }
         }
     }

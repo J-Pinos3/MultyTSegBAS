@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.controllers.network
 
+import com.facebook.FacebookAuthorizationException
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.model.SendEmailVerificationRequest
@@ -295,7 +296,14 @@ interface ApiClient {
     /** ENDPOINT PARA FACTURAS */
     @GET("tenant/{tenantId}/invoice")
     suspend fun getAllInvoicesApi(
-        @Header("Auhorization") auth_token: String,
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String
+    ): Response<JsonObject>
+
+
+    @GET("tenant/{tenantId}")
+    suspend fun getCurrentTenantApi(
+        @Header("Authorization") autho_token: String,
         @Path("tenantId") tenantId: String
     ): Response<JsonObject>
 

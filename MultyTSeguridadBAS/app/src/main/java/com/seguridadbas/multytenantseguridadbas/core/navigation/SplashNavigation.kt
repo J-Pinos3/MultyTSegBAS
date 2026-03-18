@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontroller.BillingAccountController
@@ -16,7 +15,8 @@ import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.I
 import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
-import com.seguridadbas.multytenantseguridadbas.controllers.tenantcontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantguardscontroller.TenantGuardsController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantinfocontroller.TenantInfoController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
 import com.seguridadbas.multytenantseguridadbas.controllers.visitlogscontroller.VisitLogController
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardShiftsScreen
@@ -56,6 +56,7 @@ fun SplashNavigation(authController: AuthController,
                      tenantInvitationController: TenantInvitationController,
                      visitLogController: VisitLogController,
                      invoiceController: InvoiceController,
+                     tenantInfoController: TenantInfoController,
                      deepLinkIntentFlowSocial: SharedFlow<Intent>
                      ) {
 
@@ -63,7 +64,8 @@ fun SplashNavigation(authController: AuthController,
     NavHost(navController = navController, startDestination = Splash){
         composable<Splash>{
             SplashScreen(
-                "BAS",   {  navController.navigate(Login)      }
+                "Cguard",   {  navController.navigate(Login)      },
+                tenantInfoController
             )
         }
 

@@ -1,5 +1,6 @@
 package com.seguridadbas.multytenantseguridadbas.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,24 +15,84 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.seguridadbas.multytenantseguridadbas.R
+import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
+import com.seguridadbas.multytenantseguridadbas.controllers.tenantinfocontroller.TenantInfoController
+import com.seguridadbas.multytenantseguridadbas.core.util.Resource
+import com.seguridadbas.multytenantseguridadbas.model.tenantinfo.TenantInfoResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-@Preview(showSystemUi = true)
+//@Preview(showSystemUi = true)
 @Composable
 fun SplashScreen(
-    enterprise: String = "Tu empresa",
-    onSplashComplete: () -> Unit  = {}
+    enterprise: String ,
+    onSplashComplete: () -> Unit  = {},
+    tenantInfoController: TenantInfoController
 ){
+    var token by remember { mutableStateOf("") }
+    var tenantId by remember { mutableStateOf("") }
+
+    var tenantData  by remember{ mutableStateOf<TenantInfoResponse?>(null)  }
+
+    val context = LocalContext.current
+    val dataStoreController = DataStoreController(context)
+
+    var tenantUrlForImage by remember { mutableStateOf("") }
+    var tenantBusinessName by remember { mutableStateOf(enterprise) }
+
+
+    LaunchedEffect(Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val storedData = dataStoreController.getDataFromStore().first()
+            token = storedData.token
+            token = token.replace("\"","").trim()
+
+            tenantId = dataStoreController.getTenantId().first()
+            tenantId = tenantId.replace("\"","").trim()
+
+            if( !token.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+
+                val result = tenantInfoController.getCurrentTenant("Bearer $token", tenantId)
+
+                when(result){
+                   is Resource.Success -> {
+                       tenantData = result.data
+                        tenantUrlForImage = result.data!!.logoId ?: ""
+                       tenantBusinessName = result.data.name
+
+                       Log.i("splash", result.data.name)
+                   }
+
+                   is Resource.Error -> { Log.e("splash tenant", "no se pudbo obtener el tenant") }
+
+                   else -> { Log.e("splash tenant", "no se pudbo obtener el tenant") }
+                }
+            }else{
+                tenantUrlForImage = ""
+            }
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -68,18 +129,24 @@ fun SplashScreen(
         )
 
         // dibujo
+        if( tenantUrlForImage.isNullOrEmpty() ){
+            Image(
+                painter = painterResource(R.drawable.cguardimage),
+                contentDescription = "Escudo de bas"
+            )
+        }else{
+            AsyncImage(
+                model = tenantUrlForImage,
+                contentDescription = "Escudo de bas")
+        }
 
-        Image(
-            painter = painterResource(R.drawable.basimage),
-            contentDescription = "Escudo de bas"
-        )
 
         Spacer(
             modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
         )
 
         Text(
-            text = enterprise,
+            text = tenantBusinessName,
             fontWeight = FontWeight.ExtraBold,
             fontSize = 30.sp
         )

@@ -108,7 +108,7 @@ class InvoiceController @Inject constructor(
                 items = items,
                 notes = row.get("notes").asString,
                 payments = paymentItem,
-                poSoNumber = row.get("poSoNumber").asString,
+                poSoNumber = row.isNullStringField("poSoNumber"),
                 postSite = PostSite(
                     address = postSiteObj.get("address").asString,
                             city = postSiteObj.get("city").asString,
@@ -123,7 +123,7 @@ class InvoiceController @Inject constructor(
                 sentAt = row.get("sentAt").asString ,
                 status = row.get("status").asString ,
                 subtotal = row.get("subtotal").asString ,
-                summary = row.get("summary").asString ,
+                summary = row.isNullStringField("summary"),
                 tenantId = row.get("tenantId").asString ,
                 title = row.get("title").asString ,
                 total = row.get("total").asString ,
@@ -133,6 +133,11 @@ class InvoiceController @Inject constructor(
         }
 
         return AllInvoicesResponse(count,rows)
+    }
+
+
+    private fun JsonObject?.isNullStringField(field: String): String{
+        return if(this?.get(field)?.isJsonNull == false) this.get(field).asString else ""
     }
 
 }
