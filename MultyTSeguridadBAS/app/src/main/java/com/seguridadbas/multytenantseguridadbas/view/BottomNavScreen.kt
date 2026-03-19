@@ -119,7 +119,7 @@ fun ContentScreen(
     when(selectedIndex){
         0-> HomeScreen(Modifier, certificationServicesController, tenantInvitationController, invoiceController,tenantId, navigateToBilling)
 
-        1 -> PostSitesScreen(Modifier, navigateToBusiness, stationsController)
+        1 -> StationsScreen(Modifier, navigateToBusiness, stationsController)
 
         2 -> MyAccountScreen(Modifier, authController)
 

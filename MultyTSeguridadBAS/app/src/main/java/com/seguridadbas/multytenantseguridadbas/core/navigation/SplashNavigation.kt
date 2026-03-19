@@ -33,7 +33,7 @@ import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
 import com.seguridadbas.multytenantseguridadbas.view.PatrolsByStationScreen
-import com.seguridadbas.multytenantseguridadbas.view.PostSitesScreen
+import com.seguridadbas.multytenantseguridadbas.view.StationsScreen
 import com.seguridadbas.multytenantseguridadbas.view.RegisterScreen
 import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationScreen
@@ -94,9 +94,9 @@ fun SplashNavigation(authController: AuthController,
         }
 
         composable <Sites>{
-            PostSitesScreen(
+            StationsScreen(
                 Modifier,
-                onPostSiteClicked = { siteName -> navController.navigate(Business(siteName = siteName)) },
+                onStationClicked = { siteName -> navController.navigate(Business(siteName = siteName)) },
                 stationsController = stationsController
             )
         }

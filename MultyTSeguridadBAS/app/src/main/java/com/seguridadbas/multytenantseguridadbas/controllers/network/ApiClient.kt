@@ -307,6 +307,14 @@ interface ApiClient {
         @Path("tenantId") tenantId: String
     ): Response<JsonObject>
 
+
+    @GET("tenant/{tenantId}/post-site")
+    suspend fun getAllPostSitesApi(
+        @Header("Authorization") authToken: String,
+        @Path("tenantId") tenantId: String
+    ): Response<JsonObject>
+
+
 }
 
 
