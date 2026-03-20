@@ -1,10 +1,5 @@
 package com.seguridadbas.multytenantseguridadbas.core.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.core.navigation.models.NavItem
 import kotlinx.serialization.Serializable
@@ -26,7 +21,10 @@ object ResetPasswordSc
 object Register
 
 @Serializable
-object Sites
+data class Stations(val postSiteId: String)
+
+@Serializable
+object PostSites
 
 @Serializable
 object More

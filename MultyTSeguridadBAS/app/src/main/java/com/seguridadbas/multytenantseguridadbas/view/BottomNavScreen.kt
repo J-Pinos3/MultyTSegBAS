@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
+import com.seguridadbas.multytenantseguridadbas.controllers.postsitecontrollers.PostSiteController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
 import com.seguridadbas.multytenantseguridadbas.core.navigation.BillingListScreen
@@ -22,6 +23,7 @@ import com.seguridadbas.multytenantseguridadbas.core.navigation.GuardsScreen
 import com.seguridadbas.multytenantseguridadbas.core.navigation.GuardsShiftScreen
 import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
 import com.seguridadbas.multytenantseguridadbas.core.navigation.ShiftsScreen
+import com.seguridadbas.multytenantseguridadbas.core.navigation.Stations
 import com.seguridadbas.multytenantseguridadbas.core.navigation.VisitorLogsScreen
 
 @Composable
@@ -32,15 +34,16 @@ fun BottonNavScreen(
     certificationServicesController: CertificationServicesController,
     tenantInvitationController: TenantInvitationController,
     invoiceController: InvoiceController,
+    postSiteController: PostSiteController,
     tenantId: String
 ){
     var selectedIndex by remember{ mutableStateOf(0) }
 
 
-    val navigateToBusiness: (String) -> Unit = {
-        siteName ->
+    val navigateToStations: (String) -> Unit = {
+        postSiteId ->
         navController.saveState()
-        navController.navigate(Business(siteName = siteName) )
+        navController.navigate(Stations(postSiteId = postSiteId))
     }
 
     val navigateToGuards: () -> Unit = {
@@ -82,7 +85,7 @@ fun BottonNavScreen(
         ContentScreen(
             selectedIndex,
             Modifier.padding(it),
-            navigateToBusiness = navigateToBusiness,
+            navigateToStations = navigateToStations,
             navigateToGuardsScreen = navigateToGuards,
             navigateToGuardShiftScreen = navigateToGuardShift,
             navigateToShiftScreen = navigateToShift,
@@ -93,6 +96,7 @@ fun BottonNavScreen(
             certificationServicesController =certificationServicesController,
             tenantInvitationController = tenantInvitationController,
             invoiceController = invoiceController,
+            postSiteController = postSiteController,
             tenantId = tenantId
         )
     }
@@ -103,7 +107,7 @@ fun BottonNavScreen(
 fun ContentScreen(
     selectedIndex: Int,
     modifier: Modifier,
-    navigateToBusiness: (String) -> Unit = {},
+    navigateToStations: (String) -> Unit = {},
     navigateToGuardsScreen: () -> Unit = {},
     navigateToGuardShiftScreen: () -> Unit ,
     navigateToShiftScreen: () -> Unit,
@@ -114,12 +118,13 @@ fun ContentScreen(
     certificationServicesController: CertificationServicesController,
     tenantInvitationController: TenantInvitationController,
     invoiceController: InvoiceController,
+    postSiteController: PostSiteController,
     tenantId: String
 ){
     when(selectedIndex){
         0-> HomeScreen(Modifier, certificationServicesController, tenantInvitationController, invoiceController,tenantId, navigateToBilling)
 
-        1 -> StationsScreen(Modifier, navigateToBusiness, stationsController)
+        1 -> PostSitesScreen(Modifier, navigateToStations, postSiteController)
 
         2 -> MyAccountScreen(Modifier, authController)
 

@@ -548,7 +548,7 @@ fun VisitLogScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 DropdownCustom(
                     contentList = clientsList.map { it.first },
-                    onSelectedOption = { customer -> selectedCustomer = clientsList.first{ it.second == customer }.second }
+                    onSelectedOption = { customer -> selectedCustomer = clientsList.first{ it.first == customer }.second }
                 )
 
 
@@ -564,7 +564,7 @@ fun VisitLogScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 DropdownCustom(
                     contentList = guardsList.map { it.first },
-                    onSelectedOption = { guard -> selectedGuard = guardsList.first{ it.second == guard }.second }
+                    onSelectedOption = { guard -> selectedGuard = guardsList.first{ it.first == guard }.second }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -580,7 +580,7 @@ fun VisitLogScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 DropdownCustom(
                     contentList = sitesList.map{ it.first },
-                    onSelectedOption = { site -> selectedSite = sitesList.first{ it.second == site }.second }
+                    onSelectedOption = { site -> selectedSite = sitesList.first{ it.first == site }.second }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

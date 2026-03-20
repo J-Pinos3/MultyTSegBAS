@@ -12,6 +12,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontro
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
+import com.seguridadbas.multytenantseguridadbas.controllers.postsitecontrollers.PostSiteController
 import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
@@ -33,6 +34,7 @@ import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
 import com.seguridadbas.multytenantseguridadbas.view.PatrolsByStationScreen
+import com.seguridadbas.multytenantseguridadbas.view.PostSitesScreen
 import com.seguridadbas.multytenantseguridadbas.view.StationsScreen
 import com.seguridadbas.multytenantseguridadbas.view.RegisterScreen
 import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationDetail
@@ -57,6 +59,7 @@ fun SplashNavigation(authController: AuthController,
                      visitLogController: VisitLogController,
                      invoiceController: InvoiceController,
                      tenantInfoController: TenantInfoController,
+                     postSiteController: PostSiteController,
                      deepLinkIntentFlowSocial: SharedFlow<Intent>
                      ) {
 
@@ -82,7 +85,9 @@ fun SplashNavigation(authController: AuthController,
 
         composable <Home>{ backstackEntry ->
             val home =backstackEntry.toRoute<Home>()
-            BottonNavScreen(navController, authController, stationsController, certificationServicesController,tenantInvitationController, invoiceController,home.tenantId)
+            BottonNavScreen(navController, authController, stationsController,
+                certificationServicesController,tenantInvitationController, invoiceController
+                ,postSiteController,home.tenantId)
         }
 
         composable <Register>{
@@ -93,13 +98,26 @@ fun SplashNavigation(authController: AuthController,
             ResetPasswordScreen(authController = authController)
         }
 
-        composable <Sites>{
+        composable <Stations>{ backStackEntry ->
+            val postSiteId = backStackEntry.toRoute<Stations>()
             StationsScreen(
                 Modifier,
                 onStationClicked = { siteName -> navController.navigate(Business(siteName = siteName)) },
-                stationsController = stationsController
+                stationsController = stationsController,
+                postSiteId = postSiteId.postSiteId,
+                navigateBackToPostSites = {navController.popBackStack()}
             )
         }
+
+
+        composable<PostSites>{
+            PostSitesScreen(
+                Modifier,
+                onPostSiteClicked = { postSiteId -> navController.navigate(Stations(postSiteId =postSiteId)) },
+                postSiteController = postSiteController
+            )
+        }
+
 
         composable <Business>{ backStackEntry ->
             val business = backStackEntry.toRoute<Business>()

@@ -68,11 +68,15 @@ class InvoiceController @Inject constructor(
             val items = itemsObj.map { itemElement ->
                 val item = itemElement.asJsonObject
                 Item(
-                    description = item.get("description").asString,
-                    id =  item.get("description").asString,
-                    quantity =  item.get("quantity").asInt,
-                    total =  item.get("total").asDouble,
-                    unitPrice =  item.get("unitPrice").asDouble,
+                    id = item.get("id").asString,
+                        line = item.get("line").asInt,
+                        name = item.get("name").asString,
+                        rate = item.get("rate").asInt,
+                        taxName = item.get("taxName").asString,
+                        taxRate = item.get("taxRate").asInt,
+                        quantity = item.get("quantity").asInt,
+                        lineTotal = item.get("lineTotal").asInt,
+                        taxAmount = item.get("taxAmount").asInt,
                 )
             }
             val paymentObj = row.getAsJsonArray("payments")
@@ -96,7 +100,7 @@ class InvoiceController @Inject constructor(
                     email = clientObj.get("email").asString,
                     id = clientObj.get("id").asString,
                     name = clientObj.get("name").asString,
-                    phone = clientObj.get("phone").asString
+                    phone = clientObj.get("phoneNumber").asString
                 ),
                 clientId = row.get("clientId").asString,
                 createdAt = row.get("createdAt").asString,
@@ -117,7 +121,7 @@ class InvoiceController @Inject constructor(
                             contactPhone = postSiteObj.get("contactPhone").asString,
                             country = postSiteObj.get("country").asString,
                             id = postSiteObj.get("id").asString,
-                            name = postSiteObj.get("name").asString,
+                            description = postSiteObj.get("description").asString,
                 ),
                 postSiteId = row.get("postSiteId").asString ,
                 sentAt = row.get("sentAt").asString ,

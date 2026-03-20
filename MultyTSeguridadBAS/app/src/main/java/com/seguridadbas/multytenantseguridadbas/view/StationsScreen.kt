@@ -15,7 +15,13 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,29 +33,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.station.ShortStation
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
+import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 //@Preview(showSystemUi = true)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StationsScreen(
     modifier: Modifier = Modifier,
     onStationClicked: (String) -> Unit = {},
+    navigateBackToPostSites: () -> Unit = {},
+    postSiteId: String ,//return stations by postSite
     stationsController: StationsController
-
 ){
 
     var token by remember { mutableStateOf("") }
@@ -59,6 +71,9 @@ fun StationsScreen(
 
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
+
+    val scrollVehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
 
     LaunchedEffect(Unit) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -95,18 +110,44 @@ fun StationsScreen(
     }
 
 
+    Scaffold(
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollVehaviour.nestedScrollConnection),
+        topBar = {
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-            .background(color = BasBackground)
-            .statusBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-
-        items(sitesList){ site ->
-            PostSiteItemList(
-                site, modifier, onStationClicked
+            CenterAlignedTopAppBar(
+                title = { Text(text = "Estaciones", fontSize = 18.sp, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(
+                        onClick ={ navigateBackToPostSites() }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_back),
+                            contentDescription = "navigate back to business"
+                        )
+                    }
+                },
+                scrollBehavior = scrollVehaviour,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = BasYellow,
+                    titleContentColor = Color.Black
+                )
             )
+        }
+    ){ paddingVals ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+                .background(color = BasBackground)
+                .padding(paddingVals),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+
+            items(sitesList){ site ->
+                PostSiteItemList(
+                    site, modifier, onStationClicked
+                )
+            }
         }
     }
 
