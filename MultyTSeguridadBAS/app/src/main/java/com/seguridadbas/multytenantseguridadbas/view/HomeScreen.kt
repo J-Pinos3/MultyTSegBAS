@@ -42,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +72,7 @@ import com.seguridadbas.multytenantseguridadbas.view.badgeshome.CertificationBad
 import com.seguridadbas.multytenantseguridadbas.view.badgeshome.ServiceBadgeItems
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -87,6 +89,8 @@ fun HomeScreen(
     tenantId: String,
     onBillingClicked: () -> Unit = {}
 ){
+    val coroutineScope = rememberCoroutineScope()
+
     var currentTenantId by remember { mutableStateOf(tenantId) }
     //token typed by the user
     var verificationCode by remember { mutableStateOf("") }
@@ -102,59 +106,78 @@ fun HomeScreen(
     var dueDateInvoice by remember { mutableStateOf("1999/01/01") }
 
     val context = LocalContext.current
-    val dataStoreController = DataStoreController(context)
+    val dataStoreController = remember{ DataStoreController(context) }
+
 
     LaunchedEffect(currentTenantId) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val storedData = dataStoreController.getDataFromStore().first()
-            userId = dataStoreController.getDataFromStore().first().id
-            userId = userId.replace("\"","").trim()
 
-
-            bearerToken = storedData.token
-            bearerToken = bearerToken.replace("\"","").trim()
-
-            Log.i("Home","token: ${bearerToken.substring(0,6)} and tenantId: $currentTenantId")
-
-            if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
-                val certificationsResult = certificationServicesController.getAllCertifications("Bearer $bearerToken", currentTenantId)
-
-                when(certificationsResult){
-                    is Resource.Success -> {
-                        certificationsList = certificationsResult.data?.toList()!!
-                    }
-                    is Resource.Error -> {
-                        certificationsList = emptyList()
-                        Log.e("Sites","Error al traer los certificados: ${certificationsResult.message}")
-                    }
-                    else -> {Log.e("Sites","No se pudo traer los certificados")}
-                }
-
-                val servicesResult = certificationServicesController.getAllServices("Bearer $bearerToken", currentTenantId)
-
-                when(servicesResult){
-                    is Resource.Success -> {
-                        servicesList = servicesResult.data?.toList()!!
-                    }
-
-                    is Resource.Error -> {
-                        Log.e("Sites","Error al traer los servicios: ${servicesResult.message}")
-                    }
-
-                    else ->{ Log.e("Sites","No se pudo traer los servicios") }
-                }
-
-                loadUpcomingInvoice(
-                    bearerToken, currentTenantId,invoiceController,
-                    onSuccess = {
-                        invoiceAmount = it.total
-                        dueDateInvoice = it.dueDate
-                    },
-                    onError = { errorMsg -> Log.e("home screen invoice", errorMsg)  }
-                )
-            }
+        val storedData = withContext(Dispatchers.IO){
+            dataStoreController.getDataFromStore().first()
         }
 
+        userId = storedData.id
+        userId = userId.replace("\"","").trim()
+
+
+        bearerToken = storedData.token
+        bearerToken = bearerToken.replace("\"","").trim()
+
+        //Log.i("Home","token: ${bearerToken.substring(0,6)} and tenantId: $currentTenantId")
+
+        if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+
+            val (certResult, servicesResult, invoiceResult) = withContext(Dispatchers.IO){
+                val certDeferred = async{
+                    certificationServicesController.getAllCertifications("Bearer $bearerToken", currentTenantId)
+                }
+
+                val servicesDeferred = async{
+                    certificationServicesController.getAllServices("Bearer $bearerToken", currentTenantId)
+                }
+
+                val invoiceDeferred = async{
+                    invoiceController.getAllInvoices("Bearer $bearerToken", currentTenantId)
+                }
+
+                Triple(certDeferred.await(), servicesDeferred.await(), invoiceDeferred.await())
+            }
+
+            when(certResult){
+                is Resource.Success -> certificationsList = certResult.data?.toList() ?: emptyList()
+
+                is Resource.Error ->  {
+                    Log.e("Home", "Error certificados: ${certResult.message}")
+                }
+                else -> Log.e("Home", "No se pudo traer los certificados")
+            }
+
+
+            when (servicesResult) {
+                is Resource.Success -> servicesList = servicesResult.data?.toList() ?: emptyList()
+                is Resource.Error -> Log.e("Home", "Error servicios: ${servicesResult.message}")
+                else -> Log.e("Home", "No se pudo traer los servicios")
+            }
+
+            when (invoiceResult) {
+                is Resource.Success -> {
+                    val upcoming = invoiceResult.data?.sortedBy { it.dueDate }?.firstOrNull()
+                    if (upcoming != null) {
+                        invoiceAmount = upcoming.total
+                        dueDateInvoice = upcoming.dueDate
+                    }
+                }
+                is Resource.Error -> Log.e("Home", "Error factura: ${invoiceResult.message}")
+                else -> Log.e("Home", "No se pudo traer la factura")
+            }
+            /*loadUpcomingInvoice(
+                bearerToken, currentTenantId,invoiceController,
+                onSuccess = {
+                    invoiceAmount = it.total
+                    dueDateInvoice = it.dueDate
+                },
+                onError = { errorMsg -> Log.e("home screen invoice", errorMsg)  }
+            )*/
+        }
 
     }
 
@@ -250,14 +273,16 @@ fun HomeScreen(
             codeTyped = verificationCode,
             onAcceptInvitation = {
 
-                processInvitationAccepted(
-                    "Bearer ${bearerToken}",
-                    verificationCode,
-                    userId,
-                    tenantInvitationController, acceptTokenResponse, { newTenantId->
+                coroutineScope.launch {
+                    processInvitationAccepted(
+                        "Bearer $bearerToken",
+                        verificationCode,
+                        userId,
+                        tenantInvitationController,
+                    ) { newTenantId ->
                         currentTenantId = newTenantId
                     }
-                )
+                }
 
             }
         )
@@ -494,62 +519,22 @@ fun TenantInvitationBadge(
 }
 
 
-private fun processInvitationAccepted(bearerToken: String, verificationCode: String,
-    userId: String, controller: TenantInvitationController, acceptTokenResponse: AcceptTokenResponse,
+private suspend fun processInvitationAccepted(bearerToken: String, verificationCode: String,
+    userId: String, controller: TenantInvitationController,
     onUpdateTenantId: (String) -> Unit = {} ){
-    CoroutineScope(Dispatchers.IO).launch {
-        Log.i("ACCEPT","${bearerToken}\n ${verificationCode}\n, $userId")
-        val result = controller.acceptTenantInvitation(bearerToken, verificationCode, userId)
-        withContext(Dispatchers.Main){
-            when(result){
 
-                is Resource.Success -> {
-                    Log.i("TenantInvitation","Success: ${  !acceptTokenResponse.id.isNullOrEmpty()  }")
-                    onUpdateTenantId( result.data!!.id  )
-                }
-                is Resource.Error -> {
-                    Log.e("TenantInvitation","Error: ${  result.message  }")
-                }
-                else -> {
-                    Log.e("TenantInvitation","No se pudo procesar la invitación")
-                }
-
-            }
-        }
-    }
-}
-
-
-private fun loadUpcomingInvoice(
-    bearerToken: String, tenantId: String,
-    invoiceController: InvoiceController,
-    onSuccess: (AllInvoicesRespData) -> Unit,
-    onError: (String) -> Unit
-){
-
-    CoroutineScope(Dispatchers.IO).launch{
-        if(!bearerToken.isNullOrEmpty() || !tenantId.isNullOrEmpty()){
-            val result = invoiceController.getAllInvoices("Bearer $bearerToken", tenantId)
-
-            withContext(Dispatchers.Main){
-                when(result){
-                    is Resource.Success -> { onSuccess(result.data!!.sortedBy { it.dueDate }[0]) }
-                    is Resource.Error -> {
-                        onError(result.message.toString())
-                        Log.e("home screen invoice", result.message.toString())
-                    }
-                    else -> { onError(result.message.toString())
-                        Log.e("home screen invoice", result.message.toString())
-                    }
-                }
-            }
-        }else{
-            withContext(Dispatchers.Main){
-                onError("token o tenantId inválidos")
-                Log.e("home screen invoice", "errror")
-            }
-        }
+    val result = withContext(Dispatchers.IO){
+        controller.acceptTenantInvitation(bearerToken, verificationCode, userId)
     }
 
+    when (result) {
+        is Resource.Success -> {
+            Log.i("TenantInvitation", "Success: ${result.data?.id}")
+            result.data?.id?.let { onUpdateTenantId(it) }
+        }
+        is Resource.Error -> Log.e("TenantInvitation", "Error: ${result.message}")
+        else -> Log.e("TenantInvitation", "No se pudo procesar la invitación")
+    }
 
 }
+
