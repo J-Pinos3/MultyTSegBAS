@@ -350,7 +350,7 @@ fun LoginScreen(
                 Text("Cargando...")
             }
 
-            if(!showLoginErrorMessage){
+            if(showLoginErrorMessage){
                 Text(
                     text = "Correo o contraseña incorrectos",
                     color = Color.Red,

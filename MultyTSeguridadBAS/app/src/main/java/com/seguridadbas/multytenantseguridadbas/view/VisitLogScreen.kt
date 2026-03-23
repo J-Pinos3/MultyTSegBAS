@@ -895,7 +895,7 @@ private fun loadSitesNames(
 
     CoroutineScope(Dispatchers.IO).launch {
         if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
-            val result = stationsController.getAllStations(bearerToken, tenantId)
+            val result = stationsController.getAllStations(bearerToken, tenantId,"")
 
             withContext(Dispatchers.Main){
                 when(result){

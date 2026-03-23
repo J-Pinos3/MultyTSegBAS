@@ -87,7 +87,7 @@ fun StationsScreen(
             Log.i("Sites","Token: $token \n TenantId: $tenantId")
 
             if( !token.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
-                val result = stationsController.getAllStations("Bearer $token", tenantId)
+                val result = stationsController.getAllStations("Bearer $token", tenantId, postSiteId)
 
                 when(result){
                     is Resource.Success -> {

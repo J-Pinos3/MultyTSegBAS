@@ -21,8 +21,9 @@ class StationsController @Inject constructor(
     private val stationsRepository: StationsRepository
 ): ViewModel() {
 
-    suspend fun getAllStations(token:String, tenantId: String): Resource<List<ShortStation>>{
-        val response = stationsRepository.getAllStationsRepo(token, tenantId)
+    suspend fun getAllStations(token:String, tenantId: String, postSiteId: String?
+    ): Resource<List<ShortStation>>{
+        val response = stationsRepository.getAllStationsRepo(token, tenantId, postSiteId)
 
         return try{
 

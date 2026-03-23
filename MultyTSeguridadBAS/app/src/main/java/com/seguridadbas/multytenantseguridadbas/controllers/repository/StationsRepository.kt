@@ -8,9 +8,8 @@ class StationsRepository @Inject constructor(
 ){
 
     suspend fun getAllStationsRepo(
-        token: String,
-        tenantId: String
-    ) = apiClient.getAllStationsApi(token, tenantId)
+        token: String, tenantId: String, postSiteId: String?
+    ) = apiClient.getAllStationsApi(token, tenantId, postSiteId)
 
 
     suspend fun stationDetailRepo(

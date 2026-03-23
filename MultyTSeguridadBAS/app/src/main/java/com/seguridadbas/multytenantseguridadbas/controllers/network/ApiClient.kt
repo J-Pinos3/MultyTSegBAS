@@ -150,14 +150,15 @@ interface ApiClient {
 
 
     /** 🌍 ENDPOINTS FOR STATIONS */
-    @GET("tenant/{tenantId}/station")
+    @GET("tenant/{tenantId}/stations")
     suspend fun getAllStationsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
+        @Query("filter[postSiteId]") postSiteId: String? = ""
     ): Response<JsonObject>
 
 
-    @GET("tenant/{tenantId}/station/{id}")
+    @GET("tenant/{tenantId}/stations/{id}")
     suspend fun getStationDetailsApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,
