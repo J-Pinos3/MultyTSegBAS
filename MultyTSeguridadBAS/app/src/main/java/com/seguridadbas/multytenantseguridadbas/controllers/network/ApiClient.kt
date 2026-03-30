@@ -227,6 +227,15 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
+    @GET("tenant/{tenantId/incident/{id}")
+    suspend fun getIncidentDetailApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Path("id") id: String
+    ): Response<JsonObject>
+
+
+
     @GET("tenant/{tenantId}/patrol")
     suspend fun getPatrolsByStationApi(
         @Header("Authorization") auth_token: String,
