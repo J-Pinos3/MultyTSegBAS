@@ -56,6 +56,11 @@ data class InventoryByStationDet(val reportId: String)
 @Serializable
 object IncidentsByStationScreen
 
+
+@Serializable
+data class IncidentsDetail(val incidentId: String)
+
+
 @Serializable
 data class Business(val siteName: String)
 

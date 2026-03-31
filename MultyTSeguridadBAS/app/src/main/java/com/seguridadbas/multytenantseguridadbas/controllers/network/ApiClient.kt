@@ -227,7 +227,7 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
-    @GET("tenant/{tenantId/incident/{id}")
+    @GET("tenant/{tenantId}/incident/{id}")
     suspend fun getIncidentDetailApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String,

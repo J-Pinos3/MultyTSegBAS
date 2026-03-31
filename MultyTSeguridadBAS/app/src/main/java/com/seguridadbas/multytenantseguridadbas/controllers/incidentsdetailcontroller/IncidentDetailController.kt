@@ -78,7 +78,7 @@ class IncidentDetailController @Inject constructor(
                         guardName = GuardName(
                             academicInstruction = guardNameObj.get("academicInstruction").asString,
                             address = guardNameObj.get("address").asString,
-                            availability = guardNameObj.get("availability").asString,
+                            availability = guardNameObj.isNullStringField("availability"),
                             birthDate = guardNameObj.get("birthDate").asString,
                             birthPlace = guardNameObj.get("birthPlace").asString,
                             bloodType = guardNameObj.get("bloodType").asString,

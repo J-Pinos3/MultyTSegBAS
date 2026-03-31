@@ -29,6 +29,7 @@ import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftsDetailSc
+import com.seguridadbas.multytenantseguridadbas.view.IncidentsByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.IncidentsByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationScreen
@@ -187,9 +188,21 @@ fun SplashNavigation(authController: AuthController,
             IncidentsByStationScreen(
                 Modifier,
                 navigateBackToBusiness = {navController.popBackStack()},
+                onIncidentClicked = { incidentId -> navController.navigate(IncidentsDetail(incidentId)) },
                 stationsReportsController = stationsReportsController
             )
         }
+
+
+        composable <IncidentsDetail>{ backStackEntry ->
+            val incidentId = backStackEntry.toRoute<IncidentsDetail>().incidentId
+            IncidentsByStationDetail(
+                Modifier,
+                navigateBackToIncidents = {navController.popBackStack()},
+                incidentID = incidentId
+            )
+        }
+
 
         composable <PatrolsByStation>{ backStackEntry ->
             val report = backStackEntry.toRoute<PatrolsByStation>()

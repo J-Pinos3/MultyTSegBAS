@@ -92,7 +92,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
 
-
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
