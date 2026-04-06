@@ -70,6 +70,7 @@ import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import com.seguridadbas.multytenantseguridadbas.view.badgeshome.CertificationBadgeItems
 import com.seguridadbas.multytenantseguridadbas.view.badgeshome.ServiceBadgeItems
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -249,17 +250,22 @@ fun HomeScreen(
 
             titleTexts(  modifier = Modifier.align(Alignment.Start), "Certificaciones y Permisos:"  )
 
-            LazyRow(
-                modifier = Modifier.fillMaxWidth().height(220.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                items(certificationsList){ certification ->
-                    CertificationBadgeItems(
-                        Modifier.width(160.dp).height(200.dp),
-                        certification)
+            if( !certificationsList.isNullOrEmpty() ){
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth().height(220.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    items(certificationsList){ certification ->
+                        CertificationBadgeItems(
+                            Modifier.width(160.dp).height(200.dp),
+                            certification)
+                    }
                 }
+            }else{
+                EmptyReportsState(Modifier, "Problema al conectar con servidores", true)
             }
+
 
             Spacer(modifier = Modifier.height(90.dp) )
 

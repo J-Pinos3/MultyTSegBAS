@@ -1,6 +1,7 @@
 package com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller
 
 import androidx.lifecycle.ViewModel
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.InvoiceRepository
@@ -64,8 +65,8 @@ class InvoiceController @Inject constructor(
         val rows = rowsArray.map { rowElement ->
             val row = rowElement.asJsonObject
             val clientObj = row.getAsJsonObject("client")
-            val itemsObj = row.getAsJsonArray("items")
-            val items = itemsObj.map { itemElement ->
+            val itemsObj = row.isNullArrayField("items")
+            val items = itemsObj?.map { itemElement ->
                 val item = itemElement.asJsonObject
                 Item(
                     id = item.get("id").asString,
@@ -78,9 +79,10 @@ class InvoiceController @Inject constructor(
                         lineTotal = item.get("lineTotal").asInt,
                         taxAmount = item.get("taxAmount").asInt,
                 )
-            }
-            val paymentObj = row.getAsJsonArray("payments")
-            val paymentItem = paymentObj.map { itemElement ->
+            }?:emptyList()
+
+            val paymentObj = row.isNullArrayField("payments")
+            val paymentItem = paymentObj?.map { itemElement ->
                 val item = itemElement.asJsonObject
 
                 Payment(
@@ -89,7 +91,7 @@ class InvoiceController @Inject constructor(
                     id = item.get("id").asString ,
                     method = item.get("method").asString ,
                 )
-            }
+            }?:emptyList()
 
 
             val postSiteObj = row.getAsJsonObject("postSite")
@@ -142,6 +144,10 @@ class InvoiceController @Inject constructor(
 
     private fun JsonObject?.isNullStringField(field: String): String{
         return if(this?.get(field)?.isJsonNull == false) this.get(field).asString else ""
+    }
+
+    private fun JsonObject?.isNullArrayField(field: String): JsonArray?{
+        return if (this?.get(field)?.isJsonNull == false ) this.get(field).asJsonArray else null
     }
 
 }
