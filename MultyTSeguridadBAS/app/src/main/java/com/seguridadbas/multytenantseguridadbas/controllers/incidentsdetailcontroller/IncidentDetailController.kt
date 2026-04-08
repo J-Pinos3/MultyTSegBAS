@@ -123,7 +123,7 @@ class IncidentDetailController @Inject constructor(
                         priority = incidentDetail.get("priority").asString,
                         site = incidentDetail.isNullStringField("site"),
                         siteId = incidentDetail.isNullStringField("siteId"),
-                        station = incidentDetail.isNullStringField("station"),
+                        //station = incidentDetail.isNullStringField("station"),
                         stationId = incidentDetail.get("stationId").asString,
                         stationIncidents = incidentDetail.isNullStringField("stationIncidents"),
                         stationIncidentsId = incidentDetail.isNullStringField("stationIncidentsId"),

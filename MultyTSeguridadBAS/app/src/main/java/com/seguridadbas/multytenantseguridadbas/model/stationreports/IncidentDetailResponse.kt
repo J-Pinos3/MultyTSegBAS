@@ -60,7 +60,7 @@ data class IncidentDetailResponse(
     @SerializedName("siteId")
     val siteId: String? = "",
     @SerializedName("station")
-    val station: String? = "",
+    val station: Any? = null,
     @SerializedName("stationId")
     val stationId: String,
     @SerializedName("stationIncidents")

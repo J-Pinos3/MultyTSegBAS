@@ -131,7 +131,7 @@ fun SplashScreen(
         // dibujo
         if( tenantUrlForImage.isNullOrEmpty() ){
             Image(
-                painter = painterResource(R.drawable.cguardimage),
+                painter = painterResource(R.drawable.miseguridad),
                 contentDescription = "Escudo de bas"
             )
         }else{

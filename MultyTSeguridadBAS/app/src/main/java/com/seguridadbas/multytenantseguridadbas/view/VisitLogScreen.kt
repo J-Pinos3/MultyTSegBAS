@@ -358,11 +358,11 @@ fun VisitLogScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(BasBlue)
-                    .padding(top = 30.dp, bottom = 30.dp),
+                    .padding(top = 5.dp, bottom = 5.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(R.drawable.cguardimage),
+                    painter = painterResource(R.drawable.miseguridad),
                     contentDescription = "Logo de bas"
                 )
             }
