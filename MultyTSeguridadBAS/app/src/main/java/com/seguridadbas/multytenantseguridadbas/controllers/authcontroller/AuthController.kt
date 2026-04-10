@@ -6,11 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.AuthenticationRepository
+import com.seguridadbas.multytenantseguridadbas.core.util.Constants.ALLOWED_ROLE
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.SendEmailVerificationRequest
 import com.seguridadbas.multytenantseguridadbas.model.SignInResponse
+import com.seguridadbas.multytenantseguridadbas.model.TenantLogin
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfile
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
@@ -59,7 +62,7 @@ class AuthController @Inject constructor(
 
     suspend fun signIn(email: String, password: String): Resource<SignInResponse>{
 
-
+        var userRole = ""
         return try{
             val user = User(email, password)
 
@@ -74,16 +77,35 @@ class AuthController @Inject constructor(
                         id = body?.getAsJsonObject("user")?.get("id").toString(),
                         email = body?.getAsJsonObject("user")?.get("email").toString(),
                         firstName = body?.getAsJsonObject("user")?.get("firstName").toString(),
-                        lastName = body?.getAsJsonObject("user")?.get("lastName").toString()
+                        lastName = body?.getAsJsonObject("user")?.get("lastName").toString(),
+                        tenant = TenantLogin(
+                            roles = body?.getAsJsonObject("user")?.getAsJsonObject("tenant")?.getAsJsonArray("roles")?.map {
+                                it.asString
+                            }?:emptyList()
+                        )
+
                     )
                 )
+                userRole = userResponse.user.tenant.roles[0]
 
-                Resource.Success(userResponse)
+                if(userRole == ALLOWED_ROLE){
+                    Resource.Success(userResponse)
+                }else{
+                    Resource.Error("Por favor use la app de guardias")
+                }
+
+
             }else{
-                Resource.Error( response.message().toString() +"--"+
-                        response.errorBody()
-                )
-
+                val errorMessage = try {
+                    val errorJson = response.errorBody()?.string()
+                    JsonParser.parseString(errorJson)
+                        .asJsonObject
+                        .get("message")
+                        ?.asString ?: "Error desconocido"
+                } catch (e: Exception) {
+                    "Error desconocido"
+                }
+                Resource.Error(errorMessage)
             }
         }catch (e: SocketTimeoutException){
             Resource.Error("La conexión ha tardado mucho tiempo")

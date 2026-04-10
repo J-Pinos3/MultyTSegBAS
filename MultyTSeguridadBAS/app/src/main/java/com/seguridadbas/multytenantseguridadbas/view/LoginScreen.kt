@@ -93,6 +93,7 @@ fun LoginScreen(
     var loading by remember { mutableStateOf(false) }
 
     var tenantid by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
     val showMailError = emailText.isNotEmpty() && emailText.contains("@") && emailText.contains(".")
 
@@ -329,12 +330,14 @@ fun LoginScreen(
                             is Resource.Error->{
                                 loading = false
                                 showLoginErrorMessage = true
+                                errorMessage = result.message.toString()
                                 Log.e("LOGIN SCREEN", "error login: ${result.message.toString()}")
                             }
 
                             else ->{
                                 loading = false
                                 showLoginErrorMessage = false
+                                errorMessage = result.message.toString()
                                 Log.e("LOGIN SCREEN", "error al iniciar sesion")
                             }
 
@@ -352,7 +355,7 @@ fun LoginScreen(
 
             if(showLoginErrorMessage){
                 Text(
-                    text = "Correo o contraseña incorrectos",
+                    text = errorMessage,
                     color = Color.Red,
                     modifier = Modifier
                         .padding(top = 6.dp, start = 10.dp)

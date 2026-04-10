@@ -6,5 +6,6 @@ data class UserDataStore(
     val email: String = "",
     val firstName: String = "",
     val lastName: String = "",
-    val tenantId: String = ""
+    val tenantId: String = "",
+    val userRole: String = ""
 )

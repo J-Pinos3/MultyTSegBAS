@@ -14,5 +14,15 @@ data class UserSignInResponse(
     val firstName: String = "",
 
     @SerializedName("lastName")
-    val lastName: String?  = ""
+    val lastName: String?  = "",
+
+    @SerializedName("tenant")
+    val tenant: TenantLogin
+)
+
+
+data class TenantLogin(
+    @SerializedName("roles")
+    val roles: List<String> = listOf(),
+
 )
