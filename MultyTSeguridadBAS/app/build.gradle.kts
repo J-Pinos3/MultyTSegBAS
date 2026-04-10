@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,11 +10,34 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if( localPropsFile.exists() ){
+    localProps.load(  localPropsFile.inputStream()  )
+}
+
+
+
 android {
+
+
+
     namespace = "com.seguridadbas.multytenantseguridadbas"
     compileSdk = 36
 
+    android.buildFeatures.buildConfig = true
+
     defaultConfig {
+
+        buildConfigField(
+            "String",
+            "GOOGLE_MAPS_API_KEY",
+            "\"${localProps["GOOGLE_MAPS_API_KEY"]}\""
+        )
+
+        manifestPlaceholders["googleMapsApiKey"] =
+            localProps["GOOGLE_MAPS_API_KEY"] as String
+
         applicationId = "com.seguridadbas.multytenantseguridadbas"
         minSdk = 26
         targetSdk = 36

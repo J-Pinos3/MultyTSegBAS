@@ -38,7 +38,9 @@ class StationsController @Inject constructor(
                         ShortStation(
                             stationId = it.id,
                             stationName = it.stationName,
-                            stationSchedule = it.stationSchedule
+                            stationSchedule = it.stationSchedule,
+                            latitud = it.latitud,
+                            longitud = it.longitud
                         )
                     }
                 )

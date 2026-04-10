@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.maps.model.CameraPosition
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -47,6 +48,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
@@ -83,6 +85,9 @@ fun BusinessScreen(
     var tenantId by remember { mutableStateOf("") }
     var bearerToken by remember { mutableStateOf("") }
 
+    var latitude by remember { mutableStateOf(0.0) }
+    var longitude by remember { mutableStateOf(0.0) }
+
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
 
@@ -103,6 +108,9 @@ fun BusinessScreen(
                 when(result){
                     is Resource.Success ->{
                         stationData = result.data!!
+                        latitude = result.data.latitude.toDouble()
+                        longitude = result.data.longitude.toDouble()
+                        Log.d("STATION DATA BUSINESSS", "--${result.data.latitude}--  --${result.data.longitude}--" )
                     }
                     is Resource.Error -> {
                         Log.e("SiteDetail","Error al traer los datos del sitio ${result.message.toString()}")
@@ -167,8 +175,8 @@ fun BusinessScreen(
                     .fillMaxWidth()
                     .height(350.dp)
                     .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
-                stationData?.latitude?.toDouble() ?: 0.0,
-                stationData?.longitude?.toDouble() ?: 0.0
+                latitude,
+                longitude
             )
 
             //horario de atencion
@@ -316,21 +324,33 @@ fun BadgeButtonReports(
 
 
 @Composable
-fun CustomGoogleMaps(modifier: Modifier, latitude: Double, longitude: Double){
+fun CustomGoogleMaps(modifier: Modifier, latitude: Double, longitude: Double) {
 
-    val marker = LatLng(latitude, longitude)
-    val properties by remember { mutableStateOf( MapProperties(mapType = MapType.TERRAIN, isTrafficEnabled = true ) ) }
+    val position = remember(latitude, longitude) {
+        LatLng(latitude, longitude)
+    }
 
-    val uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = true)) }
+    val cameraState = rememberCameraPositionState()
+
+    // ✅ Crea el markerState fuera del GoogleMap para poder actualizarlo
+    val markerState = rememberMarkerState()
+
+    LaunchedEffect(latitude, longitude) {
+        if (latitude != 0.0 && longitude != 0.0) {
+            cameraState.position = CameraPosition.fromLatLngZoom(position, 15f)
+            markerState.position = position  // 👈 actualiza el marker también
+        }
+    }
 
     GoogleMap(
         modifier = modifier.padding(10.dp),
-        properties = properties,
-        uiSettings = uiSettings,
-    ){
+        cameraPositionState = cameraState,
+        properties = MapProperties(mapType = MapType.NORMAL),
+        uiSettings = MapUiSettings(zoomControlsEnabled = true)
+    ) {
         Marker(
-            state = rememberMarkerState(position = marker),
-            title = "Ubicación del guardia?"
+            state = markerState,  // 👈 usa el mismo state que actualizas arriba
+            title = "Ubicación de la estación"
         )
     }
 }
