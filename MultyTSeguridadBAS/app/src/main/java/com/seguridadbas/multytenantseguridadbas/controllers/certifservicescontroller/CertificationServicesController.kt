@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.CertificationServicesRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
+import com.seguridadbas.multytenantseguridadbas.model.bannersuperiormodel.BannerSuperiorResponse
 import com.seguridadbas.multytenantseguridadbas.model.certifications.AllCertificationsResponse
 import com.seguridadbas.multytenantseguridadbas.model.certifications.CertificationDataResponse
 import com.seguridadbas.multytenantseguridadbas.model.guard_shifts.ShortGuardShift
@@ -122,6 +123,36 @@ class CertificationServicesController @Inject constructor(
         }
     }
 
+
+    suspend fun getBannerSuperior(
+        token: String, tenantId: String
+    ): Resource<BannerSuperiorResponse>{
+        val response = certificationServicesRepository.getBannerSuperiorRepo(token, tenantId)
+
+        return try{
+            if(response.isSuccessful && response.body() != null){
+                val jsonBody = response.body()!!
+
+                Resource.Success(
+                    BannerSuperiorResponse(
+                        title = jsonBody.get("title").asString,
+                        downloadUrl = jsonBody.get("downloadUrl").asString
+                    )
+                )
+            }else{
+                Resource.Error(response.message().toString() + "--" + response.raw().message )
+            }
+
+
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión ha tardado mucho tiempo")
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                is IOException -> { Resource.Error(ex.message.toString()) }
+            }
+        }
+    }
 
     private fun parseAllCertificationsResponse(jsonObject: JsonObject): AllCertificationsResponse {
 

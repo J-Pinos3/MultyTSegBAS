@@ -182,6 +182,13 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
+    @GET("tenant/{tenantId}/banner-superior-app")
+    suspend fun getBannerSuperiorApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String
+    ): Response<JsonObject>
+
+
     /** 🏠 ENDPOINTS FOR REPORTS FOR A GIVEN STATION*/
     @GET("tenant/{tenantId}/guard-shift")
     suspend fun getGuardShiftsByStationApi(

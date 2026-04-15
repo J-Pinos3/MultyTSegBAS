@@ -18,4 +18,10 @@ class CertificationServicesRepository @Inject constructor(
         token: String,
         tenantId: String
     ) = apiClient.getAllServicesApi(token, tenantId)
+
+
+    suspend fun getBannerSuperiorRepo(
+        token: String,
+        tenantId: String
+    ) = apiClient.getBannerSuperiorApi(token, tenantId)
 }
