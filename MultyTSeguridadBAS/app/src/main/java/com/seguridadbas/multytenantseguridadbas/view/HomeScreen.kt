@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
@@ -105,6 +106,7 @@ fun HomeScreen(
 
     var invoiceAmount by remember { mutableStateOf("$0.00") }
     var dueDateInvoice by remember { mutableStateOf("1999/01/01") }
+    var bannerImage by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val dataStoreController = remember{ DataStoreController(context) }
@@ -126,6 +128,13 @@ fun HomeScreen(
         //Log.i("Home","token: ${bearerToken.substring(0,6)} and tenantId: $currentTenantId")
 
         if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
+            val imageResult = withContext(Dispatchers.IO){
+                val deferred= async{
+                    certificationServicesController.getBannerSuperior("Bearer $bearerToken", currentTenantId)
+                }
+
+                deferred.await()
+            }
 
             val (certResult, servicesResult, invoiceResult) = withContext(Dispatchers.IO){
                 val certDeferred = async{
@@ -141,6 +150,14 @@ fun HomeScreen(
                 }
 
                 Triple(certDeferred.await(), servicesDeferred.await(), invoiceDeferred.await())
+            }
+            when(imageResult){
+                is Resource.Success -> bannerImage = imageResult.data?.downloadUrl.toString()
+
+                is Resource.Error ->  {
+                    Log.e("Home", "Error banner superior: ${imageResult.message}")
+                }
+                else -> Log.e("Home", "No se pudo traer el banner superior")
             }
 
             when(certResult){
@@ -208,10 +225,19 @@ fun HomeScreen(
                     .background(BasBlue)
                     .padding(top = 5.dp, bottom = 5.dp)
             ){
-                Image(
-                    painter = painterResource(R.drawable.miseguridad),
-                    contentDescription = "Logo de bas"
-                )
+                if(bannerImage.isNullOrEmpty()){
+                    Image(
+                        painter = painterResource(R.drawable.miseguridad),
+                        contentDescription = "Logo de bas"
+                    )
+                }else{
+                    AsyncImage(
+                        model = bannerImage,
+                        contentDescription = "banner image",
+                        error = painterResource(R.drawable.miseguridad)
+                    )
+                }
+
             }
 
             Spacer(modifier = Modifier.padding(top = 10.dp))
