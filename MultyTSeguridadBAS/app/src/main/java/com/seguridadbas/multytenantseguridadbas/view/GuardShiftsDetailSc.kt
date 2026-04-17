@@ -49,6 +49,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.text.substring
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,14 +159,14 @@ fun GuardShiftsDetailSc(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text=guardShiftData?.startingTimeInDay?:"00:00:00",//hora inicio
+                text=guardShiftData?.startingTimeInDay?.substring(0,10)?:"00:00:00",//hora inicio
                 fontSize = 14.sp,
             )
             Spacer(modifier = modifier.height(8.dp))
             Text(
                 //finishtimeinday
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text=guardShiftData?.finishTimeInDay ?:"00:00:00",//hora finalizacion
+                text=guardShiftData?.finishTimeInDay?.substring(0,10) ?:"00:00:00",//hora finalizacion
                 fontSize = 14.sp,
             )
 
@@ -179,7 +180,7 @@ fun GuardShiftsDetailSc(
             ){
                 //stationschedule
                 Text(
-                    text=guardShiftData?.shiftSchedule ?:"",
+                    text=guardShiftData?.shiftSchedule?.substring(0,10) ?:"",
                     fontSize = 14.sp,
                 )
 
@@ -240,7 +241,7 @@ fun GuardShiftsDetailSc(
             Text(
                 //punch in time, inicio del turno-patrullaje
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Inicio del turno: ${guardShiftData?.punchInTime}",
+                text="Inicio del turno: ${guardShiftData?.punchInTime?.substring(0,10)}",
                 fontSize = 14.sp
             )
             Spacer(modifier = modifier.height(8.dp))
@@ -248,7 +249,7 @@ fun GuardShiftsDetailSc(
             Text(
                 //punch out time, inicio del turno-patrullaje
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Fin del turno: ${guardShiftData?.punchOutTime}",
+                text="Fin del turno: ${guardShiftData?.punchOutTime?.substring(0,10)}",
                 fontSize = 14.sp
             )
 

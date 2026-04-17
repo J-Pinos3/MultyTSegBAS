@@ -236,7 +236,7 @@ private fun ReportByStationItem(
             Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = "Hora de inicio: ${report.scheduledTime}"  ,
+                text = "Hora de inicio: ${report.scheduledTime.substring(0,10)}"  ,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold
@@ -245,7 +245,7 @@ private fun ReportByStationItem(
             Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = "Hora de finalización: ${report.completionTime}"  ,
+                text = "Hora de finalización: ${report.completionTime.substring(0,10)}"  ,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold

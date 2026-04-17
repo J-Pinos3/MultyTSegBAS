@@ -220,7 +220,7 @@ private fun GuardShiftByStationItem(
            Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = report.shiftSchedule,
+                text = report.shiftSchedule.substring(0,10),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold
@@ -229,7 +229,7 @@ private fun GuardShiftByStationItem(
             Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = report.stationName.stationSchedule  ,
+                text = report.stationName.stationSchedule,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold

@@ -430,7 +430,7 @@ private fun ShiftItem(
             Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = shift.startDate,
+                text = shift.startDate.substring(0,10),
                 maxLines = 3,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,

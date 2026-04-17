@@ -43,6 +43,7 @@ import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.
 import com.seguridadbas.multytenantseguridadbas.controllers.postsitecontrollers.PostSiteController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -126,10 +127,7 @@ fun PostSitesScreen(
 
             // Opcional: Mensaje si no hay datos
             if (postSitesList.isEmpty()) {
-                Text(
-                    text = "Cargando sitios...",
-                    modifier = Modifier.padding(16.dp)
-                )
+                EmptyReportsState(Modifier, "Problema al conectar con servidores", true)
             }
         }
 

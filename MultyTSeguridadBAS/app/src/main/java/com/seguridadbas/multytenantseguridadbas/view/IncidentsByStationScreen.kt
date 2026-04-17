@@ -309,8 +309,8 @@ private fun DateRangeDialog(
     onDismiss: () -> Unit,
     onConfirm: (String?, String?) -> Unit,
 ) {
-    var startDate by remember { mutableStateOf<String?>(null) }
-    var endDate by remember { mutableStateOf<String?>(null) }
+    var startDate by remember { mutableStateOf<String?>("") }
+    var endDate by remember { mutableStateOf<String?>("") }
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
@@ -481,7 +481,7 @@ private fun IncidentByStationItem(
             Spacer(modifier = Modifier.padding(top = 6.dp))
 
             Text(
-                text = report.date,
+                text = report.date.substring(0,10),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold

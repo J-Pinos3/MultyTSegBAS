@@ -158,13 +158,13 @@ fun ReportsByStationDetail(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 20.dp),
-                text = reportData?.station?.startingTimeInDay ?: "00:00:0",
+                text = reportData?.station?.startingTimeInDay?.substring(0,10) ?: "00:00:0",
                 fontSize = 14.sp
             )
             Spacer(modifier = modifier.height(8.dp))
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 20.dp),
-                text = reportData?.station?.finishTimeInDay ?: "00:00:0",
+                text = reportData?.station?.finishTimeInDay?.substring(0,10) ?: "00:00:0",
                 fontSize = 14.sp
             )
             Spacer(modifier = modifier.height(8.dp))
@@ -195,7 +195,7 @@ fun ReportsByStationDetail(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text=reportData?.generatedDate ?: "----",
+                text=reportData?.generatedDate?.substring(0,10) ?: "----",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )

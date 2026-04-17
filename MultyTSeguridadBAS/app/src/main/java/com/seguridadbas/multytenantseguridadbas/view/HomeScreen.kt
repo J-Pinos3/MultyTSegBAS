@@ -247,17 +247,21 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.padding(top = 10.dp))
 
-            LazyRow(
-                modifier = Modifier.fillMaxWidth().height(200.dp),
-                //verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                items(servicesList){ service ->
-                    ServiceBadgeItems(
-                        Modifier.fillMaxWidth().width(160.dp).height(200.dp),
-                        service
-                    )
+            if(!servicesList.isNullOrEmpty()){
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    //verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    items(servicesList){ service ->
+                        ServiceBadgeItems(
+                            Modifier.fillMaxWidth().width(160.dp).height(200.dp),
+                            service
+                        )
+                    }
                 }
+            }else{
+                EmptyReportsState(Modifier, "Problema al conectar con servidores", true)
             }
 
             Spacer(modifier = Modifier.padding(top = 30.dp))

@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.text.substring
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -242,7 +243,7 @@ fun GuardShiftByStationDetail (
             Text(
                 //punch in time, inicio del turno-patrullaje
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Inicio del turno: ${guardShiftData?.punchInTime}",
+                text="Inicio del turno: ${guardShiftData?.punchInTime?.substring(0,10)}",
                 fontSize = 14.sp
             )
             Spacer(modifier = modifier.height(8.dp))
@@ -250,7 +251,7 @@ fun GuardShiftByStationDetail (
             Text(
                 //punch out time, inicio del turno-patrullaje
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text="Fin del turno: ${guardShiftData?.punchOutTime}",
+                text="Fin del turno: ${guardShiftData?.punchOutTime?.substring(0,10)}",
                 fontSize = 14.sp
             )
 

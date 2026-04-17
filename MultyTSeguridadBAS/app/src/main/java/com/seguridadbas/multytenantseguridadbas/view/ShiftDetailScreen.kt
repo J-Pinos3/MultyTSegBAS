@@ -175,13 +175,13 @@ fun ShiftDetailScreen(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = shiftData?.startingTimeInDay ?: "00:00:00", fontSize = 16.sp,
+                text = shiftData?.startingTimeInDay?.substring(0,10) ?: "00:00:00", fontSize = 16.sp,
             )
             Spacer(modifier = modifier.height(8.dp))
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = shiftData?.finishTimeInDay ?: "00:00:00", fontSize = 16.sp,
+                text = shiftData?.finishTimeInDay?.substring(0,10) ?: "00:00:00", fontSize = 16.sp,
             )
             Spacer(modifier = modifier.height(8.dp))
 
@@ -193,13 +193,13 @@ fun ShiftDetailScreen(
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = "Comienzo del turno: ${shiftData?.startTime}", fontSize = 16.sp,
+                text = "Comienzo del turno: ${shiftData?.startTime?.substring(0,10)}", fontSize = 16.sp,
             )
             Spacer(modifier = modifier.height(8.dp))
 
             Text(
                 modifier = modifier.align(Alignment.Start).padding(start = 10.dp),
-                text = "Fin del turno: ${shiftData?.endTime}", fontSize = 16.sp,
+                text = "Fin del turno: ${shiftData?.endTime?.substring(0,10)}", fontSize = 16.sp,
             )
             Spacer(modifier = modifier.height(8.dp))
         }
