@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.postsitecontrollers.PostSiteController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
@@ -53,7 +54,7 @@ import kotlinx.coroutines.withContext
 fun PostSitesScreen(
     modifier: Modifier = Modifier,
     onPostSiteClicked: (String) -> Unit = {},
-    postSiteController: PostSiteController
+    postSiteController: PostSiteController = hiltViewModel()
 ){
 
     var token  by remember { mutableStateOf("") }

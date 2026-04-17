@@ -29,12 +29,6 @@ import com.seguridadbas.multytenantseguridadbas.core.navigation.VisitorLogsScree
 @Composable
 fun BottonNavScreen(
     navController: NavController,
-    authController: AuthController,
-    stationsController: StationsController,
-    certificationServicesController: CertificationServicesController,
-    tenantInvitationController: TenantInvitationController,
-    invoiceController: InvoiceController,
-    postSiteController: PostSiteController,
     tenantId: String
 ){
     var selectedIndex by remember{ mutableStateOf(0) }
@@ -91,12 +85,6 @@ fun BottonNavScreen(
             navigateToShiftScreen = navigateToShift,
             navigateToBilling = navigateToBilling,
             navigateToVisitLog = navigateToVisitLog,
-            authController = authController,
-            stationsController = stationsController,
-            certificationServicesController =certificationServicesController,
-            tenantInvitationController = tenantInvitationController,
-            invoiceController = invoiceController,
-            postSiteController = postSiteController,
             tenantId = tenantId
         )
     }
@@ -113,20 +101,14 @@ fun ContentScreen(
     navigateToShiftScreen: () -> Unit,
     navigateToBilling: () -> Unit,
     navigateToVisitLog: () -> Unit,
-    authController: AuthController,
-    stationsController: StationsController,
-    certificationServicesController: CertificationServicesController,
-    tenantInvitationController: TenantInvitationController,
-    invoiceController: InvoiceController,
-    postSiteController: PostSiteController,
     tenantId: String
 ){
     when(selectedIndex){
-        0-> HomeScreen(Modifier, certificationServicesController, tenantInvitationController, invoiceController,tenantId, navigateToBilling)
+        0-> HomeScreen(Modifier, tenantId = tenantId, onBillingClicked= navigateToBilling)
 
-        1 -> PostSitesScreen(Modifier, navigateToStations, postSiteController)
+        1 -> PostSitesScreen(Modifier, navigateToStations)
 
-        2 -> MyAccountScreen(Modifier, authController)
+        2 -> MyAccountScreen(Modifier)
 
         3 -> MoreScreen(Modifier,
             navigateToGuardsScreen,

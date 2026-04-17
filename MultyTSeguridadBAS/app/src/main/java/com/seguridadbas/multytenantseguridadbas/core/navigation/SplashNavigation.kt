@@ -48,19 +48,7 @@ import com.seguridadbas.multytenantseguridadbas.view.VisitLogScreen
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
-fun SplashNavigation(authController: AuthController,
-                     stationsController: StationsController,
-                     certificationServicesController: CertificationServicesController,
-                     stationsReportsController: StationReportsController,
-                     tenantGuardsController: TenantGuardsController,
-                     guardShiftsController: GuardShiftsController,
-                     shiftsController: ShiftsController,
-                     billingAccountController: BillingAccountController,
-                     tenantInvitationController: TenantInvitationController,
-                     visitLogController: VisitLogController,
-                     invoiceController: InvoiceController,
-                     tenantInfoController: TenantInfoController,
-                     postSiteController: PostSiteController,
+fun SplashNavigation( billingAccountController: BillingAccountController,
                      deepLinkIntentFlowSocial: SharedFlow<Intent>
                      ) {
 
@@ -69,7 +57,6 @@ fun SplashNavigation(authController: AuthController,
         composable<Splash>{
             SplashScreen(
                 "Cguard",   {  navController.navigate(Login)      },
-                tenantInfoController
             )
         }
 
@@ -80,23 +67,20 @@ fun SplashNavigation(authController: AuthController,
                 { navController.navigate(ResetPasswordSc) },
                 { navController.navigate(Register) },
                 deepLinkIntentFlow = deepLinkIntentFlowSocial,
-                authController = authController
             )
         }
 
         composable <Home>{ backstackEntry ->
             val home =backstackEntry.toRoute<Home>()
-            BottonNavScreen(navController, authController, stationsController,
-                certificationServicesController,tenantInvitationController, invoiceController
-                ,postSiteController,home.tenantId)
+            BottonNavScreen(navController, home.tenantId)
         }
 
         composable <Register>{
-            RegisterScreen(authController = authController)
+            RegisterScreen()
         }
 
         composable<ResetPasswordSc>{
-            ResetPasswordScreen(authController = authController)
+            ResetPasswordScreen()
         }
 
         composable <Stations>{ backStackEntry ->
@@ -104,7 +88,6 @@ fun SplashNavigation(authController: AuthController,
             StationsScreen(
                 Modifier,
                 onStationClicked = { siteName -> navController.navigate(Business(siteName = siteName)) },
-                stationsController = stationsController,
                 postSiteId = postSiteId.postSiteId,
                 navigateBackToPostSites = {navController.popBackStack()}
             )
@@ -115,7 +98,6 @@ fun SplashNavigation(authController: AuthController,
             PostSitesScreen(
                 Modifier,
                 onPostSiteClicked = { postSiteId -> navController.navigate(Stations(postSiteId =postSiteId)) },
-                postSiteController = postSiteController
             )
         }
 
@@ -129,8 +111,7 @@ fun SplashNavigation(authController: AuthController,
                 onReportsByStationClicked = { siteId ->navController.navigate(ReportsByStation(siteId)) },
                 onIncidentsByStationClicked = { navController.navigate(IncidentsByStationScreen) },
                 onPatrolsByStationClicked = { siteId -> navController.navigate(PatrolsByStation(siteId)) },
-                onInventoryByStationClicked = { navController.navigate(InventoryByStation) },
-                stationsController = stationsController)
+                onInventoryByStationClicked = { navController.navigate(InventoryByStation) },)
         }
 
         composable <GuarShiftByStationReport>{ backStackEntry ->
@@ -140,7 +121,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 navigateBackToBusiness = { navController.popBackStack() },
                 onGuardShiftReportClicked = { reportId -> navController.navigate(GuarShiftStationReprDetail(reportId)) },
-                stationsReportsController = stationsReportsController
             )
         }
 
@@ -153,7 +133,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 reportId = report.reportId,
                 navigateBackToGuardShiftsByStation = {navController.popBackStack()},
-                stationReportsController = stationsReportsController
             )
         }
 
@@ -167,7 +146,6 @@ fun SplashNavigation(authController: AuthController,
                 navigateBackToBusiness = { navController.popBackStack() },
                 // ↓ reportId -> navController.navigate(GuarShiftStationReprDetail(reportId))
                 onStationReportClicked = { reportId -> navController.navigate(ReportsByStationDetail(reportId))  },
-                stationsReportsController = stationsReportsController
 
             )
 
@@ -180,7 +158,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 reportId = report.reportId,
                 navigateBackToReportsByStation = {navController.popBackStack()},
-                stationReportsController = stationsReportsController
             )
         }
 
@@ -189,7 +166,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 navigateBackToBusiness = {navController.popBackStack()},
                 onIncidentClicked = { incidentId -> navController.navigate(IncidentsDetail(incidentId)) },
-                stationsReportsController = stationsReportsController
             )
         }
 
@@ -211,7 +187,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 siteId = report.siteId,
                 navigateBackToBusiness = {navController.popBackStack()},
-                stationsReportsController = stationsReportsController
             )
         }
 
@@ -221,7 +196,6 @@ fun SplashNavigation(authController: AuthController,
                 navigateBackToBusiness = {navController.popBackStack()},
                 //reportId -> navController.navigate(ReportsByStationDetail(reportId))
                 onInventoryReportClicked = { reportiD -> navController.navigate( InventoryByStationDet(reportiD) ) },
-                stationsReportsController
             )
         }
 
@@ -231,7 +205,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 reportId = report.reportId,
                 navigateBackToInventoryByStat = {navController.popBackStack()},
-                stationsReportsController = stationsReportsController
             )
         }
 
@@ -240,7 +213,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 navigateBackToMore = {navController.popBackStack()},
                 onGuardClicked = { guardId -> navController.navigate(GuardsScreenDetail(guardId)) },
-                tenantGuardsController = tenantGuardsController
             )
         }
 
@@ -249,7 +221,6 @@ fun SplashNavigation(authController: AuthController,
             SecGuardDetail(
                 Modifier, guardId = guard.guardId,
                 navigateBackToAllGuards = { navController.popBackStack() },
-                tenantGuardsController = tenantGuardsController
             )
         }
 
@@ -258,7 +229,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 navigateBackToMore = { navController.popBackStack() },
                 onGuardShiftClicked = { guardShiftId -> navController.navigate(GuardsShiftDetail(guardShiftId)) },
-                guardShiftsController = guardShiftsController
             )
         }
 
@@ -268,8 +238,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 id.guardShiftId,
                 navigateBackToAllGuardsShifts = { navController.popBackStack() },
-                guardShiftsController
-
             )
         }
 
@@ -279,7 +247,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 navigateBackToMore = { navController.popBackStack()  },
                 onShiftClicked = { shiftId -> navController.navigate(ShiftDetailsSc(shiftId)) },
-                shiftsController = shiftsController
             )
         }
 
@@ -289,7 +256,6 @@ fun SplashNavigation(authController: AuthController,
                 Modifier,
                 id,
                 navigateBackToShifts = { navController.popBackStack() },
-                shiftsController
             )
         }
 
@@ -306,10 +272,6 @@ fun SplashNavigation(authController: AuthController,
             VisitLogScreen(
                 Modifier,
                 navigateBackToMore = { navController.popBackStack() },
-                visitLogController = visitLogController,
-                billingAccountController = billingAccountController,
-                stationsController = stationsController,
-                tenantGuardsController = tenantGuardsController
             )
 
         }

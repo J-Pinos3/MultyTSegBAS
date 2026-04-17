@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
@@ -54,7 +55,7 @@ import kotlinx.coroutines.withContext
 //@Preview(showSystemUi = true)
 @Composable
 fun RegisterScreen(
-    authController: AuthController
+    authController: AuthController = hiltViewModel()
 ){
 
     /** AÑADIR VOLVER AL  LOGIN

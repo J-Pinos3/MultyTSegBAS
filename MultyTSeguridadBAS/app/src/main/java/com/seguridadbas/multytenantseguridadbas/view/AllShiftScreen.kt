@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
@@ -79,7 +80,7 @@ fun AllShiftScreen(
     modifier: Modifier = Modifier,
     navigateBackToMore: () -> Unit,
     onShiftClicked: (shiftId: String) -> Unit = {},
-    shiftsController: ShiftsController
+    shiftsController: ShiftsController = hiltViewModel()
 ){
 
     var allShifts by remember { mutableStateOf( emptyList<ShortShiftData>() ) }

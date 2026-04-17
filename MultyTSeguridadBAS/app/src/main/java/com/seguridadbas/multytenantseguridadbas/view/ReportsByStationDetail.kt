@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
@@ -54,7 +55,7 @@ fun ReportsByStationDetail(
     modifier: Modifier = Modifier,
     reportId: String = "",
     navigateBackToReportsByStation: () -> Unit = {},
-    stationReportsController: StationReportsController
+    stationReportsController: StationReportsController = hiltViewModel()
 ) {
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()

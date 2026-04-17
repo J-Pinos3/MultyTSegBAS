@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
@@ -47,7 +48,7 @@ import kotlinx.coroutines.withContext
 //@Preview(showSystemUi = true)
 @Composable
 fun ResetPasswordScreen(
-    authController: AuthController
+    authController: AuthController = hiltViewModel()
 ){
 
     var emailText by remember { mutableStateOf("") }

@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
 
 import com.google.android.gms.maps.model.LatLng
@@ -78,7 +79,7 @@ fun BusinessScreen(
     onIncidentsByStationClicked: ()->Unit = {},
     onPatrolsByStationClicked: (siteId: String) -> Unit = {},
     onInventoryByStationClicked: () -> Unit = {},
-    stationsController: StationsController
+    stationsController: StationsController = hiltViewModel()
 ) {
 
     var stationData by remember { mutableStateOf<StationData?>(null) }

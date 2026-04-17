@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
@@ -61,7 +62,7 @@ fun StationsScreen(
     onStationClicked: (String) -> Unit = {},
     navigateBackToPostSites: () -> Unit = {},
     postSiteId: String ,//return stations by postSite
-    stationsController: StationsController
+    stationsController: StationsController = hiltViewModel()
 ){
 
     var token by remember { mutableStateOf("") }

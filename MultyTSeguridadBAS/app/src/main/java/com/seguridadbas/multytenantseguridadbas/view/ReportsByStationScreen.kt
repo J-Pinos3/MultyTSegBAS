@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
@@ -64,7 +65,7 @@ fun ReportsByStationScreen(
     modifier: Modifier = Modifier,
     navigateBackToBusiness: () -> Unit = {},
     onStationReportClicked: (reportId: String) -> Unit = {},
-    stationsReportsController: StationReportsController
+    stationsReportsController: StationReportsController = hiltViewModel()
 ){
 
     var siteReports by remember { mutableStateOf(emptyList<ReportsByStationData>()) }

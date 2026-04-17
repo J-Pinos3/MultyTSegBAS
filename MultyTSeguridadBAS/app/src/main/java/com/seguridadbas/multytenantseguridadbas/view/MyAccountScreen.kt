@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
@@ -58,7 +59,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun MyAccountScreen(
     modifier: Modifier = Modifier,
-    authController: AuthController
+    authController: AuthController = hiltViewModel()
 ) {
 
     var oldPassword by remember { mutableStateOf("") }

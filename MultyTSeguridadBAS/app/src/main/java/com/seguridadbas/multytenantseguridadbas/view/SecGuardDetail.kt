@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.datastorecontroller.DataStoreController
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantguardscontroller.TenantGuardsController
@@ -54,7 +55,7 @@ fun SecGuardDetail(
     modifier: Modifier = Modifier,
     guardId: String = "",
     navigateBackToAllGuards: () -> Unit = {},
-    tenantGuardsController: TenantGuardsController
+    tenantGuardsController: TenantGuardsController = hiltViewModel()
 ) {
 
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()

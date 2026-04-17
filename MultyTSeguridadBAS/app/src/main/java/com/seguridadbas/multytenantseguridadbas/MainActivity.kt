@@ -29,22 +29,8 @@ import kotlin.getValue
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val authController by viewModels<AuthController>()
-    private val stationsController by viewModels<StationsController>()
-    private val certificationServicesController by viewModels<CertificationServicesController>()
-    private val stationsReportsController by viewModels<StationReportsController>()
-    private val tenantGuardsController by viewModels<TenantGuardsController>()
-    private val guardShiftsController by viewModels<GuardShiftsController>()
-    private val shiftsController by viewModels<ShiftsController>()
+
     private val billingAccountController by viewModels<BillingAccountController>()
-    private val tenantInvitationController by viewModels<TenantInvitationController>()
-    private val visitLogController by viewModels<VisitLogController>()
-    private val invoiceController by viewModels<InvoiceController>()
-    private val tenantInfoController by viewModels<TenantInfoController>()
-    private val postSiteController by viewModels<PostSiteController>()
-
-
-
 
     val deepLinkIntentFlowSocial = MutableSharedFlow<Intent>(replay = 1)
 
@@ -61,19 +47,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MultyTenantSeguridadBASTheme {
                 SplashNavigation(
-                    authController,
-                    stationsController,
-                    certificationServicesController,
-                    stationsReportsController,
-                    tenantGuardsController,
-                    guardShiftsController,
-                    shiftsController,
                     billingAccountController,
-                    tenantInvitationController,
-                    visitLogController,
-                    invoiceController,
-                    tenantInfoController,
-                    postSiteController,
                     deepLinkIntentFlowSocial,
                 )
                 //SplashScreen()

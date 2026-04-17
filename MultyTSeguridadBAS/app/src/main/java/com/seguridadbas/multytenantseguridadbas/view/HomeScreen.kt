@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
@@ -85,9 +86,9 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    certificationServicesController: CertificationServicesController,
-    tenantInvitationController: TenantInvitationController,
-    invoiceController: InvoiceController,
+    certificationServicesController: CertificationServicesController = hiltViewModel(),
+    tenantInvitationController: TenantInvitationController = hiltViewModel(),
+    invoiceController: InvoiceController = hiltViewModel(),
     tenantId: String,
     onBillingClicked: () -> Unit = {}
 ){

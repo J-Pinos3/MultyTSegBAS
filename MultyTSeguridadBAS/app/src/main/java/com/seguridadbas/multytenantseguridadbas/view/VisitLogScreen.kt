@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.chargemap.compose.numberpicker.ListItemPicker
 import com.chargemap.compose.numberpicker.NumberPicker
@@ -64,10 +65,10 @@ import java.util.Date
 @Composable
 fun VisitLogScreen(
     modifier: Modifier = Modifier,
-    visitLogController: VisitLogController,
-    billingAccountController: BillingAccountController,//to get clients
-    stationsController: StationsController, //to get stations
-    tenantGuardsController: TenantGuardsController, //to get security guards
+    visitLogController: VisitLogController =hiltViewModel(),
+    billingAccountController: BillingAccountController = hiltViewModel(),//to get clients
+    stationsController: StationsController = hiltViewModel(), //to get stations
+    tenantGuardsController: TenantGuardsController = hiltViewModel(), //to get security guards
     navigateBackToMore: () -> Unit = {}
 ) {
 
