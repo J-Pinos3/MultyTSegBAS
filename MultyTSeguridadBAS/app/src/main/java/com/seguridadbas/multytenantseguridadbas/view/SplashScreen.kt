@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +39,7 @@ import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.tenantinfo.TenantInfoResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
+import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGrayDark
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -110,7 +113,7 @@ fun SplashScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BasYellow)
+                .background(BasGrayDark)
                 .padding(top = 40.dp, bottom = 40.dp)
         )
 
@@ -132,7 +135,8 @@ fun SplashScreen(
         // dibujo
         if( tenantUrlForImage.isNullOrEmpty() ){
             Image(
-                painter = painterResource(R.drawable.miseguridad),
+                modifier = Modifier.height(300.dp).fillMaxWidth(),
+                painter = painterResource(R.drawable.miseguridad_eyebgless),
                 contentDescription = "Escudo de bas"
             )
         }else{

@@ -3,6 +3,7 @@ package com.seguridadbas.multytenantseguridadbas.controllers.tenantguardscontrol
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.TenantGuardsRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
@@ -103,10 +104,16 @@ class TenantGuardsController @Inject constructor(
 
                 )
             }else{
-                Resource.Error(
-                    response.message().toString() + " -- " +
-                    response.raw().toString()
-                )
+                val errorMessage = try {
+                    val errorJson = response.errorBody()?.string()
+                    JsonParser.parseString(errorJson)
+                        .asJsonObject
+                        .get("message")
+                        ?.asString ?: "Error desconocido"
+                } catch (e: Exception) {
+                    "Error desconocido"
+                }
+                Resource.Error(errorMessage)
             }
 
         }catch (e: SocketTimeoutException){

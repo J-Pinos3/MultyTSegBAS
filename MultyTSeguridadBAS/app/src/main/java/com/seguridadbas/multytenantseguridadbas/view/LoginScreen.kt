@@ -195,11 +195,12 @@ fun LoginScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BasBlue)
+                    .background(BasBackground)
                     .padding(top = 5.dp, bottom = 5.dp)
             ){
                 Image(
-                    painter = painterResource(R.drawable.miseguridad),
+                    modifier = Modifier.height(30.dp).fillMaxWidth(),
+                    painter = painterResource(R.drawable.miseguridad_txt1),
                     contentDescription = "Logo de bas"
                 )
             }

@@ -18,6 +18,7 @@ val BasBlue = Color(1,2,69)
 val BasYellow = Color(255,204,0)
 
 val BasGray = Color(94,94,94)
+val BasGrayDark = Color(40, 40, 40, 255)
 
 val BasBackground = Color(233,236,245)
 
