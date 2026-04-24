@@ -6,6 +6,7 @@ import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.model.SendEmailVerificationRequest
 import com.seguridadbas.multytenantseguridadbas.model.User
 import com.seguridadbas.multytenantseguridadbas.model.UserProfileRequest
+import com.seguridadbas.multytenantseguridadbas.model.invoices.InvoiceByClientResponse
 import com.seguridadbas.multytenantseguridadbas.model.oldNewPasswords
 import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptInvitationBody
 import com.seguridadbas.multytenantseguridadbas.model.visitorlogs.VisitorLogRequestBody
@@ -310,12 +311,21 @@ interface ApiClient {
     ): Response<JsonObject>
 
 
-    /** ENDPOINT PARA FACTURAS */
+    /** ENDPOINT PARA FACTURAS DE to-do EL TENANT */
     @GET("tenant/{tenantId}/invoice")
     suspend fun getAllInvoicesApi(
         @Header("Authorization") auth_token: String,
         @Path("tenantId") tenantId: String
     ): Response<JsonObject>
+
+
+    /** FACTURAS DE UN CLIENTE */
+    @GET("tenant/{tenantId}/invoice/client/{clientID}")//userId from sign-in or authme
+    suspend fun getInvoicesByClientApi(
+        @Header("Authorization") auth_token: String,
+        @Path("tenantId") tenantId: String,
+        @Path("clientID") clientID: String
+    ): Response<InvoiceByClientResponse>
 
 
     @GET("tenant/{tenantId}")

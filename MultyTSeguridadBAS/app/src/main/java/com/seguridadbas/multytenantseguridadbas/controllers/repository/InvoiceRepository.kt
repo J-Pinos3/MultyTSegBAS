@@ -11,4 +11,9 @@ class InvoiceRepository @Inject constructor(
         token: String, tenantId: String
     ) = apiClient.getAllInvoicesApi(token, tenantId)
 
+
+    suspend fun getInvoicesByCustomerRepo(
+    token: String, tenantId: String, clientId: String
+    ) = apiClient.getInvoicesByClientApi(token, tenantId, clientId)
+
 }

@@ -3,12 +3,14 @@ package com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.InvoiceRepository
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.invoices.AllInvoicesRespData
 import com.seguridadbas.multytenantseguridadbas.model.invoices.AllInvoicesResponse
 import com.seguridadbas.multytenantseguridadbas.model.invoices.Client
+import com.seguridadbas.multytenantseguridadbas.model.invoices.InvoiceByClientObject
 import com.seguridadbas.multytenantseguridadbas.model.invoices.Item
 import com.seguridadbas.multytenantseguridadbas.model.invoices.Payment
 import com.seguridadbas.multytenantseguridadbas.model.invoices.PostSite
@@ -22,7 +24,41 @@ class InvoiceController @Inject constructor(
     private val invoiceRepository: InvoiceRepository
 ): ViewModel() {
 
+    suspend fun getInvoicesByCustomer(
+        token: String, tenantId: String, clientId: String
+    ):Resource<List<InvoiceByClientObject>>{
+        val response = invoiceRepository.getInvoicesByCustomerRepo(token, tenantId, clientId)
 
+        return try {
+
+            if(response.isSuccessful && response.body() != null){
+
+
+                Resource.Success(
+                    response.body()?.rows ?: emptyList()
+                )
+            }else{
+                val errorMessage = try {
+                    val errorJson = response.errorBody()?.string()
+                    JsonParser.parseString(errorJson)
+                        .asJsonObject
+                        .get("message")
+                        ?.asString ?: "Error desconocido"
+                } catch (e: Exception) {
+                    "Error desconocido"
+                }
+                Resource.Error(errorMessage?:"Error desconocido")
+            }
+
+        }catch (e: SocketTimeoutException){
+            Resource.Error("La conexión ha tardado mucho tiempo")
+        }catch (ex: NoNetworkException){
+            when(ex){
+                is NoNetworkException -> { Resource.Error(ex.message.toString()) }
+                is IOException -> { Resource.Error(ex.message.toString()) }
+            }
+        }
+    }
 
     suspend fun getAllInvoices(
         token: String, tenantId: String

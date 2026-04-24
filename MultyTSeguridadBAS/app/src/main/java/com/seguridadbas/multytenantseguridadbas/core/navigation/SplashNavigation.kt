@@ -264,7 +264,6 @@ fun SplashNavigation( billingAccountController: BillingAccountController,
             BillingScreen(
                 Modifier,
                 navigateBackToHome = { navController.popBackStack() },
-                billingAccountController = billingAccountController
             )
         }
 
