@@ -109,7 +109,7 @@ class InvoiceController @Inject constructor(
                         line = item.get("line").asInt,
                         name = item.get("name").asString,
                         rate = item.get("rate").asInt,
-                        taxName = item.get("taxName").asString,
+                        //taxName = item.get("taxName").asString,
                         taxRate = item.get("taxRate").asInt,
                         quantity = item.get("quantity").asInt,
                         lineTotal = item.get("lineTotal").asInt,

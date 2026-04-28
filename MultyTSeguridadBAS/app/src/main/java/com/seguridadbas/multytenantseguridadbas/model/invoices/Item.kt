@@ -12,7 +12,7 @@ data class Item(
     @SerializedName("rate")
     val rate: Int,
     @SerializedName("taxName")
-    val taxName: String,
+    val taxName: String = "",
     @SerializedName("taxRate")
     val taxRate: Int,
     @SerializedName("quantity")

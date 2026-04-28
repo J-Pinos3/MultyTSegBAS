@@ -57,7 +57,7 @@ class TenantInfoController @Inject constructor(
                         timezone = jsonBody.get("timezone").asString,
                         updatedAt = jsonBody.get("updatedAt").asString,
                         updatedById = jsonBody.isNullStringField("updatedById"),
-                        url = jsonBody.get("url").asString,
+                        //url = jsonBody.get("url").asString,
                         website = jsonBody.get("website").asString
                     )
                 )

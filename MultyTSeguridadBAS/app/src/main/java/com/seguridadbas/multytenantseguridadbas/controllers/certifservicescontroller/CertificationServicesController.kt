@@ -1,6 +1,7 @@
 package com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller
 
 import androidx.lifecycle.ViewModel
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NoNetworkException
 import com.seguridadbas.multytenantseguridadbas.controllers.repository.CertificationServicesRepository
@@ -134,10 +135,7 @@ class CertificationServicesController @Inject constructor(
                 val jsonBody = response.body()!!
 
                 Resource.Success(
-                    BannerSuperiorResponse(
-                        title = jsonBody.get("title").asString,
-                        downloadUrl = jsonBody.get("downloadUrl").asString
-                    )
+                    parseBannerSuperiorRrsponse(jsonBody)
                 )
             }else{
                 Resource.Error(response.message().toString() + "--" + response.raw().message )
@@ -152,6 +150,27 @@ class CertificationServicesController @Inject constructor(
                 is IOException -> { Resource.Error(ex.message.toString()) }
             }
         }
+    }
+
+    private fun parseBannerSuperiorRrsponse(jsonObject: JsonObject): BannerSuperiorResponse{
+        val rowsArray = jsonObject.get("rows").asJsonArray
+
+        val rows = rowsArray.map { rowElement->
+            val row = rowElement.asJsonObject
+            val imgsObjects = row.isNullArrayField("imageUrl")
+            val imgs=imgsObjects?.map { elem->
+                val item = elem.asJsonObject
+                object {
+                    val downloadUrl = item.get("downloadUrl").asString
+                }
+            }?.first()
+            BannerSuperiorResponse(
+                title = row.get("title").asString,
+                downloadUrl = imgs?.downloadUrl ?: ""
+            )
+        }.first()
+
+        return rows
     }
 
     private fun parseAllCertificationsResponse(jsonObject: JsonObject): AllCertificationsResponse {
@@ -229,4 +248,8 @@ class CertificationServicesController @Inject constructor(
         return if(this?.get(field)?.isJsonNull == false) this.get(field).asString else ""
     }
 
+
+    private fun JsonObject?.isNullArrayField(field: String): JsonArray?{
+        return if (this?.get(field)?.isJsonNull == false ) this.get(field).asJsonArray else null
+    }
 }

@@ -58,7 +58,7 @@ data class TenantInfoResponse(
     @SerializedName("updatedById")
     val updatedById: String? = "",
     @SerializedName("url")
-    val url: String,
+    val url: String? = "",
     @SerializedName("website")
     val website: String
 )

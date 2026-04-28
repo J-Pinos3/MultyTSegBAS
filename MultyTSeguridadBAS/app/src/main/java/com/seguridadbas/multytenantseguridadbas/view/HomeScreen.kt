@@ -153,7 +153,10 @@ fun HomeScreen(
                 Triple(certDeferred.await(), servicesDeferred.await(), invoiceDeferred.await())
             }
             when(imageResult){
-                is Resource.Success -> bannerImage = imageResult.data?.downloadUrl.toString()
+                is Resource.Success -> {
+                    bannerImage = imageResult.data?.downloadUrl.toString()
+                    Log.i("Home", "banner superior: ${bannerImage}")
+                }
 
                 is Resource.Error ->  {
                     Log.e("Home", "Error banner superior: ${imageResult.message}")

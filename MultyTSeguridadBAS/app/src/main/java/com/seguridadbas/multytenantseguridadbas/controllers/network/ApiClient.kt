@@ -28,7 +28,7 @@ interface ApiClient {
     @PUT("auth/verify-email")
     suspend fun verifyEmailApi(@Body token: String): Response<ResponseBody>
 
-    @POST("auth/sign-in")
+    @POST("auth/sign-in-customer")
     suspend fun
             signInApi(@Body user: User): Response<JsonObject>
 
