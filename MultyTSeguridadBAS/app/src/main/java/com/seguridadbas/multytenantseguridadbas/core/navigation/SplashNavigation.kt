@@ -9,17 +9,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
 import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontroller.BillingAccountController
-import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
-import com.seguridadbas.multytenantseguridadbas.controllers.guardshiftscontroller.GuardShiftsController
-import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
-import com.seguridadbas.multytenantseguridadbas.controllers.postsitecontrollers.PostSiteController
-import com.seguridadbas.multytenantseguridadbas.controllers.shiftscontroller.ShiftsController
-import com.seguridadbas.multytenantseguridadbas.controllers.stationreportscontroller.StationReportsController
-import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
-import com.seguridadbas.multytenantseguridadbas.controllers.tenantguardscontroller.TenantGuardsController
-import com.seguridadbas.multytenantseguridadbas.controllers.tenantinfocontroller.TenantInfoController
-import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
-import com.seguridadbas.multytenantseguridadbas.controllers.visitlogscontroller.VisitLogController
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardShiftsScreen
 import com.seguridadbas.multytenantseguridadbas.view.AllGuardsScreen
 import com.seguridadbas.multytenantseguridadbas.view.AllShiftScreen
@@ -48,7 +37,7 @@ import com.seguridadbas.multytenantseguridadbas.view.VisitLogScreen
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
-fun SplashNavigation( billingAccountController: BillingAccountController,
+fun SplashNavigation(
                      deepLinkIntentFlowSocial: SharedFlow<Intent>
                      ) {
 

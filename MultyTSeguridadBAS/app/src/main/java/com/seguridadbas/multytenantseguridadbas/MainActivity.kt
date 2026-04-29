@@ -30,8 +30,6 @@ import kotlin.getValue
 class MainActivity : ComponentActivity() {
 
 
-    private val billingAccountController by viewModels<BillingAccountController>()
-
     val deepLinkIntentFlowSocial = MutableSharedFlow<Intent>(replay = 1)
 
 
@@ -47,7 +45,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             MultyTenantSeguridadBASTheme {
                 SplashNavigation(
-                    billingAccountController,
                     deepLinkIntentFlowSocial,
                 )
                 //SplashScreen()

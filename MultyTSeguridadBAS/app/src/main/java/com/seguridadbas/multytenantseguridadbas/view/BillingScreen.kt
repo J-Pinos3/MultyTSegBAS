@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.Surface
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -57,6 +60,7 @@ import com.seguridadbas.multytenantseguridadbas.model.invoices.InvoiceByClientOb
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -76,7 +80,8 @@ fun BillingScreen(
 
     var tenantId by remember { mutableStateOf("") }
     var bearerToken by remember { mutableStateOf("") }
-    var userId by remember { mutableStateOf("") }//SHOULD BE CLIENTID!!!!
+    var clientAccountId by remember { mutableStateOf("") }
+
 
     val context = LocalContext.current
     val dataStoreController = DataStoreController(context)
@@ -88,10 +93,11 @@ fun BillingScreen(
             val storedData = dataStoreController.getDataFromStore().first()
             bearerToken = storedData.token.replace("\"","").trim()
             tenantId = dataStoreController.getTenantId().first().replace("\"","").trim()
-            userId = storedData.id.replace("\"","").trim()
+            clientAccountId = storedData.clientAccountId.replace("\"","").trim()
+            //userId = storedData.id.replace("\"","").trim()
 
             loadInvoices(
-                bearerToken, tenantId, userId,invoiceController,
+                bearerToken, tenantId, clientAccountId,invoiceController,
                 onSuccess = { invoices -> allClientInvoices = invoices },
                 onError = { error -> Log.e("billings screen", error) }
             )
@@ -106,7 +112,7 @@ fun BillingScreen(
         modifier = modifier.fillMaxSize().nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
             CenterAlignedTopAppBar(
-                title={ Text(text = "Nómina") },
+                title={ Text(text = "Pagos") },
                 navigationIcon = {
                     IconButton(
                         onClick = { navigateBackToHome()  }
@@ -150,6 +156,8 @@ fun BillingScreen(
                     )
                 }
             }
+        }else{
+            EmptyReportsState(Modifier, "Problema al conectar con servidores", true)
         }
 
     }
@@ -183,112 +191,76 @@ private fun loadInvoices(//                 should be clientID!!!!!
 }
 
 
+
 @Composable
 private fun BillingStateItem(
     billingObj: InvoiceByClientObject,
     modifier: Modifier = Modifier,
-){
-    Box(
-        modifier = modifier.padding(10.dp)
-            .clip(RoundedCornerShape(24))
-            .border(
-                2.dp, BasGray,
-                shape = RoundedCornerShape(24,24,24,24)
-            )
-            .shadow(2.dp)
+    onClick: () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
             .fillMaxWidth()
-            .background(Color.White)
-    ){
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        elevation = 2.dp,
+        backgroundColor = Color.White
+    ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalAlignment = Alignment.Start
-        ){
-            // Header de factura
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            // Fila superior: Número de factura + Total
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "FACTURA ${billingObj.invoiceNumber}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "Factura ${billingObj.invoiceNumber}",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
                 )
+                Text(
+                    text = "$${billingObj.total ?: "0"}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2E7D32)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Fila inferior: Fecha de vencimiento + indicador visual
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = "Vence: ${billingObj.dueDate?.take(10) ?: "N/A"}",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
-            }
 
-            Spacer(Modifier.height(12.dp))
-
-            // Línea separadora
-            Divider(color = BasGray, thickness = 1.dp)
-
-            Spacer(Modifier.height(8.dp))
-
-            // Tabla de items (si hay payments/items)
-            if (!billingObj.payments.isNullOrEmpty()) {
-                Column {
-                    // Encabezados de la tabla
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                // Indicador visual de que hay items (opcional)
+                if (!billingObj.payments.isNullOrEmpty()) {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = Color(0xFFEEF0F5)
                     ) {
-                        Text("Descripción", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(2f))
-                        Text("Cant.", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.7f))
-                        Text("Precio", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.8f))
-                        Text("Tax", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.6f))
-                        Text("Total", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.8f))
-                    }
-
-                    Spacer(Modifier.height(4.dp))
-
-                    // Items de la factura
-                    billingObj.payments.forEach { item ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(item.name ?: "", fontSize = 12.sp, modifier = Modifier.weight(2f))
-                            Text("${item.quantity ?: 0}", fontSize = 12.sp, modifier = Modifier.weight(0.7f))
-                            Text("$${item.rate ?: 0}", fontSize = 12.sp, modifier = Modifier.weight(0.8f))
-                            Text("${item.taxRate ?: 0}%", fontSize = 12.sp, modifier = Modifier.weight(0.6f))
-                            Text("$${item.lineTotal ?: 0}", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.8f))
-                        }
+                        Text(
+                            text = "${billingObj.payments.size} items",
+                            fontSize = 10.sp,
+                            color = Color.DarkGray,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
                     }
                 }
-
-                Spacer(Modifier.height(8.dp))
-                Divider(color = BasGray, thickness = 1.dp)
             }
-
-            Spacer(Modifier.height(8.dp))
-
-            // Totales alineados a la derecha
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.End
-            ) {
-                Row(
-                    modifier = Modifier.padding(vertical = 2.dp),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    Text("Subtotal:", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                    Text("$${billingObj.subtotal ?: "0"}", fontSize = 14.sp)
-                }
-
-                Row(
-                    modifier = Modifier.padding(vertical = 2.dp),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    Text("Total:", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    Text("$${billingObj.total ?: "0"}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-            Divider(color = BasGray, thickness = 1.dp)
         }
     }
 }

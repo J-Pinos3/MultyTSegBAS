@@ -293,6 +293,7 @@ fun LoginScreen(
                                     token = result.data?.token.toString(),
                                     id = result.data?.user?.id.toString(),
                                     email = result.data?.user?.email.toString(),
+                                    clientAccountId = result.data?.user?.clientAccountId.toString(),
                                     firstName = result.data?.user?.firstName.toString(),
                                     lastName = result.data?.user?.lastName.toString() ?: ""
                                 )

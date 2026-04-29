@@ -16,6 +16,9 @@ data class UserSignInResponse(
     @SerializedName("lastName")
     val lastName: String?  = "",
 
+    @SerializedName("clientAccountId")
+    val clientAccountId: String? = "",
+
     @SerializedName("tenant")
     val tenant: TenantLogin
 )

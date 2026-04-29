@@ -7,5 +7,6 @@ data class UserDataStore(
     val firstName: String = "",
     val lastName: String = "",
     val tenantId: String = "",
+    val clientAccountId: String = "",
     val userRole: String = ""
 )

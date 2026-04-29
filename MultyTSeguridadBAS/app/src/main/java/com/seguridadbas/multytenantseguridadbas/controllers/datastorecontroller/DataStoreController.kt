@@ -22,6 +22,7 @@ class DataStoreController(val context: Context) {
         val EMAIL = stringPreferencesKey("EMAIL")
         val FIRSTNAME = stringPreferencesKey("FIRSTNAME")
         val LASTNAME = stringPreferencesKey("LASTNAME")
+        val CLIENTACCOUNTID = stringPreferencesKey("CLIENTACCOUNTID")
 
         val TENANTID = stringPreferencesKey("TENANTID")
     }
@@ -32,7 +33,7 @@ class DataStoreController(val context: Context) {
         }
     }
 
-    suspend fun getTenantId() = context.preferencesDataStore.data.map{
+    fun getTenantId() = context.preferencesDataStore.data.map{
         it[TENANTID] ?: ""
     }
 
@@ -44,6 +45,7 @@ class DataStoreController(val context: Context) {
             preferences[EMAIL] = userDataStore.email
             preferences[FIRSTNAME] = userDataStore.firstName
             preferences[LASTNAME] = userDataStore.lastName
+            preferences[CLIENTACCOUNTID] = userDataStore.clientAccountId
         }
     }
 
@@ -54,7 +56,8 @@ class DataStoreController(val context: Context) {
             id = it[ID] ?: "",
             email = it[EMAIL] ?: "",
             firstName = it[FIRSTNAME] ?: "",
-            lastName = it[LASTNAME] ?: ""
+            lastName = it[LASTNAME] ?: "",
+            clientAccountId = it[CLIENTACCOUNTID] ?: ""
 
         )
     }

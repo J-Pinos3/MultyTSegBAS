@@ -78,6 +78,7 @@ class AuthController @Inject constructor(
                         email = body?.getAsJsonObject("user")?.get("email").toString(),
                         firstName = body?.getAsJsonObject("user")?.get("firstName").toString(),
                         lastName = body?.getAsJsonObject("user")?.get("lastName").toString(),
+                        clientAccountId = body?.getAsJsonObject("user")?.get("clientAccountId").toString(),
                         tenant = TenantLogin(
                             roles = body?.getAsJsonObject("user")?.getAsJsonObject("tenant")?.getAsJsonArray("roles")?.map {
                                 it.asString

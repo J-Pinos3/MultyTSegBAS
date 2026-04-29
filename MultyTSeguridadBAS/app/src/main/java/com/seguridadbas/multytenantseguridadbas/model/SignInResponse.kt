@@ -7,7 +7,7 @@ data class SignInResponse(
     val token: String ="No Token",
     @SerializedName("user")
     val user: UserSignInResponse = UserSignInResponse("--","--",
-        "--","--",
+        "--","--","",
         TenantLogin( emptyList()     )
         )
 )
