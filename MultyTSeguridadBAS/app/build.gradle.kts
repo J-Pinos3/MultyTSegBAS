@@ -38,10 +38,10 @@ android {
         manifestPlaceholders["googleMapsApiKey"] =
             localProps["GOOGLE_MAPS_API_KEY"] as String
 
-        applicationId = "com.seguridadbas.multytenantseguridadbas"
+        applicationId = "com.seguridadbas.multytenantcguardpro"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
+        versionCode = 4
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

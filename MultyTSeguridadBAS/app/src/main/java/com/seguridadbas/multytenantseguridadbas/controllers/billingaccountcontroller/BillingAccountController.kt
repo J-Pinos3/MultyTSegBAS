@@ -126,7 +126,6 @@ class BillingAccountController @Inject constructor(
                         website = row.isNullStringField("website"),
                         latitude = row.isNullStringField("latitude"),
                         longitude = row.isNullStringField("longitude"),
-                        categoryIds = row.getArrayFieldAsList("categoryIds"),
                         active=row.get("active").asBoolean,
                         categories = row.getAsJsonArray("categories").toList(),
                         createdAt = row.get("createdAt").asString,

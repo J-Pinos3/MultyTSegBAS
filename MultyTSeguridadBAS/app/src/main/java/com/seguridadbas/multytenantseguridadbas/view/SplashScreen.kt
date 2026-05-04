@@ -136,7 +136,7 @@ fun SplashScreen(
         if( tenantUrlForImage.isNullOrEmpty() ){
             Image(
                 modifier = Modifier.height(300.dp).fillMaxWidth(),
-                painter = painterResource(R.drawable.miseguridad_eyebgless),
+                painter = painterResource(R.drawable.miseguridadcompanylogo),
                 contentDescription = "Escudo de bas"
             )
         }else{
