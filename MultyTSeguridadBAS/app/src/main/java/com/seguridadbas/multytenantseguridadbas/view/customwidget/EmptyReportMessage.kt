@@ -23,12 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 
+@Preview(showSystemUi = true)
 @Composable
 fun EmptyReportsState(
     modifier: Modifier = Modifier,
@@ -54,13 +56,13 @@ fun EmptyReportsState(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Franja superior amarilla
+                // Franja superior Azul
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
                         .background(
-                            color = BasYellow,
+                            color = Color(0xFF1565C0),
                             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                         )
                 )
@@ -106,7 +108,7 @@ fun EmptyReportsState(
                         .fillMaxWidth()
                         .height(8.dp)
                         .background(
-                            color = BasYellow,
+                            color = Color(0xFF1565C0),
                             shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
                         )
                 )

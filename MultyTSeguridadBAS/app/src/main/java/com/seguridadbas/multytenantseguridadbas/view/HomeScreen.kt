@@ -26,17 +26,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,7 +51,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -63,11 +73,9 @@ import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.I
 import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
 import com.seguridadbas.multytenantseguridadbas.core.util.Resource
 import com.seguridadbas.multytenantseguridadbas.model.certifications.CertificationDataResponse
-import com.seguridadbas.multytenantseguridadbas.model.invoices.AllInvoicesRespData
 import com.seguridadbas.multytenantseguridadbas.model.services.ServiceDataResponse
 import com.seguridadbas.multytenantseguridadbas.model.tenantinvitation.AcceptTokenResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBackground
-import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBlue
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
 import com.seguridadbas.multytenantseguridadbas.view.badgeshome.CertificationBadgeItems
@@ -76,6 +84,7 @@ import com.seguridadbas.multytenantseguridadbas.view.customwidget.EmptyReportsSt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -83,6 +92,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 //@Preview(showSystemUi = true)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -95,265 +105,275 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
 
     var currentTenantId by remember { mutableStateOf(tenantId) }
-    //token typed by the user
     var verificationCode by remember { mutableStateOf("") }
     var userId by remember { mutableStateOf("") }
     var acceptTokenResponse by remember { mutableStateOf(AcceptTokenResponse()) }
-
     var bearerToken by remember { mutableStateOf("") }
 
-    var certificationsList by remember{ mutableStateOf<List<CertificationDataResponse>>( emptyList() ) }
-    var servicesList by remember { mutableStateOf<List<ServiceDataResponse>>( emptyList() ) }
-
+    // Estados de datos
+    var certificationsList by remember { mutableStateOf<List<CertificationDataResponse>>(emptyList()) }
+    var servicesList by remember { mutableStateOf<List<ServiceDataResponse>>(emptyList()) }
     var invoiceAmount by remember { mutableStateOf("$0.00") }
     var dueDateInvoice by remember { mutableStateOf("1999/01/01") }
     var bannerImage by remember { mutableStateOf("") }
 
+    // Estado de carga y refresh
+    var isLoading by remember { mutableStateOf(true) }
+    var isRefreshing by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
-    val dataStoreController = remember{ DataStoreController(context) }
+    val dataStoreController = remember { DataStoreController(context) }
 
+    // Función para cargar todos los datos (puede ser usada tanto en LaunchedEffect como en refresh)
+    suspend fun loadAllData() = withContext(Dispatchers.IO) {
+        // Obtener token y tenantId
+        val storedData = dataStoreController.getDataFromStore().first()
+        userId = storedData.id.replace("\"", "").trim()
+        bearerToken = storedData.token.replace("\"", "").trim()
 
-    LaunchedEffect(currentTenantId) {
-
-        val storedData = withContext(Dispatchers.IO){
-            dataStoreController.getDataFromStore().first()
-        }
-
-        userId = storedData.id
-        userId = userId.replace("\"","").trim()
-
-
-        bearerToken = storedData.token
-        bearerToken = bearerToken.replace("\"","").trim()
-
-        //Log.i("Home","token: ${bearerToken.substring(0,6)} and tenantId: $currentTenantId")
-
-        if( !bearerToken.isNullOrEmpty() && !tenantId.isNullOrEmpty() ){
-            val imageResult = withContext(Dispatchers.IO){
-                val deferred= async{
-                    certificationServicesController.getBannerSuperior("Bearer $bearerToken", currentTenantId)
-                }
-
-                deferred.await()
+        if (bearerToken.isNotEmpty() && currentTenantId.isNotEmpty()) {
+            // Ejecutar todas las peticiones en paralelo
+            val imageDeferred = async {
+                certificationServicesController.getBannerSuperior("Bearer $bearerToken", currentTenantId)
+            }
+            val certDeferred = async {
+                certificationServicesController.getAllCertifications("Bearer $bearerToken", currentTenantId)
+            }
+            val servicesDeferred = async {
+                certificationServicesController.getAllServices("Bearer $bearerToken", currentTenantId)
+            }
+            val invoiceDeferred = async {
+                invoiceController.getAllInvoices("Bearer $bearerToken", currentTenantId)
             }
 
-            val (certResult, servicesResult, invoiceResult) = withContext(Dispatchers.IO){
-                val certDeferred = async{
-                    certificationServicesController.getAllCertifications("Bearer $bearerToken", currentTenantId)
+            // Esperar resultados
+            val imageResult = imageDeferred.await()
+            val certResult = certDeferred.await()
+            val servicesResult = servicesDeferred.await()
+            val invoiceResult = invoiceDeferred.await()
+
+            // Procesar resultados
+            withContext(Dispatchers.Main) {
+                when (imageResult) {
+                    is Resource.Success -> bannerImage = imageResult.data?.downloadUrl ?: ""
+                    is Resource.Error -> Log.e("Home", "Error banner superior: ${imageResult.message}")
+                    else -> Log.e("Home", "No se pudo traer el banner superior")
                 }
 
-                val servicesDeferred = async{
-                    certificationServicesController.getAllServices("Bearer $bearerToken", currentTenantId)
+                when (certResult) {
+                    is Resource.Success -> certificationsList = certResult.data?.toList() ?: emptyList()
+                    is Resource.Error -> Log.e("Home", "Error certificados: ${certResult.message}")
+                    else -> Log.e("Home", "No se pudo traer los certificados")
                 }
 
-                val invoiceDeferred = async{
-                    invoiceController.getAllInvoices("Bearer $bearerToken", currentTenantId)
+                when (servicesResult) {
+                    is Resource.Success -> servicesList = servicesResult.data?.toList() ?: emptyList()
+                    is Resource.Error -> Log.e("Home", "Error servicios: ${servicesResult.message}")
+                    else -> Log.e("Home", "No se pudo traer los servicios")
                 }
 
-                Triple(certDeferred.await(), servicesDeferred.await(), invoiceDeferred.await())
-            }
-            when(imageResult){
-                is Resource.Success -> {
-                    bannerImage = imageResult.data?.downloadUrl.toString()
-                    Log.i("Home", "banner superior: ${bannerImage}")
-                }
-
-                is Resource.Error ->  {
-                    Log.e("Home", "Error banner superior: ${imageResult.message}")
-                }
-                else -> Log.e("Home", "No se pudo traer el banner superior")
-            }
-
-            when(certResult){
-                is Resource.Success -> certificationsList = certResult.data?.toList() ?: emptyList()
-
-                is Resource.Error ->  {
-                    Log.e("Home", "Error certificados: ${certResult.message}")
-                }
-                else -> Log.e("Home", "No se pudo traer los certificados")
-            }
-
-
-            when (servicesResult) {
-                is Resource.Success -> servicesList = servicesResult.data?.toList() ?: emptyList()
-                is Resource.Error -> Log.e("Home", "Error servicios: ${servicesResult.message}")
-                else -> Log.e("Home", "No se pudo traer los servicios")
-            }
-
-            when (invoiceResult) {
-                is Resource.Success -> {
-                    val upcoming = invoiceResult.data?.sortedBy { it.dueDate }?.firstOrNull()
-                    if (upcoming != null) {
-                        invoiceAmount = upcoming.total
-                        dueDateInvoice = upcoming.dueDate
+                when (invoiceResult) {
+                    is Resource.Success -> {
+                        val upcoming = invoiceResult.data?.sortedBy { it.dueDate }?.firstOrNull()
+                        if (upcoming != null) {
+                            invoiceAmount = upcoming.total
+                            dueDateInvoice = upcoming.dueDate
+                        }
                     }
+                    is Resource.Error -> Log.e("Home", "Error factura: ${invoiceResult.message}")
+                    else -> Log.e("Home", "No se pudo traer la factura")
                 }
-                is Resource.Error -> Log.e("Home", "Error factura: ${invoiceResult.message}")
-                else -> Log.e("Home", "No se pudo traer la factura")
             }
-            /*loadUpcomingInvoice(
-                bearerToken, currentTenantId,invoiceController,
-                onSuccess = {
-                    invoiceAmount = it.total
-                    dueDateInvoice = it.dueDate
-                },
-                onError = { errorMsg -> Log.e("home screen invoice", errorMsg)  }
-            )*/
         }
-
     }
 
-    if( !currentTenantId.isNullOrEmpty()){
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .background(color = BasBackground)
-                .statusBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally
+    // Carga inicial
+    LaunchedEffect(currentTenantId) {
+        isLoading = true
+        loadAllData()
+        isLoading = false
+    }
 
-        ){
-            Text(
-                modifier = Modifier
-                    .padding(vertical = 16.dp, horizontal = 6.dp)
-                    .align(Alignment.Start),
-                text = "Bienvenido Cliente, ",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.ExtraBold,
-            )
+    // Estado de pull refresh usando la API oficial de Compose
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = {
+            coroutineScope.launch {
+                isRefreshing = true
+                loadAllData()
+                isRefreshing = false
+            }
+        }
+    )
 
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Imagen de fondo
+        Image(
+            painter = painterResource(id = R.drawable.splashscreenbackground),
+            contentDescription = "Fondo de pantalla",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
+        if (!currentTenantId.isNullOrEmpty()) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(BasBackground)
-                    .padding(top = 5.dp, bottom = 5.dp)
-            ){
-                if(bannerImage.isNullOrEmpty()){
-                    Image(
-                        modifier = Modifier.height(30.dp).fillMaxWidth(),
-                        painter = painterResource(R.drawable.miseguridad_txt1),
-                        contentDescription = "Logo de bas"
+                    .fillMaxSize()
+                    .pullRefresh(pullRefreshState)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .statusBarsPadding(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(vertical = 16.dp, horizontal = 6.dp)
+                            .align(Alignment.Start),
+                        text = "Bienvenido Cliente, ",
+                        color = Color(0xFFE7E2E2),
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.ExtraBold,
                     )
-                }else{
-                    AsyncImage(
-                        model = bannerImage,
-                        contentDescription = "banner image",
-                        error = painterResource(R.drawable.miseguridad_txt1)
-                    )
-                }
 
-            }
-
-            Spacer(modifier = Modifier.padding(top = 10.dp))
-
-            titleTexts(  modifier = Modifier.align(Alignment.Start), "Nuestros Servicios:"  )
-
-            Spacer(modifier = Modifier.padding(top = 10.dp))
-
-            if(!servicesList.isNullOrEmpty()){
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth().height(200.dp),
-                    //verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    items(servicesList){ service ->
-                        ServiceBadgeItems(
-                            Modifier.fillMaxWidth().width(160.dp).height(200.dp),
-                            service
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                            .padding(top = 5.dp, bottom = 5.dp)
+                    ) {
+                        if (bannerImage.isNullOrEmpty()) {
+                            Image(
+                                modifier = Modifier.height(30.dp).fillMaxWidth(),
+                                painter = painterResource(R.drawable.miseguridad_txt1),
+                                contentDescription = "Logo de bas"
+                            )
+                        } else {
+                            AsyncImage(
+                                model = bannerImage,
+                                contentDescription = "banner image",
+                                error = painterResource(R.drawable.miseguridad_txt1)
+                            )
+                        }
                     }
-                }
-            }else{
-                EmptyReportsState(Modifier, "Problema al conectar con servidores", true)
-            }
 
-            Spacer(modifier = Modifier.padding(top = 30.dp))
+                    Spacer(modifier = Modifier.padding(top = 10.dp))
 
-            titleTexts(  modifier = Modifier.align(Alignment.Start), "Facturación:"  )
+                    titleTexts(modifier = Modifier.align(Alignment.Start), "Nuestros Servicios:")
 
-            Spacer(modifier = Modifier.padding(top = 10.dp))
+                    Spacer(modifier = Modifier.padding(top = 10.dp))
 
-            BillingComposable(
-                modifier.padding(horizontal = 2.dp),
-                invoiceAmount,
-                dueDateInvoice,
-                onBillingClicked = { onBillingClicked() }
-            )
-
-            Spacer(modifier = Modifier.padding(top = 30.dp))
-
-            titleTexts(  modifier = Modifier.align(Alignment.Start), "Certificaciones y Permisos:"  )
-
-            if( !certificationsList.isNullOrEmpty() ){
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth().height(220.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
-                    items(certificationsList){ certification ->
-                        CertificationBadgeItems(
-                            Modifier.width(160.dp).height(200.dp),
-                            certification)
+                    if (!servicesList.isNullOrEmpty()) {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth().height(200.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            items(servicesList) { service ->
+                                ServiceBadgeItems(
+                                    Modifier.fillMaxWidth().width(160.dp).height(200.dp),
+                                    service
+                                )
+                            }
+                        }
+                    } else if (!isLoading) {
+                        EmptyReportsState(Modifier, "Problema al conectar con servidores", true)
                     }
+
+                    Spacer(modifier = Modifier.padding(top = 20.dp))
+
+                    titleTexts(modifier = Modifier.align(Alignment.Start), "Certificaciones y Permisos:")
+
+                    if (!certificationsList.isNullOrEmpty()) {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth().height(220.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            items(certificationsList) { certification ->
+                                CertificationBadgeItems(
+                                    Modifier.width(160.dp).height(200.dp),
+                                    certification
+                                )
+                            }
+                        }
+                    } else if (!isLoading) {
+                        EmptyReportsState(Modifier, "Problema al conectar con servidores", true)
+                    }
+
+                    Spacer(modifier = Modifier.height(90.dp))
                 }
-            }else{
-                EmptyReportsState(Modifier, "Problema al conectar con servidores", true)
+
+                // Indicador de Pull to Refresh
+                PullRefreshIndicator(
+                    refreshing = isRefreshing,
+                    state = pullRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
-
-
-            Spacer(modifier = Modifier.height(90.dp) )
-
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.92f))
+            ) {
+                TenantInvitationBadge(
+                    modifier = Modifier.fillMaxWidth(),
+                    onCodeChanged = { verificationCode = it },
+                    isButtonEnabled = true,
+                    codeTyped = verificationCode,
+                    onAcceptInvitation = {
+                        coroutineScope.launch {
+                            processInvitationAccepted(
+                                "Bearer $bearerToken",
+                                verificationCode,
+                                userId,
+                                tenantInvitationController,
+                            ) { newTenantId ->
+                                currentTenantId = newTenantId
+                            }
+                        }
+                    }
+                )
+            }
         }
-    }else{
-        TenantInvitationBadge(
-            modifier = Modifier.fillMaxWidth(),
-            onCodeChanged = {
-                currentTypedToken -> verificationCode = currentTypedToken   },
-            isButtonEnabled = true,
-            codeTyped = verificationCode,
-            onAcceptInvitation = {
 
-                coroutineScope.launch {
-                    processInvitationAccepted(
-                        "Bearer $bearerToken",
-                        verificationCode,
-                        userId,
-                        tenantInvitationController,
-                    ) { newTenantId ->
-                        currentTenantId = newTenantId
-                    }
-                }
-
+        // Loading inicial
+        if (isLoading && !isRefreshing) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp),
+                    color = BasYellow,
+                    strokeWidth = 4.dp
+                )
             }
-        )
+        }
     }
-
 }
 
-
+// El resto de las funciones (BillingComposable, titleTexts, TenantInvitationBadge, processInvitationAccepted) permanecen igual
 @Composable
 fun BillingComposable(
     modifier: Modifier,  amount: String,
     lastPayment: String, onBillingClicked: () -> Unit = {}
 ){
-
     val apiFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd" )
     val date = LocalDate.parse(LocalDate.now().toString(), apiFormat)
 
-
     Surface(
-        modifier = modifier.clickable(
-            onClick = onBillingClicked
-        ),
+        modifier = modifier.clickable( onClick = onBillingClicked ),
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, BasGray),
         color = Color.Transparent
     ){
         Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min),
+            modifier = modifier.fillMaxWidth().height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -363,49 +383,22 @@ fun BillingComposable(
                     .height(50.dp)
                     .width(10.dp)
             )
-
             Spacer(modifier = Modifier.padding(top = 16.dp))
-
             Column(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        modifier = Modifier,
-                        text = "Siguiente Pago",
-                        fontSize = 14.sp
-                    )
-
-                    Text(
-                        modifier = Modifier,
-                        text = "${date.month.toString().uppercase()} ${date.year}",
-                        textAlign = TextAlign.End
-                    )
+                    Text(modifier = Modifier, text = "Siguiente Pago", fontSize = 14.sp)
+                    Text(modifier = Modifier, text = "${date.month.toString().uppercase()} ${date.year}", textAlign = TextAlign.End)
                 }
-
                 Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                Text(
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    text = amount,
-                    textAlign = TextAlign.Start,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
+                Text(modifier = Modifier.padding(horizontal = 10.dp), text = amount, textAlign = TextAlign.Start, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.padding(top = 10.dp))
-
-                Text(
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    text = "Último Pago: $lastPayment",
-                    textAlign = TextAlign.Start
-                )
+                Text(modifier = Modifier.padding(horizontal = 10.dp), text = "Último Pago: $lastPayment", textAlign = TextAlign.Start)
             }
         }
     }
@@ -414,17 +407,15 @@ fun BillingComposable(
 @Composable
 fun titleTexts(modifier: Modifier, text: String){
     Text(
-        modifier = modifier
-            .padding(start = 10.dp),
+        modifier = modifier.padding(start = 10.dp),
         text = text,
         fontWeight = FontWeight.ExtraBold,
         fontSize = 24.sp,
+        color = Color(0xFFE7E2E2),
         textAlign = TextAlign.Start
     )
 }
 
-
-//functions to accept tenant invitation
 @Composable
 fun TenantInvitationBadge(
     modifier: Modifier = Modifier,
@@ -433,52 +424,37 @@ fun TenantInvitationBadge(
     codeTyped: String,
     onAcceptInvitation: () -> Unit = {},
 ){
-
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
+            modifier = Modifier.fillMaxWidth().padding(24.dp),
             elevation = CardDefaults.cardElevation(4.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ){
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
-                // Franja superior amarilla
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .background(
-                            color = BasYellow,
-                            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                        )
+                    modifier = Modifier.fillMaxWidth().height(8.dp).background(
+                        color = BasYellow,
+                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                    )
                 )
-
-
-                // Contenido principal centrado
                 Column(
                     modifier = Modifier.padding(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
                     Box(
-                        modifier = Modifier
-                            .size(72.dp)
-                            .background(
-                                color = BasBackground,
-                                shape = CircleShape
-                            ),
+                        modifier = Modifier.size(72.dp).background(
+                            color = BasBackground,
+                            shape = CircleShape
+                        ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -488,8 +464,6 @@ fun TenantInvitationBadge(
                             tint = BasGray
                         )
                     }
-
-
                     Text(
                         text = "Ingresa el código de la organización",
                         fontSize = 18.sp,
@@ -498,13 +472,10 @@ fun TenantInvitationBadge(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
-
                     TextField(
                         value = codeTyped,
                         onValueChange = onCodeChanged,
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 15.dp),
+                        modifier = modifier.fillMaxWidth().padding(horizontal = 15.dp),
                         placeholder = { Text(text="Código:") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true, maxLines = 1,
@@ -516,58 +487,38 @@ fun TenantInvitationBadge(
                             unfocusedContainerColor = Color.White
                         )
                     )
-
-                //button send code - accept invitation
                     Button(
                         onClick = onAcceptInvitation,
-                        modifier
-                            .padding(horizontal = 20.dp)
-                            .fillMaxWidth()
-                            .height(50.dp) ,
+                        modifier.padding(horizontal = 20.dp).fillMaxWidth().height(50.dp),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if(isButtonEnabled) Color.Black else Color.Gray ,
+                            containerColor = if(isButtonEnabled) Color.Black else Color.Gray,
                             contentColor = Color.White,
                             disabledContainerColor = Color.Gray,
                             disabledContentColor = Color.White.copy(alpha = 0.6f)
                         ),
                         enabled = isButtonEnabled
-
-                    )
-                    {
-                        Text(
-                            text = "Continuar",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 30.sp
-                        )
+                    ) {
+                        Text(text = "Continuar", fontWeight = FontWeight.ExtraBold, fontSize = 30.sp)
                     }
                 }
-
-
-                // Franja inferior amarilla
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .background(
-                            color = BasYellow,
-                            shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
-                        )
+                    modifier = Modifier.fillMaxWidth().height(8.dp).background(
+                        color = BasYellow,
+                        shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                    )
                 )
             }
         }
     }
 }
 
-
 private suspend fun processInvitationAccepted(bearerToken: String, verificationCode: String,
-    userId: String, controller: TenantInvitationController,
-    onUpdateTenantId: (String) -> Unit = {} ){
-
+                                              userId: String, controller: TenantInvitationController,
+                                              onUpdateTenantId: (String) -> Unit = {} ){
     val result = withContext(Dispatchers.IO){
         controller.acceptTenantInvitation(bearerToken, verificationCode, userId)
     }
-
     when (result) {
         is Resource.Success -> {
             Log.i("TenantInvitation", "Success: ${result.data?.id}")
@@ -576,6 +527,4 @@ private suspend fun processInvitationAccepted(bearerToken: String, verificationC
         is Resource.Error -> Log.e("TenantInvitation", "Error: ${result.message}")
         else -> Log.e("TenantInvitation", "No se pudo procesar la invitación")
     }
-
 }
-

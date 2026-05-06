@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -25,17 +26,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.model.certifications.CertificationDataResponse
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 
-//@Preview(showSystemUi = true)
 @Composable
 fun CertificationBadgeItems(
     modifier: Modifier = Modifier,
     certification: CertificationDataResponse
-
-){
-
+) {
     Box(
         modifier = modifier
             .padding(8.dp)
@@ -48,9 +47,39 @@ fun CertificationBadgeItems(
                 shape = RoundedCornerShape(12.dp)
             )
             .shadow(2.dp, shape = RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .aspectRatio(0.85f) // Hacerlo más cuadrado (ancho/alto = 0.85)
+            .background(Color.White.copy(alpha = 0.95f)) // Fondo blanco semi-transparente
+            .aspectRatio(0.85f)
     ) {
+        // Fondo con imagen difuminada
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(12.dp))
+        ) {
+            // Imagen de fondo difuminada
+            AsyncImage(
+                model = if (certification.icon.isNullOrEmpty())
+                    "https://picsum.photos/200/200?random=${certification.code}"
+                else
+                    certification.icon,
+                contentDescription = "Fondo difuminado",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(8.dp) // Difuminado
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop,
+                alpha = 0.4f // Transparencia adicional (40% visible)
+            )
+
+            // Overlay blanco semi-transparente para mejorar legibilidad
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.7f))
+            )
+        }
+
+        // Contenido principal
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -60,14 +89,15 @@ fun CertificationBadgeItems(
             // Sección superior: Título y código
             Column(
                 modifier = Modifier.weight(0.4f)
-            ){
+            ) {
                 Text(
                     text = certification.title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    lineHeight = 18.sp
+                    lineHeight = 18.sp,
+                    color = Color.Black // Asegurar contraste
                 )
 
                 HorizontalDivider(
@@ -81,20 +111,10 @@ fun CertificationBadgeItems(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
-                    color = Color.Gray,
+                    color = Color.DarkGray,
                     overflow = TextOverflow.Clip,
                 )
             }
-
-            // Sección media: Descripción
-            Text(
-                modifier = Modifier.weight(0.3f).padding(top = 5.dp),
-                text = certification.description,
-                fontSize = 12.sp,
-                maxLines = 3, // Limitar a 3 líneas máximo
-                lineHeight = 14.sp,
-                overflow = TextOverflow.Clip // Puntos suspensivos si es muy largo
-            )
 
             // Sección inferior: Imagen
             Box(
@@ -110,14 +130,13 @@ fun CertificationBadgeItems(
                         .fillMaxSize()
                         .clip(RoundedCornerShape(8.dp)),
                     model = if (certification.icon.isNullOrEmpty())
-                        "https://picsum.photos/100"
+                        "https://picsum.photos/100?random=${certification.code}"
                     else
                         certification.icon,
                     contentDescription = "certification image",
-                    contentScale = ContentScale.Crop // Cambiar a Crop para llenar el espacio
+                    contentScale = ContentScale.Crop
                 )
             }
         }
     }
 }
-

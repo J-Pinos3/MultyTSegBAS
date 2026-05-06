@@ -55,7 +55,6 @@ fun SplashNavigation(
                 {it-> navController.navigate(Home(tenantId = it)) },
                 { navController.navigate(ResetPasswordSc) },
                 { navController.navigate(Register) },
-                deepLinkIntentFlow = deepLinkIntentFlowSocial,
             )
         }
 

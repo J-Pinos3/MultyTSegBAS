@@ -1,11 +1,12 @@
+
 package com.seguridadbas.multytenantseguridadbas.view.badgeshome
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -21,12 +22,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.seguridadbas.multytenantseguridadbas.model.services.ServiceDataResponse
@@ -45,18 +43,14 @@ fun ServiceBadgeItems(
             .padding(8.dp)
             .width(180.dp)
             .height(200.dp)
-            .clip(RoundedCornerShape(12))
+            .clip(RoundedCornerShape(12.dp))
             .border(
-                width = 0.5.dp,
-                color = BasGray,
+                width = 0.5.dp, color = BasGray,
                 shape = RoundedCornerShape(12.dp)
             )
-            .shadow(2.dp, shape = RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .background(Color.White.copy(alpha = 0.65f)) // Solo fondo blanco semi-transparente
             .aspectRatio(0.85f)
-    ){
-
-
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -64,7 +58,7 @@ fun ServiceBadgeItems(
             verticalArrangement = Arrangement.SpaceBetween
         ){
             Column(
-                modifier = Modifier.weight(0.4f)
+                modifier = Modifier.weight(0.2f)
             ){
                 Text(
                     text = service.title,
@@ -75,7 +69,7 @@ fun ServiceBadgeItems(
                     lineHeight = 18.sp
                 )
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 6.dp),
+                    modifier = Modifier.padding(vertical = 2.dp),
                     thickness = 1.dp,
                     color = Color(0f, 0f, 0f, 0.14f)
                 )
@@ -86,19 +80,6 @@ fun ServiceBadgeItems(
                     fontWeight = FontWeight.SemiBold
                 )
             }
-
-            /*
-            //descripcion
-            Text(
-                modifier = Modifier.weight(0.3f).padding(top = 5.dp),
-                text = service.specifications,
-                fontSize = 12.sp,
-                maxLines = 3,
-                lineHeight = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                overflow = TextOverflow.Clip
-            )
-            */
 
             Box(
                 modifier = Modifier
@@ -118,5 +99,4 @@ fun ServiceBadgeItems(
             }
         }
     }
-
 }
