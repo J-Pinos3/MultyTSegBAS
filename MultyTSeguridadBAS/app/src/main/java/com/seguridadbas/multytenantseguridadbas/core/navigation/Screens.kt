@@ -91,6 +91,9 @@ object VisitorLogsScreen
 @Serializable
 object BillingListScreen
 
+@Serializable
+object Consignas
+
 object NavItemList{
     val navItemList = listOf(
 

@@ -15,6 +15,7 @@ import com.seguridadbas.multytenantseguridadbas.view.AllShiftScreen
 import com.seguridadbas.multytenantseguridadbas.view.BillingScreen
 import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
 import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
+import com.seguridadbas.multytenantseguridadbas.view.ConsignasScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationScreen
 import com.seguridadbas.multytenantseguridadbas.view.GuardShiftsDetailSc
@@ -261,6 +262,13 @@ fun SplashNavigation(
                 navigateBackToMore = { navController.popBackStack() },
             )
 
+        }
+
+        composable<Consignas>{
+            ConsignasScreen(
+                onBackClick = { navController.popBackStack() },
+                onAddTaskClick = { /* Implementar navegación a agregar tarea */ }
+            )
         }
 
     }

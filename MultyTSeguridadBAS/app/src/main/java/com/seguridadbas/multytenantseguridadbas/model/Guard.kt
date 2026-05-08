@@ -5,5 +5,7 @@ data class Guard(
     val firstName: String = "",
     val id: String = "",
     val lastName: String = "",
-    val governmentId: String = ""
+    val governmentId: String = "",
+    val gender: String = "",
+    val isOnDuty: Boolean = false
 )

@@ -97,7 +97,9 @@ class TenantGuardsController @Inject constructor(
                             firstName =  it.guard.firstName,
                             id = it.id,
                             lastName = it.guard.lastName,
-                            governmentId = it.governmentId
+                            governmentId = it.governmentId,
+                            gender = it.gender,
+                            isOnDuty = it.isOnDuty
                         )
                     }
 
