@@ -10,10 +10,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,11 +40,12 @@ import com.seguridadbas.multytenantseguridadbas.model.Guard
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBlue
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasGray
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun AssignedGuardsList(
     modifier: Modifier = Modifier,
@@ -54,36 +59,36 @@ fun AssignedGuardsList(
 
     var guardsList by remember { mutableStateOf<List<Guard>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
+    var isRefreshing by remember { mutableStateOf(false) }
 
-    guardsList = listOf(
-        Guard("Jhon@mail1.com", "Jhon", "1", "Doe", "123456789", "Masculino", true),
-        Guard("Jhon@mail1.com", "Jhon", "1", "Doe", "123456789", "Masculino", true),
+    // Función para simular carga de datos
+    suspend fun refreshData() {
+        // En una implementación real, aquí llamarías al controlador
+        delay(2000)
+        guardsList = listOf(
+            Guard("Jhon@mail1.com", "Jhon", "1", "Doe", "123456789", "Masculino", true),
+            Guard("Jhon@mail1.com", "Jhon", "1", "Doe", "123456789", "Masculino", true),
+        )
+    }
 
+    // Estado de pull-to-refresh
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = {
+            scope.launch {
+                isRefreshing = true
+                refreshData()
+                isRefreshing = false
+            }
+        }
     )
 
-    /*
+    // Carga inicial
     LaunchedEffect(Unit) {
-        scope.launch {
-            val storedData = dataStoreController.getDataFromStore().first()
-            val token = storedData.token.replace("\"", "").trim()
-            val tenantId = dataStoreController.getTenantId().first().replace("\"", "").trim()
-
-            if (token.isNotEmpty() && tenantId.isNotEmpty()) {
-                val result = tenantGuardsController.getSecGuards("Bearer $token", tenantId)
-                when (result) {
-                    is Resource.Success -> {
-                        guardsList = result.data ?: emptyList()
-                    }
-                    is Resource.Error -> {
-                        Log.e("AssignedGuardsList", "Error: ${result.message}")
-                    }
-                    else -> {}
-                }
-            }
-            isLoading = false
-        }
+        isLoading = true
+        refreshData()
+        isLoading = false
     }
-    */
 
     Scaffold(
         topBar = {
@@ -124,36 +129,50 @@ fun AssignedGuardsList(
                 contentScale = ContentScale.Crop
             )
 
-            Column(
+            // Contenedor con Pull to Refresh
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .pullRefresh(pullRefreshState)
             ) {
-                Spacer(modifier = Modifier.height(24.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                Text(
-                    text = "PERSONAL ASIGNADO",
-                    color = Color.LightGray,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                    Text(
+                        text = "PERSONAL ASIGNADO",
+                        color = Color.LightGray,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
-                if (isLoading) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = BasYellow)
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 24.dp)
-                    ) {
-                        items(guardsList) { guard ->
-                            GuardCardItem(guard = guard, onClick = { onGuardClick(guard.id) })
+                    if (isLoading && !isRefreshing) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = BasYellow)
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = PaddingValues(bottom = 24.dp)
+                        ) {
+                            items(guardsList) { guard ->
+                                GuardCardItem(guard = guard, onClick = { onGuardClick(guard.id) })
+                            }
                         }
                     }
                 }
+
+                // Indicador de Refresh
+                PullRefreshIndicator(
+                    refreshing = isRefreshing,
+                    state = pullRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
         }
     }
@@ -170,7 +189,7 @@ fun GuardCardItem(
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = BasBlue.copy(alpha = 0.8f) // Similar al toolbar pero con algo de transparencia
+            containerColor = BasBlue.copy(alpha = 0.8f)
         )
     ) {
         Row(

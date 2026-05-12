@@ -5,17 +5,17 @@ import com.google.gson.annotations.SerializedName
 //todo replace List<any> for a proper datatype
 data class GuardDataResponse(
     @SerializedName("academicInstruction")
-    val academicInstruction: String,
+    val academicInstruction: String = "",
     @SerializedName("address")
     val address: String? = "",
     @SerializedName("birthDate")
-    val birthDate: String,
+    val birthDate: String = "",
     @SerializedName("birthPlace")
-    val birthPlace: String,
+    val birthPlace: String = "",
     @SerializedName("bloodType")
-    val bloodType: String,
+    val bloodType: String = "",
     @SerializedName("createdAt")
-    val createdAt: String,
+    val createdAt: String = "",
     @SerializedName("createdById")
     val createdById: String? = "",
     @SerializedName("credentialImage")
@@ -23,25 +23,25 @@ data class GuardDataResponse(
     @SerializedName("deletedAt")
     val deletedAt: String? = "",
     @SerializedName("fullName")
-    val fullName: String,
+    val fullName: String = "",
     @SerializedName("gender")
-    val gender: String,
+    val gender: String = "",
     @SerializedName("governmentId")
-    val governmentId: String,
+    val governmentId: String = "",
     @SerializedName("guard")
-    val guard: Guard,
+    val guard: Guard = Guard(),
     @SerializedName("guardCredentials")
-    val guardCredentials: String,
-    val guardId: String,
-    val hiringContractDate: String,
+    val guardCredentials: String = "",
+    val guardId: String = "",
+    val hiringContractDate: String = "",
     @SerializedName("id")
-    val id: String,
+    val id: String = "",
     @SerializedName("importHash")
     val importHash: String? = "",
     @SerializedName("isOnDuty")
-    val isOnDuty: Boolean,
+    val isOnDuty: Boolean = false,
     @SerializedName("maritalStatus")
-    val maritalStatus: String,
+    val maritalStatus: String = "",
     @SerializedName("memos")
     val memos: List<Any?> = emptyList<Any>(),
     @SerializedName("profileImage")
@@ -51,11 +51,11 @@ data class GuardDataResponse(
     @SerializedName("requests")
     val requests: List<Any?> = emptyList<Any>(),
     @SerializedName("tenantId")
-    val tenantId: String,
+    val tenantId: String = "",
     @SerializedName("tutoriales")
     val tutoriales: List<Any?> = emptyList<Any>(),
     @SerializedName("updatedAt")
-    val updatedAt: String,
+    val updatedAt: String = "",
     @SerializedName("updatedById")
     val updatedById: String? = ""
 ){

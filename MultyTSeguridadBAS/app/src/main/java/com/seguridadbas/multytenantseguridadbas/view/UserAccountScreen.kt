@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +32,10 @@ import coil.compose.AsyncImage
 import com.seguridadbas.multytenantseguridadbas.R
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasBlue
 import com.seguridadbas.multytenantseguridadbas.ui.theme.BasYellow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview(showBackground = true)
 @Composable
 fun UserAccountScreen(
@@ -43,8 +50,22 @@ fun UserAccountScreen(
     toolbarBackgroundColor: Color = BasBlue,
     menuContainerColor: Color = Color.Transparent
 ) {
+    var isRefreshing by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = {
+            scope.launch {
+                isRefreshing = true
+                delay(2000) // Simulación de actualización de datos
+                isRefreshing = false
+            }
+        }
+    )
+
     Box(modifier = modifier.fillMaxSize()) {
-        // 3. Fondo (Misma imagen que HomeScreen, LoginScreen y SplashScreen)
+        // Fondo
         Image(
             painter = painterResource(id = R.drawable.splashscreenbackground),
             contentDescription = null,
@@ -52,132 +73,140 @@ fun UserAccountScreen(
             contentScale = ContentScale.Crop
         )
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
+                .pullRefresh(pullRefreshState)
         ) {
-            // 2. Toolbar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(toolbarBackgroundColor)
-                    .padding(horizontal = 24.dp, vertical = 20.dp)
-            ) {
-                Text(
-                    text = "Mi Cuenta",
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .statusBarsPadding()
             ) {
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // 4.1 Perfil - Avatar en contenedor cuadrado con bordes redondeados
+                // Toolbar
                 Box(
                     modifier = Modifier
-                        .size(130.dp)
-                        .border(1.dp, Color.White, RoundedCornerShape(20.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (profileImageUrl != null) {
-                        AsyncImage(
-                            model = profileImageUrl,
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier.fillMaxSize().padding(1.dp),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        // Ícono por defecto (usuario)
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_person_add),
-                            contentDescription = null,
-                            modifier = Modifier.size(90.dp),
-                            tint = BasYellow
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Nombre del usuario (blanco, bold)
-                Text(
-                    text = userName,
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                
-                // Rol (texto normal, color más tenue)
-                Text(
-                    text = userRole,
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(48.dp))
-
-                // 4.2 Menú de opciones
-                Column(
-                    modifier = Modifier
                         .fillMaxWidth()
-                        .background(menuContainerColor)
-                ) {
-                    AccountOptionItem(
-                        icon = R.drawable.ic_person,
-                        title = "Detalles de la Cuenta",
-                        description = "Nombre de usuario, cargo, etc.",
-                        onClick = onAccountDetailsClick
-                    )
-                    
-                    AccountOptionItem(
-                        icon = R.drawable.ic_settings,
-                        title = "Configuración",
-                        description = "Configure sus preferencias en notificaciones y más",
-                        onClick = onSettingsClick
-                    )
-                    
-                    AccountOptionItem(
-                        icon = R.drawable.ic_pay_money,
-                        title = "Facturación",
-                        description = "Encuentre información sobre facturación",
-                        onClick = onBillingClick
-                    )
-                }
-
-                //Spacer(modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // 5. Botón de cerrar sesión
-                Button(
-                    onClick = onLogoutClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = BasBlue // Letras azules
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+                        .background(toolbarBackgroundColor)
+                        .padding(horizontal = 24.dp, vertical = 20.dp)
                 ) {
                     Text(
-                        text = "Cerrar Sesión",
-                        fontSize = 20.sp,
+                        text = "Mi Cuenta",
+                        color = Color.White,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(40.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Perfil
+                    Box(
+                        modifier = Modifier
+                            .size(130.dp)
+                            .border(1.dp, Color.White, RoundedCornerShape(20.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (profileImageUrl != null) {
+                            AsyncImage(
+                                model = profileImageUrl,
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier.fillMaxSize().padding(1.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_person_add),
+                                contentDescription = null,
+                                modifier = Modifier.size(90.dp),
+                                tint = BasYellow
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = userName,
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Text(
+                        text = userRole,
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 16.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(48.dp))
+
+                    // Menú de opciones
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(menuContainerColor)
+                    ) {
+                        AccountOptionItem(
+                            icon = R.drawable.ic_person,
+                            title = "Detalles de la Cuenta",
+                            description = "Nombre de usuario, cargo, etc.",
+                            onClick = onAccountDetailsClick
+                        )
+                        
+                        AccountOptionItem(
+                            icon = R.drawable.ic_settings,
+                            title = "Configuración",
+                            description = "Configure sus preferencias en notificaciones y más",
+                            onClick = onSettingsClick
+                        )
+                        
+                        AccountOptionItem(
+                            icon = R.drawable.ic_pay_money,
+                            title = "Facturación",
+                            description = "Encuentre información sobre facturación",
+                            onClick = onBillingClick
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Botón de cerrar sesión
+                    Button(
+                        onClick = onLogoutClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(28.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = BasBlue
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+                    ) {
+                        Text(
+                            text = "Cerrar Sesión",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
             }
+
+            PullRefreshIndicator(
+                refreshing = isRefreshing,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 }
@@ -196,7 +225,6 @@ fun AccountOptionItem(
             .padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Ícono a la izquierda
         Icon(
             painter = painterResource(id = icon),
             contentDescription = null,
@@ -207,14 +235,12 @@ fun AccountOptionItem(
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            // Título (negro, bold)
             Text(
                 text = title,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp
             )
-            // Descripción (más tenue)
             Text(
                 text = description,
                 color = Color.White.copy(alpha = 0.6f),
@@ -222,7 +248,6 @@ fun AccountOptionItem(
             )
         }
 
-        // Flecha > a la derecha
         Icon(
             painter = painterResource(id = R.drawable.ic_chevron_forward),
             contentDescription = null,

@@ -267,7 +267,6 @@ fun SplashNavigation(
         composable<Consignas>{
             ConsignasScreen(
                 onBackClick = { navController.popBackStack() },
-                onAddTaskClick = { /* Implementar navegación a agregar tarea */ }
             )
         }
 
