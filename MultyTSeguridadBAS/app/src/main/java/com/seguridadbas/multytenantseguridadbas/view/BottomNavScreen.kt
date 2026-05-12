@@ -10,21 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
-import com.seguridadbas.multytenantseguridadbas.controllers.certifservicescontroller.CertificationServicesController
-import com.seguridadbas.multytenantseguridadbas.controllers.invoicescontroller.InvoiceController
-import com.seguridadbas.multytenantseguridadbas.controllers.postsitecontrollers.PostSiteController
-import com.seguridadbas.multytenantseguridadbas.controllers.stationscontroller.StationsController
-import com.seguridadbas.multytenantseguridadbas.controllers.tenantinvitation.TenantInvitationController
-import com.seguridadbas.multytenantseguridadbas.core.navigation.BillingListScreen
-import com.seguridadbas.multytenantseguridadbas.core.navigation.BottomNavBar
-import com.seguridadbas.multytenantseguridadbas.core.navigation.Business
-import com.seguridadbas.multytenantseguridadbas.core.navigation.GuardsScreen
-import com.seguridadbas.multytenantseguridadbas.core.navigation.GuardsShiftScreen
-import com.seguridadbas.multytenantseguridadbas.core.navigation.NavItemList
-import com.seguridadbas.multytenantseguridadbas.core.navigation.ShiftsScreen
-import com.seguridadbas.multytenantseguridadbas.core.navigation.Stations
-import com.seguridadbas.multytenantseguridadbas.core.navigation.VisitorLogsScreen
+import com.seguridadbas.multytenantseguridadbas.core.navigation.*
 
 @Composable
 fun BottonNavScreen(
@@ -33,8 +19,19 @@ fun BottonNavScreen(
 ){
     var selectedIndex by remember{ mutableStateOf(0) }
 
+    // --- NUEVAS ACCIONES DE NAVEGACIÓN ---
+    val navigateToAssignedGuards = { navController.navigate(AssignedGuardsList) }
+    val navigateToPersonalStaffing = { navController.navigate(PersonalStaffingScreen) }
+    val navigateToConsignas = { navController.navigate(Consignas) }
+    val navigateToRoundsHistory = { navController.navigate(RoundsHistoryScreen) }
+    val navigateToHelp = { navController.navigate(HelpCustomerService) }
+    val navigateToGuardDetail: (String) -> Unit = { id ->
+        navController.navigate(AssignedGuardDetails(id))
+    }
 
-    val navigateToStations: (String) -> Unit = {
+    // --- LOGICA ANTERIOR (Comentada o Desacoplada) ---
+    /*
+val navigateToStations: (String) -> Unit = {
         postSiteId ->
         navController.saveState()
         navController.navigate(Stations(postSiteId = postSiteId))
@@ -65,45 +62,60 @@ fun BottonNavScreen(
         navController.saveState()
         navController.navigate(VisitorLogsScreen)
     }
+    */
 
     Scaffold(
        modifier = Modifier.fillMaxWidth(),
         bottomBar = {
             BottomNavBar(
-                navItemList = NavItemList.navItemList,
+                navItemList = NavItemList.navItemList, // Ahora usa la lista de 3 items
                 selectedIndex = selectedIndex,
                 onItemSelected = { index -> selectedIndex = index }
             )
         }
     ){ it ->
         ContentScreen(
-            selectedIndex,
-            Modifier.padding(it),
-            navigateToStations = navigateToStations,
-            navigateToGuardsScreen = navigateToGuards,
-            navigateToGuardShiftScreen = navigateToGuardShift,
-            navigateToShiftScreen = navigateToShift,
-            navigateToBilling = navigateToBilling,
-            navigateToVisitLog = navigateToVisitLog,
-            tenantId = tenantId
+            selectedIndex = selectedIndex,
+            modifier = Modifier.padding(it),
+            tenantId = tenantId,
+            onAssignedGuardsClick = navigateToAssignedGuards,
+            onPersonalStaffingClick = navigateToPersonalStaffing,
+            onConsignasClick = navigateToConsignas,
+            onRoundsHistoryClick = navigateToRoundsHistory,
+            onHelpCustomerServiceClick = navigateToHelp,
+            onGuardClick = navigateToGuardDetail
         )
     }
 }
-
 
 @Composable
 fun ContentScreen(
     selectedIndex: Int,
     modifier: Modifier,
-    navigateToStations: (String) -> Unit = {},
-    navigateToGuardsScreen: () -> Unit = {},
-    navigateToGuardShiftScreen: () -> Unit ,
-    navigateToShiftScreen: () -> Unit,
-    navigateToBilling: () -> Unit,
-    navigateToVisitLog: () -> Unit,
-    tenantId: String
+    tenantId: String,
+    onAssignedGuardsClick: () -> Unit = {},
+    onPersonalStaffingClick: () -> Unit = {},
+    onConsignasClick: () -> Unit = {},
+    onRoundsHistoryClick: () -> Unit = {},
+    onHelpCustomerServiceClick: () -> Unit = {},
+    onGuardClick: (String) -> Unit = {}
 ){
     when(selectedIndex){
+        0 -> HomeScreen(modifier, tenantId = tenantId)
+
+        1 -> MySecurityScreen(
+            onAssignedGuardsClick = onAssignedGuardsClick,
+            onPersonalStaffingClick = onPersonalStaffingClick,
+            onConsignasClick = onConsignasClick,
+            onRoundsHistoryClick = onRoundsHistoryClick,
+            onHelpCustomerServiceClick = onHelpCustomerServiceClick,
+            onGuardClick = onGuardClick
+        )
+
+        2 -> UserAccountScreen(modifier)
+
+        // --- PESTAÑAS ANTERIORES COMENTADAS ---
+        /*
         0-> HomeScreen(Modifier, tenantId = tenantId, onBillingClicked= navigateToBilling)
 
         1 -> PostSitesScreen(Modifier, navigateToStations)
@@ -115,5 +127,6 @@ fun ContentScreen(
             navigateToGuardShiftScreen,
             navigateToShiftScreen,
             navigateToVisitLog)
+        */
     }
 }

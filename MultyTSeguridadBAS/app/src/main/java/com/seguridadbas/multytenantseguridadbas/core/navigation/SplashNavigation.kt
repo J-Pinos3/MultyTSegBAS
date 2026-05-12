@@ -1,40 +1,17 @@
 package com.seguridadbas.multytenantseguridadbas.core.navigation
 
 import android.content.Intent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.seguridadbas.multytenantseguridadbas.controllers.authcontroller.AuthController
-import com.seguridadbas.multytenantseguridadbas.controllers.billingaccountcontroller.BillingAccountController
-import com.seguridadbas.multytenantseguridadbas.view.AllGuardShiftsScreen
-import com.seguridadbas.multytenantseguridadbas.view.AllGuardsScreen
-import com.seguridadbas.multytenantseguridadbas.view.AllShiftScreen
-import com.seguridadbas.multytenantseguridadbas.view.BillingScreen
-import com.seguridadbas.multytenantseguridadbas.view.BottonNavScreen
-import com.seguridadbas.multytenantseguridadbas.view.BusinessScreen
-import com.seguridadbas.multytenantseguridadbas.view.ConsignasScreen
-import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationDetail
-import com.seguridadbas.multytenantseguridadbas.view.GuardShiftByStationScreen
-import com.seguridadbas.multytenantseguridadbas.view.GuardShiftsDetailSc
-import com.seguridadbas.multytenantseguridadbas.view.IncidentsByStationDetail
-import com.seguridadbas.multytenantseguridadbas.view.IncidentsByStationScreen
-import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationDetail
-import com.seguridadbas.multytenantseguridadbas.view.InventoryByStationScreen
-import com.seguridadbas.multytenantseguridadbas.view.LoginScreen
-import com.seguridadbas.multytenantseguridadbas.view.PatrolsByStationScreen
-import com.seguridadbas.multytenantseguridadbas.view.PostSitesScreen
-import com.seguridadbas.multytenantseguridadbas.view.StationsScreen
-import com.seguridadbas.multytenantseguridadbas.view.RegisterScreen
-import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationDetail
-import com.seguridadbas.multytenantseguridadbas.view.ReportsByStationScreen
-import com.seguridadbas.multytenantseguridadbas.view.ResetPasswordScreen
-import com.seguridadbas.multytenantseguridadbas.view.SecGuardDetail
-import com.seguridadbas.multytenantseguridadbas.view.ShiftDetailScreen
-import com.seguridadbas.multytenantseguridadbas.view.SplashScreen
-import com.seguridadbas.multytenantseguridadbas.view.VisitLogScreen
+import com.seguridadbas.multytenantseguridadbas.view.*
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
@@ -71,6 +48,43 @@ fun SplashNavigation(
         composable<ResetPasswordSc>{
             ResetPasswordScreen()
         }
+
+        // --- NUEVAS RUTAS DE NAVEGACIÓN ---
+
+        composable<AssignedGuardsList> {
+            AssignedGuardsList(
+                onBackClick = { navController.popBackStack() },
+                onGuardClick = { guardId -> navController.navigate(AssignedGuardDetails(guardId)) }
+            )
+        }
+
+        composable<AssignedGuardDetails> { backStackEntry ->
+            val guardId = backStackEntry.toRoute<AssignedGuardDetails>().guardId
+            // Usando el ID para la pantalla de detalle (Placeholder o implementación real)
+            AssignedGuardDetailsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable<PersonalStaffingScreen> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Personal Staffing Screen (Placeholder)")
+            }
+        }
+
+        composable<RoundsHistoryScreen> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Rounds History Screen (Placeholder)")
+            }
+        }
+
+        composable<HelpCustomerService> {
+            HelpCustomerService(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        // --- RUTAS ANTERIORES (Mantenidas para compatibilidad) ---
 
         composable <Stations>{ backStackEntry ->
             val postSiteId = backStackEntry.toRoute<Stations>()

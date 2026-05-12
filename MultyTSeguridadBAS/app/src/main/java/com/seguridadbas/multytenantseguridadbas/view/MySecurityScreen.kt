@@ -50,10 +50,16 @@ data class GuardiaEnServicio(
     val idNumber: String
 )
 
-@Preview(showSystemUi = true)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun MySecurityScreen() {
+fun MySecurityScreen(
+    onAssignedGuardsClick: () -> Unit = {},
+    onPersonalStaffingClick: () -> Unit = {},
+    onConsignasClick: () -> Unit = {},
+    onRoundsHistoryClick: () -> Unit = {},
+    onHelpCustomerServiceClick: () -> Unit = {},
+    onGuardClick: (String) -> Unit = {}
+) {
     val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
 
@@ -125,13 +131,19 @@ fun MySecurityScreen() {
                     MainImageCard(imageUrl = "https://via.placeholder.com/600x300")
 
                     // Card "Guardia en turno" con scroll horizontal funcional
-                    GuardiaEnTurnoCard(guardiasList)
+                    GuardiaEnTurnoCard(guardiasList, onGuardClick)
 
                     // Card "Incidentes recientes" con scroll horizontal funcional
                     IncidentesRecientesCard(incidentesList)
 
                     // Card "Acciones rápidas"
-                    AccionesRapidasCard()
+                    AccionesRapidasCard(
+                        onAssignedGuardsClick = onAssignedGuardsClick,
+                        onPersonalStaffingClick = onPersonalStaffingClick,
+                        onConsignasClick = onConsignasClick,
+                        onRoundsHistoryClick = onRoundsHistoryClick,
+                        onHelpCustomerServiceClick = onHelpCustomerServiceClick
+                    )
 
                     Spacer(modifier = Modifier.height(80.dp))
                 }
@@ -167,7 +179,7 @@ fun MainImageCard(imageUrl: String) {
 }
 
 @Composable
-fun GuardiaEnTurnoCard(guardias: List<GuardiaEnServicio>) {
+fun GuardiaEnTurnoCard(guardias: List<GuardiaEnServicio>, onGuardClick: (String) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -192,7 +204,8 @@ fun GuardiaEnTurnoCard(guardias: List<GuardiaEnServicio>) {
                         isActive = guardia.isActive,
                         gender = guardia.gender,
                         station = guardia.station,
-                        idNumber = guardia.idNumber
+                        idNumber = guardia.idNumber,
+                        modifier = Modifier.clickable { onGuardClick(guardia.idNumber) }
                     )
                 }
             }
@@ -206,10 +219,11 @@ fun GuardiaItem(
     isActive: Boolean = true,
     gender: String,
     station: String,
-    idNumber: String
+    idNumber: String,
+    modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .width(170.dp)
             .wrapContentHeight(),
         shape = RoundedCornerShape(20.dp),
@@ -385,7 +399,13 @@ fun IncidenteItem(text: String) {
 }
 
 @Composable
-fun AccionesRapidasCard() {
+fun AccionesRapidasCard(
+    onAssignedGuardsClick: () -> Unit,
+    onPersonalStaffingClick: () -> Unit,
+    onConsignasClick: () -> Unit,
+    onRoundsHistoryClick: () -> Unit,
+    onHelpCustomerServiceClick: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -402,18 +422,19 @@ fun AccionesRapidasCard() {
                 fontSize = 13.sp
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickActionItem(Modifier.weight(1f), "Guardias Asignados", R.drawable.ic_groups)
-                QuickActionItem(Modifier.weight(1f), "Dotación del Personal", R.drawable.ic_business)
+                QuickActionItem(Modifier.weight(1f), "Guardias Asignados", R.drawable.ic_groups, onClick = onAssignedGuardsClick)
+                QuickActionItem(Modifier.weight(1f), "Dotación del Personal", R.drawable.ic_business, onClick = onPersonalStaffingClick)
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickActionItem(Modifier.weight(1f), "Consignas", R.drawable.ic_orders)
-                QuickActionItem(Modifier.weight(1f), "Historial de Rondas", R.drawable.ic_tracking)
+                QuickActionItem(Modifier.weight(1f), "Consignas", R.drawable.ic_orders, onClick = onConsignasClick)
+                QuickActionItem(Modifier.weight(1f), "Historial de Rondas", R.drawable.ic_tracking, onClick = onRoundsHistoryClick)
             }
             Row(modifier = Modifier.fillMaxWidth()) {
                 QuickActionItem(
                     modifier = Modifier.fillMaxWidth(0.485f),
                     title = "Contactar al Servicio al Cliente",
-                    iconRes = R.drawable.ic_person
+                    iconRes = R.drawable.ic_person,
+                    onClick = onHelpCustomerServiceClick
                 )
             }
         }
@@ -421,9 +442,9 @@ fun AccionesRapidasCard() {
 }
 
 @Composable
-fun QuickActionItem(modifier: Modifier = Modifier, title: String, iconRes: Int) {
+fun QuickActionItem(modifier: Modifier = Modifier, title: String, iconRes: Int, onClick: () -> Unit) {
     Card(
-        modifier = modifier.height(110.dp).clickable { },
+        modifier = modifier.height(110.dp).clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = ActionCardAlpha),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))

@@ -189,9 +189,11 @@ fun HomeScreen(
 
     // Carga inicial
     LaunchedEffect(currentTenantId) {
-        isLoading = true
-        loadAllData()
-        isLoading = false
+        if( servicesList.isEmpty() || certificationsList.isEmpty() ){
+            isLoading = true
+            loadAllData()
+            isLoading = false
+        }
     }
 
     // Estado de pull refresh usando la API oficial de Compose
