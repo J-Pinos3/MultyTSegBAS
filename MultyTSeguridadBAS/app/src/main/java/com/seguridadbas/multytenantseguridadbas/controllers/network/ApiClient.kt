@@ -22,6 +22,12 @@ import retrofit2.http.Query
 
 interface ApiClient {
 
+    @GET("/customer/me/account")
+    suspend fun getMeCustomerAccountApi(
+        @Header("Authorization") auth_token: String
+    ): Response<JsonObject>
+
+
     @POST("auth/sign-up")
     suspend fun signUpApi(@Body user: User): Response<ResponseBody>
 
