@@ -2,6 +2,7 @@
 
 package com.seguridadbas.multytenantseguridadbas.controllers.customercontrollers
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -30,6 +31,12 @@ class AuthenticateCustomerController @Inject constructor(
 
             if (response.isSuccessful) {
                 val jsonBody = response.body()
+                val cleanJson = jsonBody?.toString()?.trim()?.replace("\uFEFF", "") // Remover BOM
+
+
+                Log.d("API_RESPONSE", "Raw JSON: $cleanJson") // Ver los caracteres exactos
+                Log.d("API_RESPONSE", "First char code: ${cleanJson?.firstOrNull()?.code}")
+
                 if (jsonBody != null) {
                     val authenticateMeCustResponse = parseAuthenticateMeCustResponse(jsonBody)
                     Resource.Success(authenticateMeCustResponse)
@@ -44,7 +51,7 @@ class AuthenticateCustomerController @Inject constructor(
                         .get("message")
                         ?.asString ?: "Error desconocido"
                 } catch (e: Exception) {
-                    "Error desconocido"
+                    e.toString()
                 }
                 Resource.Error(errorMessage)
             }

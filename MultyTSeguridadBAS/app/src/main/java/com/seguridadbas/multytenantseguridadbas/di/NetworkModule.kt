@@ -2,6 +2,7 @@ package com.seguridadbas.multytenantseguridadbas.di
 
 import android.content.Context
 import android.icu.util.TimeUnit
+import com.google.gson.GsonBuilder
 import com.seguridadbas.multytenantseguridadbas.controllers.network.ApiClient
 import com.seguridadbas.multytenantseguridadbas.controllers.network.LiveNetworkMonitor
 import com.seguridadbas.multytenantseguridadbas.controllers.network.NetworkMonitor
@@ -41,9 +42,13 @@ object NetworkModule {
             .addInterceptor( NetworkMonitorInterceptor(liveNetworkMonitor) )
             .build()
 
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
+
         return Retrofit.Builder()
             .baseUrl("https://api.cguardpro.com/api/")
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory .create(gson))
             .client(monitorClient)
             .build()
     }

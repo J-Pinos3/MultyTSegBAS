@@ -15,10 +15,10 @@ data class AuthenticateMeCustResponse (
 
 data class PostSitesCust(
     @SerializedName("address")
-    val address: String? = null.toString(),
+    val address: String? = "",
 
     @SerializedName("city")
-    val city: String? = null.toString(),
+    val city: String? = "",
 
     @SerializedName("stations")
     val stations: List<StationsCust> = emptyList()
@@ -26,17 +26,17 @@ data class PostSitesCust(
 
 data class StationsCust(
     @SerializedName("stationName")
-    val stationName: String? = null.toString(),
+    val stationName: String? = "",
 )
 
 
 data class ClientAccountCust(
     @SerializedName("id")
-    val id: String? = null.toString(),
+    val id: String? = "",
 
     @SerializedName("name")
-    val name: String? = null.toString(),
+    val name: String? = "",
 
     @SerializedName("email")
-    val email:String? = null.toString(),
+    val email:String? = "",
 )
